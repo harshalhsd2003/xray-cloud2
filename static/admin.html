@@ -331,12 +331,19 @@ async function doLogin(){
       return;
     }
 
-    localStorage.setItem("xray_token", data.access_token);
+    // IMPORTANT: store token first
+    TOKEN = data.access_token;
+    localStorage.setItem("xray_token", TOKEN);
+
+    console.log("TOKEN:", TOKEN);  // debug
+
+    // THEN start app
     showApp();
 
   } catch(e){
     err.innerText = "Server unreachable";
   }
+
 }
 
 function logout(){
