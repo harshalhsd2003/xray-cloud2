@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>XRay Scanner — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --safe:#00ff41; --danger:#ff1744; --accent:#00d4ff;
+  --bg:#0a0e17; --panel:#141928; --border:#2a3446; --text:#cdd6f4;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:sans-serif;min-height:100vh;}
+
+/* LOGIN */
+#login-screen{
+  display:flex;align-items:center;justify-content:center;
+  min-height:100vh;background:var(--bg);
+}
+.login-box{
+  background:var(--panel);border:1px solid var(--border);border-radius:12px;
+  padding:36px 32px;width:320px;text-align:center;
+}
+.login-box h2{font-family:'Orbitron';color:var(--accent);margin-bottom:24px;font-size:16px;}
+.input{
+  width:100%;background:#0d1420;border:1px solid var(--border);border-radius:6px;
+  color:var(--text);padding:10px 12px;font-size:14px;margin-bottom:12px;outline:none;
+}
+.input:focus{border-color:var(--accent);}
+.btn{
+  width:100%;background:var(--accent);color:#000;border:none;border-radius:6px;
+  padding:11px;font-weight:700;font-family:'Orbitron';font-size:12px;cursor:pointer;
+}
+.btn:hover{background:#00b8d9;}
+.btn-red{background:var(--danger);color:#fff;}
+.btn-sm{
+  background:var(--accent);color:#000;border:none;border-radius:5px;
+  padding:5px 12px;font-weight:700;font-size:11px;cursor:pointer;font-family:'Orbitron';
+}
+#login-err{color:var(--danger);font-size:12px;margin-top:8px;min-height:18px;}
+
+/* MAIN APP */
+#app{display:none;}
+.header{
+  height:50px;background:#000;border-bottom:1px solid var(--border);
+  padding:0 18px;display:flex;align-items:center;justify-content:space-between;
+  font-family:'Orbitron';color:var(--accent);font-size:14px;position:sticky;top:0;z-index:100;
+}
+.hdr-right{display:flex;align-items:center;gap:16px;font-size:11px;}
+#conn-badge{
+  padding:3px 9px;border-radius:10px;font-size:10px;font-weight:700;font-family:'Orbitron';
+}
+.connected{background:#00ff4122;color:var(--safe);border:1px solid var(--safe);}
+.disconnected{background:#ff174422;color:var(--danger);border:1px solid var(--danger);}
+
+/* TABS */
+.tabs{display:flex;border-bottom:1px solid var(--border);background:#000;}
+.tab{
+  padding:12px 24px;cursor:pointer;font-size:13px;font-family:'Orbitron';
+  color:#555;border-bottom:2px solid transparent;transition:all .2s;
+}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+
+/* PANELS */
+.tab-panel{display:none;padding:16px;}
+.tab-panel.active{display:block;}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.card{
+  background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px;
+}
+.card h4{font-family:'Orbitron';font-size:11px;color:var(--accent);margin-bottom:12px;}
+
+/* STATUS BADGES */
+.badge{
+  padding:6px 10px;border-radius:6px;font-size:12px;font-weight:700;
+  text-align:center;flex:1;
+}
+.badge.on{background:var(--safe);color:#000;}
+.badge.off{background:var(--danger);color:#fff;}
+.badge-row{display:flex;gap:8px;flex-wrap:wrap;}
+
+/* SETTINGS CONTROLS */
+.setting-row{
+  display:grid;grid-template-columns:130px 1fr 50px;
+  align-items:center;gap:10px;font-size:13px;margin-bottom:10px;
+}
+.vbox{
+  font-family:monospace;background:#000;text-align:center;
+  border-radius:4px;padding:3px;color:var(--accent);font-size:13px;
+}
+input[type=range]{accent-color:var(--accent);width:100%;}
+
+/* LIVE FEED */
+.feed-wrap{
+  background:#000;border-radius:10px;overflow:hidden;position:relative;
+  aspect-ratio:16/9;max-height:65vh;display:flex;align-items:center;justify-content:center;
+}
+#feed-canvas{width:100%;height:100%;object-fit:contain;background:#000;}
+#feed-overlay{
+  position:absolute;inset:0;display:none;align-items:center;justify-content:center;
+  background:rgba(255,0,0,.2);animation:pulse 1s infinite;
+}
+@keyframes pulse{0%,100%{background:rgba(255,0,0,.2);}50%{background:rgba(255,0,0,.35);}}
+.prohibited{
+  font-size:clamp(18px,3vw,36px);font-weight:900;border:4px solid #ff1744;
+  padding:12px 28px;background:rgba(255,0,0,.3);font-family:'Orbitron';color:#fff;
+}
+#no-stream{color:#333;font-family:'Orbitron';font-size:14px;}
+
+/* STATS */
+.stat-num{font-family:'Orbitron';font-size:26px;font-weight:700;color:var(--accent);}
+.stat-lbl{font-size:11px;color:#555;margin-top:4px;}
+
+/* DETECTION LOG */
+.det-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+  gap:12px;margin-top:12px;
+}
+.det-card{
+  background:var(--panel);border:1px solid var(--border);border-radius:8px;overflow:hidden;
+  cursor:pointer;transition:border-color .2s;
+}
+.det-card:hover{border-color:var(--accent);}
+.det-card img{width:100%;aspect-ratio:4/3;object-fit:cover;background:#000;}
+.det-card .det-info{padding:8px 10px;}
+.det-class{color:var(--accent);font-weight:700;font-size:13px;}
+.det-meta{color:#555;font-size:11px;margin-top:2px;}
+
+/* MODAL */
+#modal{
+  position:fixed;inset:0;background:rgba(0,0,0,.88);
+  display:none;align-items:center;justify-content:center;z-index:9999;flex-direction:column;gap:10px;
+}
+#modal img{max-width:90%;max-height:75vh;border:2px solid var(--accent);border-radius:8px;}
+.modal-info{color:var(--text);font-size:13px;text-align:center;background:rgba(0,0,0,.5);padding:6px 14px;border-radius:6px;}
+.modal-close{position:absolute;top:14px;right:18px;color:#fff;font-size:28px;cursor:pointer;}
+
+/* ALERT TOAST */
+#toast{
+  position:fixed;bottom:20px;right:20px;
+  background:#ff1744;color:#fff;padding:12px 18px;border-radius:8px;
+  font-weight:700;font-size:13px;display:none;z-index:99999;
+  animation:slideIn .3s ease;
+}
+@keyframes slideIn{from{transform:translateY(30px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+
+/* RESPONSIVE */
+@media(max-width:640px){
+  .grid2,.grid3{grid-template-columns:1fr;}
+  .setting-row{grid-template-columns:100px 1fr 44px;}
+  .tab{padding:10px 14px;font-size:11px;}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <h2>🔒 XRAY SCANNER<br>ADMIN LOGIN</h2>
+    <input class="input" id="u" type="text" placeholder="Username" value="admin">
+    <input class="input" id="p" type="password" placeholder="Password">
+    <button class="btn" onclick="doLogin()">LOGIN</button>
+    <div id="login-err"></div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app">
+  <div class="header">
+    <span>📡 XRAY SCANNER — ADMIN</span>
+    <div class="hdr-right">
+      <span id="conn-badge" class="disconnected">PC OFFLINE</span>
+      <span id="hdr-time"></span>
+      <button class="btn-sm btn-red" onclick="logout()">LOGOUT</button>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('live')">📹 LIVE FEED</div>
+    <div class="tab" onclick="switchTab('controls')">⚙️ CONTROLS</div>
+    <div class="tab" onclick="switchTab('log')">📋 DETECTION LOG</div>
+    <div class="tab" onclick="switchTab('stats')">📊 STATS</div>
+  </div>
+
+  <!-- LIVE FEED TAB -->
+  <div id="tab-live" class="tab-panel active">
+    <div class="feed-wrap" id="feed-wrap">
+      <canvas id="feed-canvas"></canvas>
+      <div id="feed-overlay">
+        <div class="prohibited">⚠ PROHIBITED ITEM</div>
+      </div>
+      <div id="no-stream">NO STREAM — PC OFFLINE</div>
+    </div>
+    <div style="margin-top:10px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <div id="badge-main"  class="badge off" style="max-width:140px">STATUS: --</div>
+      <div id="badge-gate"  class="badge off" style="max-width:120px">GATE: --</div>
+      <div id="badge-belt"  class="badge off" style="max-width:130px">BELT: --</div>
+      <div id="badge-buzzer"class="badge off" style="max-width:120px">BUZ: --</div>
+      <span id="fps-lbl" style="font-family:monospace;font-size:12px;color:#444;margin-left:auto"></span>
+    </div>
+  </div>
+
+  <!-- CONTROLS TAB -->
+  <div id="tab-controls" class="tab-panel">
+    <div class="grid2">
+      <div class="card">
+        <h4>DETECTION SETTINGS</h4>
+        <div class="setting-row">
+          <label>Confidence</label>
+          <input type="range" id="th" min="0.1" max="1" step="0.05" value="0.80" oninput="previewSetting('th','th-val',parseFloat(this.value).toFixed(2))">
+          <span id="th-val" class="vbox">0.80</span>
+        </div>
+        <div class="setting-row">
+          <label>Confirm Frames</label>
+          <input type="range" id="cf" min="1" max="30" step="1" value="12" oninput="previewSetting('cf','cf-val',this.value)">
+          <span id="cf-val" class="vbox">12</span>
+        </div>
+        <div class="setting-row">
+          <label>Camera</label>
+          <select id="cam-sel" style="background:#0d1420;border:1px solid var(--border);border-radius:5px;color:var(--text);padding:5px 8px;font-size:13px">
+            <option value="0">Camera 0</option>
+            <option value="1">Camera 1</option>
+            <option value="2">Camera 2</option>
+            <option value="3">Camera 3</option>
+          </select>
+          <div></div>
+        </div>
+        <button class="btn" style="margin-top:6px" onclick="applySettings()">APPLY TO SYSTEM</button>
+        <div id="settings-msg" style="font-size:11px;color:var(--safe);margin-top:6px;min-height:16px"></div>
+      </div>
+
+      <div class="card">
+        <h4>CURRENT SYSTEM SETTINGS</h4>
+        <div id="live-settings" style="font-family:monospace;font-size:13px;line-height:2;color:#888">
+          Loading...
+        </div>
+        <button class="btn" style="margin-top:12px;background:#1e2535;color:var(--accent)" onclick="loadSettings()">↻ REFRESH</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOG TAB -->
+  <div id="tab-log" class="tab-panel">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+      <input id="log-filter" class="input" style="width:200px;margin:0" placeholder="Filter by class...">
+      <div style="display:flex;gap:8px">
+        <button class="btn-sm" onclick="loadLog(1)">↻ REFRESH</button>
+        <a id="export-btn" href="#" onclick="exportCSV(event)" class="btn-sm" style="text-decoration:none;display:inline-flex;align-items:center">⬇ EXPORT CSV</a>
+      </div>
+    </div>
+    <div id="det-grid" class="det-grid">
+      <div style="color:#444;font-size:13px;padding:20px">Loading detections...</div>
+    </div>
+    <div style="display:flex;justify-content:center;gap:10px;margin-top:16px">
+      <button class="btn-sm" id="prev-btn" onclick="changePage(-1)" style="display:none">◀ PREV</button>
+      <span id="page-info" style="font-size:12px;color:#555;align-self:center"></span>
+      <button class="btn-sm" id="next-btn" onclick="changePage(1)" style="display:none">NEXT ▶</button>
+    </div>
+  </div>
+
+  <!-- STATS TAB -->
+  <div id="tab-stats" class="tab-panel">
+    <div class="grid3">
+      <div class="card" style="text-align:center">
+        <div class="stat-num" id="s-total">-</div>
+        <div class="stat-lbl">TOTAL DETECTIONS</div>
+      </div>
+      <div class="card" style="text-align:center">
+        <div class="stat-num" id="s-today">-</div>
+        <div class="stat-lbl">TODAY</div>
+      </div>
+      <div class="card" style="text-align:center">
+        <div class="stat-num" id="s-classes">-</div>
+        <div class="stat-lbl">UNIQUE CLASSES</div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:14px">
+      <h4>RECENT ACTIVITY</h4>
+      <div id="recent-list" style="font-size:12px;line-height:2;color:#666">Loading...</div>
+    </div>
+  </div>
+</div>
+
+<!-- IMAGE MODAL -->
+<div id="modal" onclick="closeModal()">
+  <span class="modal-close">✕</span>
+  <img id="modal-img" src="">
+  <div class="modal-info" id="modal-info"></div>
+</div>
+
+<!-- DANGER TOAST -->
+<div id="toast">⚠ DANGER DETECTED!</div>
+
+<script>
+const API = window.location.origin;
+let TOKEN = localStorage.getItem("xray_token") || "";
+let ws = null;
+let currentPage = 1;
+let filterClass = "";
+let totalDetections = [];
+
+// ── AUTH ──────────────────────────────────────────────────────────────────────
+async function doLogin(){
+  const u = document.getElementById("u").value;
+  const p = document.getElementById("p").value;
+  const err = document.getElementById("login-err");
+  try {
+    const fd = new FormData();
+    fd.append("username", u);
+    fd.append("password", p);
+    const res = await fetch(`${API}/api/admin/login`, {method:"POST", body:fd});
+    if(!res.ok){ err.innerText = "Wrong credentials"; return; }
+    const d = await res.json();
+    TOKEN = d.access_token;
+    localStorage.setItem("xray_token", TOKEN);
+    err.innerText = "";
+    showApp();
+  } catch(e){ err.innerText = "Server unreachable"; }
+}
+
+function logout(){
+  TOKEN = "";
+  localStorage.removeItem("xray_token");
+  document.getElementById("app").style.display = "none";
+  document.getElementById("login-screen").style.display = "flex";
+  if(ws) ws.close();
+}
+
+// ── STARTUP ───────────────────────────────────────────────────────────────────
+function showApp(){
+  document.getElementById("login-screen").style.display = "none";
+  document.getElementById("app").style.display = "block";
+  connectWS();
+  loadSettings();
+  loadLog(1);
+  loadStats();
+  setInterval(updateClock, 1000);
+  setInterval(loadStats, 30000);
+}
+
+// Auto-login if token exists
+window.onload = () => {
+  document.getElementById("p").addEventListener("keydown", e => { if(e.key==="Enter") doLogin(); });
+  if(TOKEN) showApp();
+};
+
+// ── WEBSOCKET ─────────────────────────────────────────────────────────────────
+function connectWS(){
+  if(ws) ws.close();
+  const wsProto = location.protocol === "https:" ? "wss" : "ws";
+  const wsUrl = `${wsProto}://${location.host}/api/stream/watch?token=${TOKEN}`;
+  ws = new WebSocket(wsUrl);
+  ws.binaryType = "arraybuffer";
+
+  ws.onopen = () => {
+    setConnected(true);
+  };
+
+  ws.onclose = () => {
+    setConnected(false);
+    // Reconnect after 5s
+    setTimeout(connectWS, 5000);
+  };
+
+  ws.onmessage = (ev) => {
+    if(ev.data instanceof ArrayBuffer){
+      // JPEG frame from PC
+      renderFrame(ev.data);
+    } else {
+      try {
+        const msg = JSON.parse(ev.data);
+        handleEvent(msg);
+      } catch(e){}
+    }
+  };
+}
+
+function setConnected(c){
+  const b = document.getElementById("conn-badge");
+  b.innerText = c ? "PC ONLINE" : "PC OFFLINE";
+  b.className = c ? "connected" : "disconnected";
+  document.getElementById("no-stream").style.display = c ? "none" : "block";
+}
+
+// ── LIVE FRAME RENDER ─────────────────────────────────────────────────────────
+function renderFrame(buf){
+  const canvas = document.getElementById("feed-canvas");
+  const blob = new Blob([buf], {type:"image/jpeg"});
+  const url = URL.createObjectURL(blob);
+  const img = new Image();
+  img.onload = () => {
+    canvas.width = img.width;
+    canvas.height = img.height;
+    canvas.getContext("2d").drawImage(img, 0, 0);
+    URL.revokeObjectURL(url);
+    document.getElementById("no-stream").style.display = "none";
+  };
+  img.src = url;
+}
+
+// ── EVENTS ────────────────────────────────────────────────────────────────────
+function handleEvent(msg){
+  if(msg.type === "new_detection"){
+    showToast(`⚠ DANGER: ${msg.class_name}`);
+    loadLog(1);
+    loadStats();
+  }
+  if(msg.type === "status_update"){
+    updateBadges(msg.status);
+    if(msg.fps !== undefined){
+      document.getElementById("fps-lbl").innerText = msg.fps.toFixed(1) + " fps";
+    }
+  }
+  if(msg.type === "settings_update"){
+    applySettingsDisplay(msg);
+  }
+}
+
+function updateBadges(st){
+  if(!st) return;
+  badgeSet("badge-main",  "STATUS: "+st.main,   st.main);
+  badgeSet("badge-gate",  "GATE: "+st.gate,      st.gate);
+  badgeSet("badge-belt",  "BELT: "+st.belt,      st.belt);
+  badgeSet("badge-buzzer","BUZ: "+st.buzzer,     st.buzzer);
+  const overlay = document.getElementById("feed-overlay");
+  if(overlay) overlay.style.display = st.main === "DANGER" ? "flex" : "none";
+}
+
+function badgeSet(id, text, val){
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.innerText = text;
+  const on = ["OPEN","RUNNING","ON","SAFE"].includes(val);
+  el.className = "badge " + (on ? "on" : "off");
+}
+
+// ── SETTINGS ──────────────────────────────────────────────────────────────────
+function previewSetting(sliderId, valId, val){
+  document.getElementById(valId).innerText = val;
+}
+
+async function loadSettings(){
+  try {
+    const res = await authFetch("/api/settings/");
+    const d = await res.json();
+    document.getElementById("th").value = d.confidence_threshold;
+    document.getElementById("th-val").innerText = parseFloat(d.confidence_threshold).toFixed(2);
+    document.getElementById("cf").value = d.confirm_frames;
+    document.getElementById("cf-val").innerText = d.confirm_frames;
+    document.getElementById("cam-sel").value = d.camera_index;
+    applySettingsDisplay(d);
+  } catch(e){}
+}
+
+function applySettingsDisplay(d){
+  document.getElementById("live-settings").innerHTML =
+    `Confidence: <span style="color:var(--accent)">${parseFloat(d.confidence_threshold||d.confidence_threshold).toFixed(2)}</span><br>
+     Confirm Frames: <span style="color:var(--accent)">${d.confirm_frames}</span><br>
+     Camera Index: <span style="color:var(--accent)">${d.camera_index}</span>`;
+}
+
+async function applySettings(){
+  const body = {
+    confidence_threshold: parseFloat(document.getElementById("th").value),
+    confirm_frames:       parseInt(document.getElementById("cf").value),
+    camera_index:         parseInt(document.getElementById("cam-sel").value)
+  };
+  try {
+    const res = await authFetch("/api/settings/update", {
+      method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(body)
+    });
+    const d = await res.json();
+    const msg = document.getElementById("settings-msg");
+    msg.innerText = "✓ Applied to system";
+    setTimeout(() => msg.innerText = "", 3000);
+    applySettingsDisplay(d.settings);
+  } catch(e){}
+}
+
+// ── DETECTION LOG ─────────────────────────────────────────────────────────────
+async function loadLog(page){
+  currentPage = page;
+  filterClass = document.getElementById("log-filter").value.toLowerCase();
+  try {
+    const res = await authFetch(`/api/detections/list?page=${page}&limit=30`);
+    const data = await res.json();
+    renderLog(data);
+  } catch(e){}
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const f = document.getElementById("log-filter");
+  if(f) f.oninput = () => loadLog(1);
+});
+
+function renderLog(data){
+  const grid = document.getElementById("det-grid");
+  const filtered = filterClass ? data.filter(d => d.class_name.toLowerCase().includes(filterClass)) : data;
+
+  if(!filtered.length){
+    grid.innerHTML = `<div style="color:#444;font-size:13px;padding:20px">No detections found</div>`;
+    return;
+  }
+
+  grid.innerHTML = filtered.map(d => {
+    const imgSrc = d.image_url || "/static/no-image.png";
+    const conf = d.conf ? `conf ${parseFloat(d.conf).toFixed(2)}` : "";
+    return `
+    <div class="det-card" onclick="openModal('${imgSrc}','${d.class_name} | ${d.time_hms} ${d.date_dmy} | cam ${d.camera_idx}')">
+      <img src="${imgSrc}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22/>'">
+      <div class="det-info">
+        <div class="det-class">${d.class_name}</div>
+        <div class="det-meta">${d.time_hms} &nbsp;${d.date_dmy}</div>
+        <div class="det-meta" style="color:#444">${conf} &nbsp;cam ${d.camera_idx}</div>
+      </div>
+    </div>`;
+  }).join("");
+
+  document.getElementById("prev-btn").style.display = currentPage > 1 ? "block" : "none";
+  document.getElementById("next-btn").style.display = data.length === 30 ? "block" : "none";
+  document.getElementById("page-info").innerText = `Page ${currentPage}`;
+}
+
+function changePage(dir){
+  loadLog(currentPage + dir);
+}
+
+async function exportCSV(e){
+  e.preventDefault();
+  const res = await authFetch("/api/detections/export");
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = "detections.csv"; a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ── STATS ─────────────────────────────────────────────────────────────────────
+async function loadStats(){
+  try {
+    const res = await authFetch("/api/detections/list?page=1&limit=100");
+    const data = await res.json();
+    document.getElementById("s-total").innerText = data.length < 100 ? data.length : "100+";
+    const today = new Date().toLocaleDateString("en-GB").replace(/\//g,"/");
+    document.getElementById("s-today").innerText = data.filter(d => d.date_dmy === today).length;
+    const classes = [...new Set(data.map(d => d.class_name))];
+    document.getElementById("s-classes").innerText = classes.length;
+    document.getElementById("recent-list").innerHTML =
+      data.slice(0, 10).map(d =>
+        `<span style="color:var(--accent)">${d.class_name}</span> — ${d.time_hms} ${d.date_dmy} — cam ${d.camera_idx}<br>`
+      ).join("");
+  } catch(e){}
+}
+
+// ── TABS ──────────────────────────────────────────────────────────────────────
+function switchTab(name){
+  document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+  document.getElementById("tab-"+name).classList.add("active");
+  event.target.classList.add("active");
+}
+
+// ── MODAL ─────────────────────────────────────────────────────────────────────
+function openModal(src, info){
+  document.getElementById("modal-img").src = src;
+  document.getElementById("modal-info").innerText = info;
+  document.getElementById("modal").style.display = "flex";
+}
+function closeModal(){ document.getElementById("modal").style.display = "none"; }
+document.addEventListener("keydown", e => { if(e.key === "Escape") closeModal(); });
+
+// ── TOAST ─────────────────────────────────────────────────────────────────────
+function showToast(msg){
+  const t = document.getElementById("toast");
+  t.innerText = msg;
+  t.style.display = "block";
+  setTimeout(() => t.style.display = "none", 4000);
+}
+
+// ── UTILS ─────────────────────────────────────────────────────────────────────
+function updateClock(){
+  document.getElementById("hdr-time").innerText = new Date().toLocaleTimeString();
+}
+
+async function authFetch(url, opts = {}){
+  opts.headers = {...(opts.headers||{}), "Authorization": `Bearer ${TOKEN}`};
+  const res = await fetch(API + url, opts);
+  if(res.status === 401){ logout(); throw new Error("Unauthorized"); }
+  return res;
+}
+</script>
+</body>
+</html>
