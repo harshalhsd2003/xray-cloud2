@@ -26,7 +26,15 @@ class ConnectionManager:
 
     async def connect_pc(self, ws: WebSocket):
         await ws.accept()
-        self.pc_socket = ws
+
+    # close previous PC connection if exists
+    if self.pc_socket:
+        try:
+            await self.pc_socket.close()    
+        except:
+            pass
+
+    self.pc_socket = ws
 
     def disconnect_pc(self):
         self.pc_socket = None

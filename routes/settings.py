@@ -45,15 +45,18 @@ async def update_settings(
 
     # Push new settings to all connected clients + PC
     from routes.stream import manager
-    await manager.broadcast_event({
-        "type":                  "settings_update",
-        "confidence_threshold":  s.confidence_threshold,
-        "confirm_frames":        s.confirm_frames,
-        "camera_index":          s.camera_index
-    })
+    # send to scanner PC
+    await manager.send_command_to_pc({
+    "type": "settings_update",
+    "confidence_threshold": s.confidence_threshold,
+    "confirm_frames": s.confirm_frames,
+    "camera_index": s.camera_index
+})
 
-    return {"status": "ok", "settings": {
-        "confidence_threshold": s.confidence_threshold,
-        "confirm_frames":       s.confirm_frames,
-        "camera_index":         s.camera_index
-    }}
+    # also notify dashboard
+    await manager.broadcast_event({
+    "type": "settings_update",
+    "confidence_threshold": s.confidence_threshold,
+    "confirm_frames": s.confirm_frames,
+    "camera_index": s.camera_index
+})
