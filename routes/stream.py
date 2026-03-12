@@ -119,20 +119,34 @@ async def pc_websocket(ws: WebSocket, token: str = Query(...)):
 
     await manager.connect_pc(ws)
 
+    print("[WS] Scanner PC connected")
+
     try:
         while True:
 
             data = await ws.receive()
 
-            # Video frame
-            if "bytes" in data:
-                await manager.broadcast_frame(data["bytes"])
+            # --- VIDEO FRAME ---
+            frame = data.get("bytes") or data.get("binary")
 
-            # Status JSON
-            elif "text" in data:
-                await manager.broadcast_event(json.loads(data["text"]))
+            if frame:
+                print("Frame received:", len(frame))
+                await manager.broadcast_frame(frame)
+                continue
+
+            # --- JSON MESSAGE ---
+            text = data.get("text")
+
+            if text:
+                try:
+                    msg = json.loads(text)
+                    await manager.broadcast_event(msg)
+                except Exception as e:
+                    print("JSON parse error:", e)
 
     except WebSocketDisconnect:
+
+        print("[WS] Scanner PC disconnected")
         manager.disconnect_pc()
 
 
