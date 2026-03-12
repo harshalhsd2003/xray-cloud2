@@ -14,9 +14,10 @@
 body{background:var(--bg);color:var(--text);font-family:sans-serif;min-height:100vh;}
 
 .grid-responsive{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-gap:16px;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:16px;
+  width:100%;
 }
 
 /* LOGIN */
@@ -147,6 +148,25 @@ input[type=range]{accent-color:var(--accent);width:100%;}
 </head>
 <body>
 
+<div class="grid-responsive">
+
+  <div class="card">
+    <h4>Total Detections</h4>
+    <div id="s-total">0</div>
+  </div>
+
+  <div class="card">
+    <h4>Today</h4>
+    <div id="s-today">0</div>
+  </div>
+
+  <div class="card">
+    <h4>Unique Classes</h4>
+    <div id="s-classes">0</div>
+  </div>
+
+</div>
+
 <!-- LOGIN -->
 <div id="login-screen">
   <div class="login-box">
@@ -170,7 +190,6 @@ input[type=range]{accent-color:var(--accent);width:100%;}
   </div>
 
   <div class="tabs">
-    <div class="tab active" onclick="switchTab('live')">📹 LIVE FEED</div>
     <div class="tab" onclick="switchTab('controls')">⚙️ CONTROLS</div>
     <div class="tab" onclick="switchTab('log')">📋 DETECTION LOG</div>
     <div class="tab" onclick="switchTab('stats')">📊 STATS</div>
@@ -212,25 +231,6 @@ input[type=range]{accent-color:var(--accent);width:100%;}
         </div>
         <button class="btn" style="margin-top:12px;background:#1e2535;color:var(--accent)" onclick="loadSettings()">↻ REFRESH</button>
       </div>
-    </div>
-  </div>
-
-  <!-- LOG TAB -->
-  <div id="tab-log" class="tab-panel">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
-      <input id="log-filter" class="input" style="width:200px;margin:0" placeholder="Filter by class...">
-      <div style="display:flex;gap:8px">
-        <button class="btn-sm" onclick="loadLog(1)">↻ REFRESH</button>
-        <a id="export-btn" href="#" onclick="exportCSV(event)" class="btn-sm" style="text-decoration:none;display:inline-flex;align-items:center">⬇ EXPORT CSV</a>
-      </div>
-    </div>
-    <div id="det-grid" class="det-grid">
-      <div style="color:#444;font-size:13px;padding:20px">Loading detections...</div>
-    </div>
-    <div style="display:flex;justify-content:center;gap:10px;margin-top:16px">
-      <button class="btn-sm" id="prev-btn" onclick="changePage(-1)" style="display:none">◀ PREV</button>
-      <span id="page-info" style="font-size:12px;color:#555;align-self:center"></span>
-      <button class="btn-sm" id="next-btn" onclick="changePage(1)" style="display:none">NEXT ▶</button>
     </div>
   </div>
 
@@ -456,7 +456,7 @@ function renderLog(data){
   }
 
   grid.innerHTML = filtered.map(d => {
-    const imgSrc = d.image_url ? d.image_url : "https://via.placeholder.com/400x300?text=No+Image";
+    const imgSrc = d.image_url ? d.image_url : "/static/no-image.png";
     const conf = d.conf ? `conf ${parseFloat(d.conf).toFixed(2)}` : "";
     return `
     <div class="det-card" onclick="openModal('${imgSrc}','${d.class_name} | ${d.time_hms} ${d.date_dmy} | cam ${d.camera_idx}')">
