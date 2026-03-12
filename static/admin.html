@@ -531,7 +531,7 @@ function renderLog(data){
   }
 
   grid.innerHTML = filtered.map(d => {
-    const imgSrc = d.image_url || "/static/no-image.png";
+    const imgSrc = d.image_url ? d.image_url : "https://via.placeholder.com/400x300?text=No+Image";
     const conf = d.conf ? `conf ${parseFloat(d.conf).toFixed(2)}` : "";
     return `
     <div class="det-card" onclick="openModal('${imgSrc}','${d.class_name} | ${d.time_hms} ${d.date_dmy} | cam ${d.camera_idx}')">
