@@ -306,38 +306,26 @@ let totalDetections = [];
 
 // ── AUTH ──────────────────────────────────────────────────────────────────────
 async function doLogin(){
+
   const u = document.getElementById("u").value;
   const p = document.getElementById("p").value;
-  const err = document.getElementById("login-err");
 
-  try {
-    const res = await fetch(`${API}/api/admin/login`,{
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json"
-      },
-      body: JSON.stringify({
-        username: u,
-        password: p
-      })
-    });
+  console.log("LOGIN DATA:", u, p);   // DEBUG
 
-    if(!res.ok){
-      err.innerText = "Wrong credentials";
-      return;
-    }
+  const res = await fetch(`${API}/api/admin/login`,{
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json"
+    },
+    body: JSON.stringify({
+      username: u,
+      password: p
+    })
+  });
 
-    const d = await res.json();
-    TOKEN = d.access_token;
+  const data = await res.json();
+  console.log("LOGIN RESPONSE:", data);
 
-    localStorage.setItem("xray_token", TOKEN);
-
-    err.innerText = "";
-    showApp();
-
-  } catch(e){
-    err.innerText = "Server unreachable";
-  }
 }
 
 function logout(){
