@@ -309,22 +309,34 @@ async function doLogin(){
 
   const u = document.getElementById("u").value;
   const p = document.getElementById("p").value;
+  const err = document.getElementById("login-err");
 
-  console.log("LOGIN DATA:", u, p);   // DEBUG
+  try {
 
-  const res = await fetch(`${API}/api/admin/login`,{
-    method:"POST",
-    headers:{
-      "Content-Type":"application/json"
-    },
-    body: JSON.stringify({
-      username: u,
-      password: p
-    })
-  });
+    const res = await fetch("/api/admin/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        username: u,
+        password: p
+      })
+    });
 
-  const data = await res.json();
-  console.log("LOGIN RESPONSE:", data);
+    const data = await res.json();
+
+    if(!res.ok){
+      err.innerText = data.detail || "Login failed";
+      return;
+    }
+
+    localStorage.setItem("xray_token", data.access_token);
+    showApp();
+
+  } catch(e){
+    err.innerText = "Server unreachable";
+  }
 
 }
 
