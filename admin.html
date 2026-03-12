@@ -329,6 +329,7 @@ async function doLogin(){
 
     const d = await res.json();
     TOKEN = d.access_token;
+
     localStorage.setItem("xray_token", TOKEN);
 
     err.innerText = "";
