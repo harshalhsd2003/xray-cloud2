@@ -1,9 +1,13 @@
 import json
+import asyncio
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Query
 from jose import JWTError, jwt
 from auth import SECRET_KEY, ALGORITHM, ADMIN_USER
 
 router = APIRouter()
+
+# How often to ping the PC to detect dead connections (seconds)
+PC_PING_INTERVAL = 5
 
 
 class ConnectionManager:
@@ -11,6 +15,7 @@ class ConnectionManager:
         self.clients = []
         self.pc_socket = None
         self.latest_frame = None
+        self._pc_ping_task = None
 
     async def connect_client(self, ws: WebSocket):
         await ws.accept()
@@ -23,6 +28,7 @@ class ConnectionManager:
     async def connect_pc(self, ws: WebSocket):
         await ws.accept()
 
+        # Close any existing stale PC connection first
         if self.pc_socket:
             try:
                 await self.pc_socket.close()
@@ -32,22 +38,52 @@ class ConnectionManager:
         self.pc_socket = ws
         print("[WS] Scanner PC connected")
 
-    def disconnect_pc(self):
+        # Cancel old ping task if running, start fresh
+        if self._pc_ping_task:
+            self._pc_ping_task.cancel()
+        self._pc_ping_task = asyncio.create_task(self._ping_pc_loop())
+
+        # Notify all watch clients that PC is now online
+        await self.broadcast_event({"type": "pc_status", "online": True})
+
+    async def disconnect_pc(self):
         print("[WS] Scanner PC disconnected")
         self.pc_socket = None
         self.latest_frame = None
+
+        # Stop ping loop
+        if self._pc_ping_task:
+            self._pc_ping_task.cancel()
+            self._pc_ping_task = None
+
+        # Immediately tell all watch clients PC went offline
+        await self.broadcast_event({"type": "pc_status", "online": False})
+
+    async def _ping_pc_loop(self):
+        """Send periodic pings to the PC. If ping fails, mark PC offline immediately."""
+        try:
+            while True:
+                await asyncio.sleep(PC_PING_INTERVAL)
+                if self.pc_socket is None:
+                    break
+                try:
+                    await self.pc_socket.send_text(json.dumps({"type": "ping"}))
+                except Exception:
+                    print("[WS] PC ping failed — marking offline")
+                    await self.disconnect_pc()
+                    break
+        except asyncio.CancelledError:
+            pass
 
     async def broadcast_frame(self, frame_bytes):
         self.latest_frame = frame_bytes
 
         dead = []
-
         for ws in self.clients:
             try:
                 await ws.send_bytes(frame_bytes)
             except:
                 dead.append(ws)
-
         for ws in dead:
             self.disconnect_client(ws)
 
@@ -55,25 +91,22 @@ class ConnectionManager:
         msg = json.dumps(event)
 
         dead = []
-
         for ws in self.clients:
             try:
                 await ws.send_text(msg)
             except:
                 dead.append(ws)
-
         for ws in dead:
             self.disconnect_client(ws)
 
     async def send_command_to_pc(self, cmd):
         if not self.pc_socket:
             return False
-
         try:
             await self.pc_socket.send_text(json.dumps(cmd))
             return True
         except:
-            self.disconnect_pc()
+            await self.disconnect_pc()
             return False
 
 
@@ -94,7 +127,6 @@ def auth_ws_token(token: str):
 async def pc_websocket(ws: WebSocket, token: str = Query(...)):
 
     user = auth_ws_token(token)
-
     if not user:
         await ws.close(code=4001)
         return
@@ -103,40 +135,45 @@ async def pc_websocket(ws: WebSocket, token: str = Query(...)):
 
     try:
         while True:
-
             data = await ws.receive()
 
             frame = data.get("bytes") or data.get("binary")
-
             if frame:
-                print("Frame received:", len(frame))
                 await manager.broadcast_frame(frame)
                 continue
 
             text = data.get("text")
-
             if text:
                 try:
                     msg = json.loads(text)
+                    # Ignore pong replies from PC
+                    if msg.get("type") == "pong":
+                        continue
                     await manager.broadcast_event(msg)
                 except Exception as e:
                     print("JSON error:", e)
 
     except WebSocketDisconnect:
-        manager.disconnect_pc()
+        await manager.disconnect_pc()
 
 
 @router.websocket("/watch")
 async def watch_websocket(ws: WebSocket, token: str = Query(...)):
 
     user = auth_ws_token(token)
-
     if not user:
         await ws.close(code=4001)
         return
 
     await manager.connect_client(ws)
 
+    # Send current PC status immediately on connect so badge is accurate
+    await ws.send_text(json.dumps({
+        "type": "pc_status",
+        "online": manager.pc_socket is not None
+    }))
+
+    # Send last frame if we have one
     if manager.latest_frame:
         try:
             await ws.send_bytes(manager.latest_frame)
