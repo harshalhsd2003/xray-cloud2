@@ -32,15 +32,13 @@ async def push_detection(
 ):
     now = datetime.utcnow()
     image_bytes = await image.read()
-    image_url = None
-
-    if USE_CLOUDINARY:
-        result = cloudinary.uploader.upload(
-            image_bytes,
-            folder="xray_detections",
-            public_id=f"{now.strftime('%Y%m%d_%H%M%S')}_{class_name}"
-        )
-        image_url = result["secure_url"]
+    
+    os.makedirs("static/detections", exist_ok=True)
+    
+    with open(f"static/detections/{image.filename}", "wb") as f:
+        f.write(image_bytes)
+        
+    image_url = f"/static/detections/{image.filename}"
 
     det = Detection(
         timestamp  = now,
