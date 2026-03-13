@@ -1,8 +1,9 @@
 import json
 import asyncio
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Query
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Query, Depends
+from fastapi.responses import StreamingResponse, Response
 from jose import JWTError, jwt
-from auth import SECRET_KEY, ALGORITHM, ADMIN_USER
+from auth import SECRET_KEY, ALGORITHM, ADMIN_USER, verify_token
 
 router = APIRouter()
 
@@ -188,3 +189,44 @@ async def watch_websocket(ws: WebSocket, token: str = Query(...)):
 
     except WebSocketDisconnect:
         manager.disconnect_client(ws)
+
+
+# ── MJPEG PROXY ───────────────────────────────────────────────────────────────
+# Browser calls GET /api/stream/mjpeg?token=...
+# Railway serves the latest frame buffer as a continuous MJPEG stream over HTTPS.
+# This bypasses the browser's mixed-content block (https page → http localhost).
+
+BOUNDARY = b"--mjpegframe"
+
+async def mjpeg_generator():
+    """Yield MJPEG frames from the latest_frame buffer as fast as they arrive."""
+    last_sent = None
+    while True:
+        frame = manager.latest_frame
+        if frame is not None and frame is not last_sent:
+            last_sent = frame
+            yield (
+                BOUNDARY + b"\r\n"
+                b"Content-Type: image/jpeg\r\n"
+                b"Content-Length: " + str(len(frame)).encode() + b"\r\n\r\n" +
+                frame + b"\r\n"
+            )
+        await asyncio.sleep(0.033)   # ~30 fps max polling
+
+
+@router.get("/mjpeg")
+async def mjpeg_stream(token: str = Query(...)):
+    # Validate token manually (can't use Depends with StreamingResponse easily)
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        if payload.get("sub") != ADMIN_USER:
+            return Response(status_code=401)
+    except JWTError:
+        return Response(status_code=401)
+
+    return StreamingResponse(
+        mjpeg_generator(),
+        media_type=f"multipart/x-mixed-replace; boundary=mjpegframe",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"}
+    )
+

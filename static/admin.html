@@ -590,21 +590,6 @@ select.inp-sel:focus{border-color:var(--accent);}
           <button class="btn-apply" style="margin-top:14px;background:#1a2535;color:var(--accent)" onclick="loadSettings()">↻ REFRESH</button>
         </div>
 
-        <div class="card" style="grid-column:1/-1">
-          <div class="card-title">LOCAL PC — LIVE FEED SOURCE</div>
-          <div style="font-size:11px;color:var(--text2);margin-bottom:10px;line-height:1.7">
-            The MJPEG video stream is served directly from your local PC on port 5000.
-            Enter your PC's local IP address below (check with <code style="color:var(--accent)">ipconfig</code> on Windows).
-            The browser will try to connect to <code id="feed-url-preview" style="color:var(--accent)">http://localhost:5000/video_feed</code>.
-          </div>
-          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-            <input class="log-search" id="pc-host-input" placeholder="e.g. 192.168.1.5 or localhost"
-              style="flex:1;min-width:180px"
-              value="">
-            <button class="btn-apply" style="width:auto;padding:10px 20px" onclick="savePcHost()">▶ SAVE &amp; CONNECT</button>
-          </div>
-          <div id="pc-host-msg" style="font-size:10px;color:var(--safe);margin-top:6px;min-height:14px;letter-spacing:.04em;"></div>
-        </div>
 
       </div>
     </div>
@@ -687,14 +672,31 @@ let recentDets   = [];
 let pcConnected  = false;
 let mjpegActive  = false;
 
-// PC host — stored in localStorage so user sets it once
-// Default: localhost (since Railway and Flask run on same machine)
-let PC_HOST = localStorage.getItem("pc_host") || "localhost";
-
-function getPcMjpegUrl(){
-  return `http://${PC_HOST}:5000/video_feed`;
+// ── MJPEG STREAM via Railway proxy (no mixed-content issues) ────
+function getMjpegUrl(){
+  return `${API}/api/stream/mjpeg?token=${TOKEN}`;
 }
 
+function startMjpeg(){
+  const img = document.getElementById("feed-img");
+  img.onload  = () => { mjpegActive = true; updateFeedVisibility(); };
+  img.onerror = () => {
+    img.style.display = "none";
+    mjpegActive = false;
+    updateFeedVisibility();
+  };
+  img.src = getMjpegUrl();
+  img.style.display = "block";
+  updateFeedVisibility();
+}
+
+function stopMjpeg(){
+  const img = document.getElementById("feed-img");
+  img.src = "";
+  img.style.display = "none";
+  mjpegActive = false;
+  updateFeedVisibility();
+}
 // ── AUTH ────────────────────────────────────────────────────────
 async function doLogin(){
   const u = document.getElementById("u").value.trim();
@@ -732,51 +734,18 @@ function showApp(){
   document.getElementById("login-screen").style.display = "none";
   document.getElementById("app").style.display = "flex";
   connectWS();
-  startMjpeg();          // try MJPEG immediately
+  startMjpeg();
   loadSettings();
   loadLog(1);
   loadStats();
   setInterval(updateClock, 1000);
   setInterval(loadStats, 30000);
-  // populate pc host input
-  const inp = document.getElementById("pc-host-input");
-  if(inp) inp.value = PC_HOST;
-  updateFeedUrlPreview();
 }
 
 window.onload = () => {
   document.getElementById("p").addEventListener("keydown", e => { if(e.key==="Enter") doLogin(); });
   if(TOKEN) showApp();
 };
-
-// ── MJPEG STREAM (primary feed) ──────────────────────────────────
-function startMjpeg(){
-  const img = document.getElementById("feed-img");
-  const url = getPcMjpegUrl();
-
-  img.onload  = () => { /* first frame loaded = success */ };
-  img.onerror = () => {
-    // MJPEG not reachable — hide img, WS canvas will show if connected
-    img.style.display = "none";
-    mjpegActive = false;
-    updateFeedVisibility();
-  };
-
-  // Setting src starts the MJPEG stream
-  img.src = url;
-  img.style.display = "block";
-  mjpegActive = true;
-  updateFeedVisibility();
-  document.getElementById("feed-rec").style.display = "flex";
-}
-
-function stopMjpeg(){
-  const img = document.getElementById("feed-img");
-  img.src = "";
-  img.style.display = "none";
-  mjpegActive = false;
-  updateFeedVisibility();
-}
 
 // Show/hide feed elements based on what's available
 function updateFeedVisibility(){
@@ -786,44 +755,21 @@ function updateFeedVisibility(){
   const rec      = document.getElementById("feed-rec");
 
   if(mjpegActive){
-    // MJPEG is showing — hide canvas, hide offline msg
     noStream.style.display = "none";
     canvas.style.display   = "none";
     feedImg.style.display  = "block";
     rec.style.display      = "flex";
   } else if(pcConnected){
-    // No MJPEG but WS connected — show canvas (binary frames)
     noStream.style.display = "none";
     canvas.style.display   = "block";
     feedImg.style.display  = "none";
     rec.style.display      = "flex";
   } else {
-    // Nothing connected
     noStream.style.display = "flex";
     canvas.style.display   = "none";
     feedImg.style.display  = "none";
     rec.style.display      = "none";
   }
-}
-
-// PC Host settings
-function savePcHost(){
-  const inp = document.getElementById("pc-host-input");
-  const val = (inp.value||"").trim().replace(/^https?:\/\//,"").replace(/\/.*$/,"");
-  if(!val){ return; }
-  PC_HOST = val;
-  localStorage.setItem("pc_host", PC_HOST);
-  updateFeedUrlPreview();
-  stopMjpeg();
-  setTimeout(startMjpeg, 300);
-  const msg = document.getElementById("pc-host-msg");
-  msg.innerText = `✓ Connecting to http://${PC_HOST}:5000/video_feed ...`;
-  setTimeout(() => msg.innerText = "", 4000);
-}
-
-function updateFeedUrlPreview(){
-  const el = document.getElementById("feed-url-preview");
-  if(el) el.innerText = `http://${PC_HOST}:5000/video_feed`;
 }
 
 // ── WEBSOCKET (events + WS canvas fallback) ───────────────────────
