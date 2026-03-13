@@ -1,28 +1,37 @@
-from fastapi import APIRouter, Depends, HTTPException
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from auth import create_token, verify_token
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
+from datetime import datetime, timedelta
+from jose import jwt
+import os
 
 router = APIRouter()
-security = HTTPBearer()
+
+SECRET_KEY = os.getenv("SECRET_KEY", "secret")
+ALGORITHM = "HS256"
+
+ADMIN_USER = os.getenv("ADMIN_USERNAME", "admin")
+ADMIN_PASS = os.getenv("ADMIN_PASSWORD", "xray1234")
+
 
 class LoginRequest(BaseModel):
     username: str
     password: str
 
+
+def create_token(data: dict):
+    expire = datetime.utcnow() + timedelta(hours=72)
+    return jwt.encode({**data, "exp": expire}, SECRET_KEY, algorithm=ALGORITHM)
+
+
 @router.post("/login")
 async def login(req: LoginRequest):
-    import os
-    admin_user = os.getenv("ADMIN_USERNAME", "admin")
-    admin_pass = os.getenv("ADMIN_PASSWORD", "xray1234")
-    if req.username != admin_user or req.password != admin_pass:
-        raise HTTPException(status_code=401, detail="Invalid credentials")
-    token = create_token({"sub": req.username})
-    return {"access_token": token, "token_type": "bearer"}
 
-@router.get("/verify")
-async def verify(credentials: HTTPAuthorizationCredentials = Depends(security)):
-    payload = verify_token(credentials.credentials)
-    if not payload:
-        raise HTTPException(status_code=401, detail="Invalid token")
-    return {"valid": True, "user": payload.get("sub")}
+    if req.username != ADMIN_USER or req.password != ADMIN_PASS:
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+
+    token = create_token({"sub": req.username})
+
+    return {
+        "access_token": token,
+        "token_type": "bearer"
+    }
