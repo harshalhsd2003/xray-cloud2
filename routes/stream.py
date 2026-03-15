@@ -20,8 +20,9 @@ class ConnectionManager:
         self.camera_snapshots:   dict         = {}
         self.pc_current_cam:     int          = 0
         self._pc_ping_task:      asyncio.Task = None
-        # PERF FIX: use an asyncio.Lock to prevent concurrent broadcast issues
         self._broadcast_lock:    asyncio.Lock = asyncio.Lock()
+        # Track when PC first connected so web UI can show real uptime
+        self.pc_connected_at:    float        = None   # epoch seconds (float)
 
     # ── CLIENT CONNECTIONS ────────────────────────────────────────────
     async def connect_client(self, ws: WebSocket):
@@ -34,6 +35,7 @@ class ConnectionManager:
 
     # ── PC CONNECTION ─────────────────────────────────────────────────
     async def connect_pc(self, ws: WebSocket):
+        import time as _time
         await ws.accept()
         if self.pc_socket:
             try:
@@ -41,13 +43,18 @@ class ConnectionManager:
             except Exception:
                 pass
         self.pc_socket = ws
+        self.pc_connected_at = _time.time()   # record real connection epoch
         print("[WS] Scanner PC connected")
 
         if self._pc_ping_task:
             self._pc_ping_task.cancel()
         self._pc_ping_task = asyncio.create_task(self._ping_pc_loop())
 
-        await self.broadcast_event({"type": "pc_status", "online": True})
+        await self.broadcast_event({
+            "type": "pc_status",
+            "online": True,
+            "connected_at": self.pc_connected_at   # ← send epoch to all clients
+        })
 
         try:
             from routes.notifications import notify_pc_online
@@ -59,6 +66,7 @@ class ConnectionManager:
         print("[WS] Scanner PC disconnected")
         self.pc_socket    = None
         self.latest_frame = None
+        self.pc_connected_at = None
 
         if self._pc_ping_task:
             self._pc_ping_task.cancel()
@@ -197,8 +205,9 @@ async def watch_websocket(ws: WebSocket, token: str = Query(...)):
     await manager.connect_client(ws)
 
     await ws.send_text(json.dumps({
-        "type":   "pc_status",
-        "online": manager.pc_socket is not None
+        "type":         "pc_status",
+        "online":       manager.pc_socket is not None,
+        "connected_at": manager.pc_connected_at
     }))
 
     # Send latest frame so the watch client gets a picture immediately

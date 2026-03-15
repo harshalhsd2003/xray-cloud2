@@ -1,8 +1,8 @@
-import os, io, base64
+import os, io, base64, glob, shutil
 from fastapi import APIRouter, Depends, UploadFile, File, Form, Query
 from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, desc
+from sqlalchemy import select, desc, delete
 from database import Detection, get_db
 from auth import verify_token
 from datetime import datetime
@@ -127,6 +127,39 @@ async def list_detections(
         }
         for r in rows
     ]
+
+# ── Reset all detections ─────────────────────────────────────────────────────
+@router.delete("/reset")
+async def reset_detections(
+    db: AsyncSession = Depends(get_db),
+    _=Depends(verify_token)
+):
+    """Delete all detection records, images from local disk and Cloudinary, reset counter."""
+    # 1. Delete all DB rows
+    await db.execute(delete(Detection))
+    await db.commit()
+
+    # 2. Delete local image files
+    local_dir = "static/detections"
+    if os.path.isdir(local_dir):
+        for f in glob.glob(os.path.join(local_dir, "*")):
+            try:
+                os.remove(f)
+            except Exception:
+                pass
+
+    # 3. Delete Cloudinary folder if configured
+    if USE_CLOUDINARY:
+        try:
+            cloudinary.api.delete_resources_by_prefix("xray_detections/")
+        except Exception:
+            pass
+
+    # Notify all connected clients that counter was reset
+    from routes.stream import manager
+    await manager.broadcast_event({"type": "detections_reset"})
+
+    return {"ok": True, "message": "All detections cleared"}
 
 # ── CSV export ────────────────────────────────────────────────────────────────
 @router.get("/export")

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>X-Ray Scanner</title>
+<title>X-Ray Scanner — Admin</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -22,7 +22,7 @@ body{display:flex;flex-direction:column;}
 ::-webkit-scrollbar{width:4px;height:4px;}
 ::-webkit-scrollbar-track{background:var(--bg);}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
-/* LOGIN */
+
 #login-screen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:var(--bg);z-index:9999;background-image:radial-gradient(ellipse 60% 50% at 50% 0%,rgba(0,212,255,.06) 0%,transparent 70%),repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(0,212,255,.03) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(0,212,255,.03) 40px);}
 .login-box{background:var(--panel);border:1px solid var(--border2);border-radius:16px;padding:40px 36px;width:min(340px,92vw);text-align:center;box-shadow:0 0 60px rgba(0,212,255,.08),0 24px 48px rgba(0,0,0,.6);position:relative;overflow:hidden;}
 .login-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);}
@@ -33,54 +33,53 @@ body{display:flex;flex-direction:column;}
 .btn-login{width:100%;background:var(--accent);color:#000;border:none;border-radius:var(--radius-sm);padding:12px;font-weight:700;font-family:'Orbitron';font-size:11px;cursor:pointer;letter-spacing:.1em;transition:background .15s,box-shadow .15s;margin-top:4px;}
 .btn-login:hover{background:#00eeff;box-shadow:0 0 20px rgba(0,212,255,.4);}
 #login-err{color:var(--danger);font-size:11px;margin-top:10px;min-height:16px;}
-/* HEADER */
-.header{height:var(--hdr);background:#000;border-bottom:1px solid var(--border);padding:0 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;z-index:50;}
-.hdr-logo{font-family:'Orbitron';font-size:12px;font-weight:700;color:var(--accent);letter-spacing:.1em;display:flex;align-items:center;gap:8px;}
+
+.header{height:var(--hdr);background:#000;border-bottom:1px solid var(--border);padding:0 14px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;z-index:50;gap:8px;}
+.hdr-logo{font-family:'Orbitron';font-size:11px;font-weight:700;color:var(--accent);letter-spacing:.1em;display:flex;align-items:center;gap:8px;flex-shrink:0;}
 .hdr-logo-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:var(--glow-accent);animation:blink 2s ease-in-out infinite;}
 @keyframes blink{0%,100%{opacity:1;}50%{opacity:.3;}}
-.hdr-right{display:flex;align-items:center;gap:10px;}
-#conn-badge{padding:3px 10px;border-radius:20px;font-size:9px;font-weight:700;font-family:'Orbitron';letter-spacing:.08em;transition:all .3s;}
+.hdr-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;}
+#conn-badge{padding:3px 9px;border-radius:20px;font-size:9px;font-weight:700;font-family:'Orbitron';letter-spacing:.08em;transition:all .3s;white-space:nowrap;}
 .badge-on{background:rgba(0,255,65,.1);color:var(--safe);border:1px solid rgba(0,255,65,.4);box-shadow:var(--glow-safe);}
 .badge-off{background:rgba(255,23,68,.1);color:var(--danger);border:1px solid rgba(255,23,68,.4);}
-#hdr-uptime{font-size:10px;color:var(--text2);background:var(--panel2);padding:3px 8px;border-radius:4px;border:1px solid var(--border);}
-#hdr-time{font-size:11px;color:var(--text2);}
-.btn-sm{background:transparent;color:var(--text2);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:5px 12px;font-weight:700;font-size:10px;cursor:pointer;font-family:'Orbitron';letter-spacing:.06em;transition:all .15s;}
+#hdr-uptime{font-size:10px;color:var(--text2);background:var(--panel2);padding:3px 7px;border-radius:4px;border:1px solid var(--border);white-space:nowrap;display:none;}
+#hdr-time{font-size:10px;color:var(--text2);white-space:nowrap;}
+.btn-sm{background:transparent;color:var(--text2);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:5px 10px;font-weight:700;font-size:9px;cursor:pointer;font-family:'Orbitron';letter-spacing:.06em;transition:all .15s;white-space:nowrap;}
 .btn-sm:hover{color:var(--danger);border-color:var(--danger);}
-/* LAYOUT */
+
 #app{display:none;flex-direction:column;flex:1;min-height:0;overflow:hidden;}
 .main-layout{display:flex;flex:1;min-height:0;overflow:hidden;}
-/* LIVE FEED */
-.feed-col{flex:1;min-width:0;display:flex;flex-direction:column;padding:10px 6px 10px 10px;gap:8px;}
+
+.feed-col{flex:1;min-width:0;display:flex;flex-direction:column;padding:8px 6px 8px 8px;gap:6px;}
 .feed-hud{flex:1;min-height:0;background:#000;border-radius:var(--radius);overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);}
-.feed-hud::before,.feed-hud::after,.feed-hud .hud-br,.feed-hud .hud-bl{content:'';position:absolute;width:20px;height:20px;z-index:5;pointer-events:none;}
+.feed-hud::before,.feed-hud::after,.feed-hud .hud-br,.feed-hud .hud-bl{content:'';position:absolute;width:18px;height:18px;z-index:5;pointer-events:none;}
 .feed-hud::before{top:8px;left:8px;border-top:2px solid var(--accent);border-left:2px solid var(--accent);}
 .feed-hud::after{top:8px;right:8px;border-top:2px solid var(--accent);border-right:2px solid var(--accent);}
 .feed-hud .hud-br{bottom:8px;right:8px;border-bottom:2px solid var(--accent);border-right:2px solid var(--accent);}
 .feed-hud .hud-bl{bottom:8px;left:8px;border-bottom:2px solid var(--accent);border-left:2px solid var(--accent);}
 .feed-hud .scanlines{position:absolute;inset:0;z-index:4;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.05) 3px);}
 #feed-img{width:100%;height:100%;object-fit:contain;background:#000;display:none;position:relative;z-index:2;}
-#feed-canvas{width:100%;height:100%;object-fit:contain;background:#000;display:none;position:relative;z-index:2;}
 #no-stream{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;z-index:3;background:#000;}
-.no-stream-icon{font-size:36px;opacity:.2;}
-.no-stream-text{font-family:'Orbitron';font-size:11px;color:var(--text3);letter-spacing:.15em;}
-.feed-tag{position:absolute;z-index:6;background:rgba(0,0,0,.8);border-radius:4px;padding:3px 8px;font-size:10px;pointer-events:none;backdrop-filter:blur(4px);}
+.no-stream-icon{font-size:34px;opacity:.2;}
+.no-stream-text{font-family:'Orbitron';font-size:10px;color:var(--text3);letter-spacing:.15em;text-align:center;padding:0 16px;}
+.feed-tag{position:absolute;z-index:6;background:rgba(0,0,0,.8);border-radius:4px;padding:3px 7px;font-size:10px;pointer-events:none;backdrop-filter:blur(4px);}
 #feed-fps-tag{top:10px;right:12px;color:var(--accent);font-size:11px;font-weight:700;display:none;}
 #feed-cam-tag{top:10px;left:12px;color:var(--text2);}
 #feed-rec{top:10px;left:50%;transform:translateX(-50%);color:var(--danger);display:none;align-items:center;gap:5px;}
 .rec-dot{width:6px;height:6px;border-radius:50%;background:var(--danger);animation:blink .8s ease-in-out infinite;}
 #feed-overlay{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:rgba(255,23,68,.12);animation:dangerPulse 1s ease-in-out infinite;z-index:7;}
 @keyframes dangerPulse{0%,100%{background:rgba(255,23,68,.12);box-shadow:inset 0 0 60px rgba(255,23,68,.15);}50%{background:rgba(255,23,68,.22);box-shadow:inset 0 0 100px rgba(255,23,68,.3);}}
-.danger-banner{font-family:'Orbitron';font-size:clamp(13px,2vw,22px);font-weight:900;color:#fff;letter-spacing:.15em;border:2px solid var(--danger);padding:10px 24px;background:rgba(255,23,68,.25);text-shadow:0 0 20px var(--danger);box-shadow:0 0 40px rgba(255,23,68,.4);animation:bannerFlicker .15s ease-in-out infinite alternate;}
+.danger-banner{font-family:'Orbitron';font-size:clamp(11px,2vw,20px);font-weight:900;color:#fff;letter-spacing:.15em;border:2px solid var(--danger);padding:8px 20px;background:rgba(255,23,68,.25);text-shadow:0 0 20px var(--danger);box-shadow:0 0 40px rgba(255,23,68,.4);animation:bannerFlicker .15s ease-in-out infinite alternate;}
 @keyframes bannerFlicker{from{opacity:1;}to{opacity:.85;}}
-.status-row{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;flex-shrink:0;}
-.s-badge{border-radius:var(--radius-sm);padding:7px 4px;text-align:center;font-family:'Orbitron';font-size:9px;font-weight:700;letter-spacing:.04em;border:1px solid transparent;transition:all .3s;}
+.status-row{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;flex-shrink:0;}
+.s-badge{border-radius:var(--radius-sm);padding:6px 3px;text-align:center;font-family:'Orbitron';font-size:9px;font-weight:700;letter-spacing:.03em;border:1px solid transparent;transition:all .3s;}
 .s-badge.on{background:rgba(0,255,65,.1);color:var(--text-safe);border-color:rgba(0,255,65,.3);box-shadow:var(--glow-safe);}
 .s-badge.off{background:rgba(255,23,68,.08);color:#ff6b6b;border-color:rgba(255,23,68,.25);}
-.s-badge-label{font-size:8px;opacity:.65;display:block;margin-bottom:2px;color:var(--text2);}
-/* SIDE PANEL */
+.s-badge-label{font-size:7px;opacity:.65;display:block;margin-bottom:2px;color:var(--text2);}
+
 .side-panel{width:var(--side);flex-shrink:0;border-left:1px solid var(--border);display:flex;flex-direction:column;background:var(--panel);overflow:hidden;}
 .side-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;background:#000;}
-.side-tab{flex:1;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:8px;font-family:'Orbitron';color:var(--text3);border-bottom:2px solid transparent;transition:all .2s;letter-spacing:.04em;white-space:nowrap;}
+.side-tab{flex:1;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:8px;font-family:'Orbitron';color:var(--text3);border-bottom:2px solid transparent;transition:all .2s;letter-spacing:.04em;white-space:nowrap;}
 .side-tab:hover{color:var(--text2);}
 .side-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
 .side-content{flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column;}
@@ -89,8 +88,8 @@ body{display:flex;flex-direction:column;}
 .side-scroll{flex:1;overflow-y:auto;padding:12px;min-height:0;}
 .section-label{font-family:'Orbitron';font-size:9px;color:var(--accent);letter-spacing:.15em;margin-bottom:8px;margin-top:4px;display:flex;align-items:center;gap:6px;}
 .section-label::before{content:'';width:3px;height:9px;background:var(--accent);border-radius:2px;flex-shrink:0;}
-/* CONTROLS */
-.ctrl-section{margin-bottom:18px;}
+
+.ctrl-section{margin-bottom:16px;}
 .setting-label{font-size:10px;color:var(--text2);margin-bottom:5px;display:flex;justify-content:space-between;align-items:center;}
 .vbox{font-family:'Share Tech Mono',monospace;background:#080d16;text-align:center;border-radius:4px;padding:3px 5px;color:var(--accent);font-size:11px;border:1px solid var(--border);min-width:42px;flex-shrink:0;}
 input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:4px;cursor:pointer;display:block;background:var(--border2);border-radius:2px;outline:none;margin-bottom:2px;}
@@ -100,33 +99,33 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 .btn-ctrl{background:var(--panel2);color:var(--text2);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:8px 4px;font-size:9px;cursor:pointer;font-family:'Orbitron';transition:all .15s;text-align:center;letter-spacing:.04em;}
 .btn-ctrl:hover{color:var(--accent);border-color:var(--accent);background:rgba(0,212,255,.06);}
 .btn-ctrl.active{color:var(--accent);border-color:var(--accent);background:rgba(0,212,255,.12);}
-.btn-ctrl-icon{font-size:14px;display:block;margin-bottom:3px;}
+.btn-ctrl-icon{font-size:13px;display:block;margin-bottom:3px;}
 .btn-reset{width:100%;background:transparent;color:var(--text3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px;font-size:9px;cursor:pointer;font-family:'Orbitron';transition:all .15s;letter-spacing:.06em;}
 .btn-reset:hover{color:var(--warn);border-color:var(--warn);}
-/* CAMERA */
-.cam-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px;overflow-y:auto;}
-.cam-thumb{border-radius:var(--radius-sm);overflow:hidden;position:relative;cursor:pointer;border:2px solid var(--border);transition:all .2s;background:#000;aspect-ratio:16/9;}
-.cam-thumb:hover{border-color:var(--accent);box-shadow:0 0 10px rgba(0,212,255,.2);}
-.cam-thumb.cam-active{border-color:var(--accent);box-shadow:0 0 12px rgba(0,212,255,.3);}
-.cam-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
-.cam-label{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.78);font-family:'Orbitron';font-size:8px;padding:3px 6px;display:flex;justify-content:space-between;align-items:center;color:var(--text2);}
-.cam-thumb.cam-active .cam-label{color:var(--accent);}
-.cam-active-dot{width:5px;height:5px;border-radius:50%;background:var(--safe);box-shadow:var(--glow-safe);animation:blink .8s ease-in-out infinite;flex-shrink:0;}
-.cam-nosig{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:8px;color:var(--text3);font-family:'Orbitron';letter-spacing:.1em;background:rgba(0,0,0,.85);}
-/* LOG */
+.btn-danger-reset{width:100%;background:transparent;color:var(--text3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px;font-size:9px;cursor:pointer;font-family:'Orbitron';transition:all .15s;letter-spacing:.06em;margin-top:6px;}
+.btn-danger-reset:hover{color:var(--danger);border-color:var(--danger);}
+
+/* Camera buttons — no previews */
+.cam-btn-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:6px;}
+.cam-btn{background:var(--panel2);color:var(--text2);border:2px solid var(--border2);border-radius:var(--radius-sm);padding:10px 2px;font-size:9px;font-weight:700;cursor:pointer;font-family:'Orbitron';transition:all .15s;text-align:center;letter-spacing:.04em;line-height:1.4;}
+.cam-btn:hover{color:var(--accent);border-color:var(--accent);background:rgba(0,212,255,.06);}
+.cam-btn.cam-active{color:var(--accent);border-color:var(--accent);background:rgba(0,212,255,.1);box-shadow:0 0 8px rgba(0,212,255,.2);}
+.cam-active-dot{width:5px;height:5px;border-radius:50%;background:var(--safe);box-shadow:var(--glow-safe);animation:blink .8s ease-in-out infinite;display:inline-block;margin-left:3px;vertical-align:middle;}
+
+/* Log */
 .log-top{padding:10px 12px 8px;border-bottom:1px solid var(--border);flex-shrink:0;}
-.class-btns{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;}
-.cls-btn{padding:4px 10px;border-radius:20px;font-size:9px;font-family:'Orbitron';cursor:pointer;border:1px solid var(--border2);color:var(--text3);background:transparent;transition:all .15s;letter-spacing:.04em;}
+.class-btns{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;}
+.cls-btn{padding:3px 9px;border-radius:20px;font-size:9px;font-family:'Orbitron';cursor:pointer;border:1px solid var(--border2);color:var(--text3);background:transparent;transition:all .15s;letter-spacing:.04em;}
 .cls-btn:hover{border-color:var(--accent);color:var(--text2);}
 .cls-btn.sel{background:rgba(0,212,255,.12);border-color:var(--accent);color:var(--accent);}
 .cls-btn[data-c="Gun"].sel{background:rgba(255,23,68,.12);border-color:var(--danger);color:#ff6b6b;}
 .cls-btn[data-c="Knife"].sel{background:rgba(255,171,0,.1);border-color:var(--warn);color:var(--warn);}
 .cls-btn[data-c="Scissors"].sel{background:rgba(168,85,247,.1);border-color:var(--purple);color:#c084fc;}
 .cls-btn[data-c="Pliers"].sel{background:rgba(0,255,65,.08);border-color:rgba(0,255,65,.4);color:var(--text-safe);}
-.log-row{display:flex;gap:6px;}
-.log-search{background:#080d16;border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);padding:6px 10px;font-size:11px;font-family:'Share Tech Mono',monospace;outline:none;flex:1;transition:border-color .2s;}
+.log-row{display:flex;gap:6px;align-items:center;}
+.log-search{background:#080d16;border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);padding:6px 10px;font-size:11px;font-family:'Share Tech Mono',monospace;outline:none;flex:1;transition:border-color .2s;min-width:0;}
 .log-search:focus{border-color:var(--accent);}
-.btn-icon{background:transparent;color:var(--text2);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:6px 10px;font-size:9px;cursor:pointer;font-family:'Orbitron';transition:all .15s;display:flex;align-items:center;white-space:nowrap;gap:4px;letter-spacing:.04em;}
+.btn-icon{background:transparent;color:var(--text2);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:6px 9px;font-size:9px;cursor:pointer;font-family:'Orbitron';transition:all .15s;display:flex;align-items:center;white-space:nowrap;gap:4px;letter-spacing:.04em;flex-shrink:0;}
 .btn-icon:hover{color:var(--accent);border-color:var(--accent);}
 .dl-wrap{position:relative;}
 .dl-menu{position:absolute;right:0;top:calc(100% + 4px);background:var(--panel);border:1px solid var(--border2);border-radius:var(--radius-sm);z-index:100;min-width:160px;display:none;box-shadow:0 8px 24px rgba(0,0,0,.6);}
@@ -135,16 +134,23 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 .dl-item:last-child{border-bottom:none;}
 .dl-item:hover{background:rgba(0,212,255,.08);color:var(--accent);}
 .det-list{flex:1;overflow-y:auto;padding:6px 8px;min-height:0;}
-.det-item{display:flex;align-items:center;gap:8px;padding:7px;margin-bottom:5px;background:var(--panel2);border-radius:var(--radius-sm);border:1px solid var(--border);cursor:pointer;transition:border-color .15s;}
-.det-item:hover{border-color:var(--accent);}
-.det-item img{width:56px;height:42px;object-fit:cover;border-radius:4px;background:#111;flex-shrink:0;}
-.det-item-info{min-width:0;flex:1;}
-.det-item-class{font-size:11px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--accent);}
-.det-item-meta{color:var(--text2);font-size:10px;margin-top:2px;}
-.det-item-conf{display:inline-block;background:rgba(0,212,255,.08);color:var(--accent);border:1px solid rgba(0,212,255,.18);border-radius:3px;font-size:9px;padding:1px 5px;margin-top:3px;}
+
+/* Text-only detection rows — no thumbnail images */
+.det-row{display:flex;align-items:center;gap:7px;padding:8px 10px;margin-bottom:4px;background:var(--panel2);border-radius:var(--radius-sm);border:1px solid var(--border);transition:border-color .15s;flex-wrap:nowrap;}
+.det-row-class{font-size:11px;font-weight:700;white-space:nowrap;min-width:64px;}
+.det-row-time{font-size:10px;color:var(--text2);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.det-row-cam{font-size:8px;color:var(--text3);background:var(--panel);border:1px solid var(--border);border-radius:3px;padding:1px 4px;flex-shrink:0;}
+.det-row-conf{font-size:9px;color:var(--accent);background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.18);border-radius:3px;padding:1px 5px;flex-shrink:0;}
+.cls-Gun{color:#ff6b6b !important;}
+.cls-Knife{color:var(--warn) !important;}
+.cls-Scissors{color:#c084fc !important;}
+.cls-Pliers{color:var(--text-safe) !important;}
+.cls-Wrench{color:var(--accent) !important;}
+
 .log-pages{display:flex;justify-content:center;align-items:center;gap:10px;padding:8px;border-top:1px solid var(--border);flex-shrink:0;}
 #page-info{font-size:10px;color:var(--text2);}
-/* STATUS */
+
+/* Status pane */
 .stat-chips{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
 .stat-chip{background:var(--panel2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 6px;text-align:center;}
 .stat-chip-num{font-family:'Orbitron';font-size:22px;font-weight:700;color:var(--accent);line-height:1;}
@@ -155,21 +161,37 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 .sts-val{font-family:'Orbitron';font-size:11px;color:var(--text2);}
 .sts-val.on{color:var(--text-safe);}
 .sts-val.off{color:#ff6b6b;}
-/* MODAL */
+
+/* Mini det rows — text-only, no images */
+.mini-row{display:flex;align-items:center;gap:7px;padding:7px 8px;margin-bottom:4px;background:var(--panel2);border-radius:var(--radius-sm);border:1px solid var(--border);}
+.mini-cls{font-size:10px;font-weight:700;min-width:60px;}
+.mini-time{font-size:9px;color:var(--text2);flex:1;}
+.mini-cam{font-size:8px;color:var(--text3);background:var(--panel);border:1px solid var(--border);border-radius:3px;padding:1px 4px;}
+
 #modal{position:fixed;inset:0;background:rgba(0,0,0,.94);display:none;align-items:center;justify-content:center;z-index:9998;flex-direction:column;gap:12px;backdrop-filter:blur(8px);}
 #modal img{max-width:min(90vw,900px);max-height:72vh;border:1px solid var(--accent);border-radius:var(--radius);box-shadow:0 0 60px rgba(0,212,255,.2);}
 .modal-info{color:var(--text2);font-size:12px;text-align:center;background:rgba(0,0,0,.6);padding:8px 16px;border-radius:var(--radius-sm);border:1px solid var(--border);}
 .modal-close{position:absolute;top:16px;right:20px;color:var(--text2);font-size:24px;cursor:pointer;transition:color .15s;line-height:1;}
 .modal-close:hover{color:#fff;}
-/* TOAST */
-#toast{position:fixed;bottom:20px;right:20px;background:rgba(255,23,68,.95);color:#fff;padding:12px 18px;border-radius:var(--radius-sm);font-family:'Orbitron';font-weight:700;font-size:11px;letter-spacing:.06em;display:none;z-index:99999;box-shadow:0 0 30px rgba(255,23,68,.5);animation:toastIn .3s ease;}
+
+#toast{position:fixed;bottom:20px;right:20px;background:rgba(255,23,68,.95);color:#fff;padding:12px 18px;border-radius:var(--radius-sm);font-family:'Orbitron';font-weight:700;font-size:11px;letter-spacing:.06em;display:none;z-index:99999;box-shadow:0 0 30px rgba(255,23,68,.5);animation:toastIn .3s ease;max-width:calc(100vw - 40px);}
 #toast.info-toast{background:rgba(0,212,255,.92);color:#000;}
 @keyframes toastIn{from{transform:translateY(20px);opacity:0;}to{transform:translateY(0);opacity:1;}}
-@media(max-width:768px){
-  :root{--side:100%;}
+
+/* Responsive */
+@media(max-width:900px){
+  :root{--side:100%;--hdr:44px;}
   .main-layout{flex-direction:column;}
-  .feed-col{flex:none;height:44vw;min-height:180px;}
-  .side-panel{width:100%;border-left:none;border-top:1px solid var(--border);}
+  .feed-col{flex:none;height:42vw;min-height:180px;padding:6px;}
+  .side-panel{width:100%;border-left:none;border-top:1px solid var(--border);flex:1;min-height:0;}
+  #hdr-uptime{display:none !important;}
+}
+@media(max-width:480px){
+  .feed-col{height:55vw;min-height:160px;}
+  .status-row{grid-template-columns:repeat(2,1fr);}
+  .hdr-logo span{display:none;}
+  #hdr-time{display:none;}
+  .cam-btn-grid{grid-template-columns:repeat(2,1fr);}
 }
 </style>
 </head>
@@ -188,7 +210,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 
 <div id="app">
   <div class="header">
-    <div class="hdr-logo"><div class="hdr-logo-dot"></div>X-RAY SCANNER</div>
+    <div class="hdr-logo"><div class="hdr-logo-dot"></div><span>X-RAY SCANNER</span></div>
     <div class="hdr-right">
       <span id="conn-badge" class="badge-off">PC OFFLINE</span>
       <span id="hdr-uptime">UP 00:00:00</span>
@@ -203,7 +225,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
         <div class="hud-br"></div><div class="hud-bl"></div>
         <div class="scanlines"></div>
         <img id="feed-img" alt="live">
-        <canvas id="feed-canvas"></canvas>
         <div id="no-stream">
           <div class="no-stream-icon">&#128225;</div>
           <div class="no-stream-text">AWAITING SCANNER CONNECTION</div>
@@ -222,16 +243,24 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
     </div>
 
     <div class="side-panel">
+      <!-- 3 tabs: CONTROLS / LOGS / STATUS  (Camera tab removed; cam select is inside Controls) -->
       <div class="side-tabs">
-        <div class="side-tab active" onclick="switchTab('controls',this)">CONTROLS</div>
-        <div class="side-tab" onclick="switchTab('camera',this)">CAMERA</div>
-        <div class="side-tab" onclick="switchTab('log',this)">LOGS</div>
-        <div class="side-tab" onclick="switchTab('status',this)">STATUS</div>
+        <div class="side-tab active" onclick="switchTab('controls',this)">&#9881; CONTROLS</div>
+        <div class="side-tab" onclick="switchTab('log',this)">&#128203; LOGS</div>
+        <div class="side-tab" onclick="switchTab('status',this)">&#128202; STATUS</div>
       </div>
       <div class="side-content">
 
+        <!-- CONTROLS PANE -->
         <div id="pane-controls" class="side-pane active">
           <div class="side-scroll">
+
+            <!-- Camera select — buttons only, no preview thumbnails -->
+            <div class="ctrl-section">
+              <div class="section-label">CAMERA SELECT</div>
+              <div class="cam-btn-grid" id="cam-btn-grid"></div>
+            </div>
+
             <div class="ctrl-section">
               <div class="section-label">DETECTION SETTINGS</div>
               <div class="setting-label">Confidence Threshold <span id="th-val" class="vbox">0.80</span></div>
@@ -241,6 +270,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
               <input type="range" id="cf" min="1" max="30" step="1" value="12" oninput="onCfChange(this.value)">
               <div class="ctrl-hint">Frames before alert fires</div>
             </div>
+
             <div class="ctrl-section">
               <div class="section-label">IMAGE PROCESSING</div>
               <div class="ctrl-hint" style="margin-bottom:10px;color:var(--text2)">Applied to frames BEFORE YOLO inference</div>
@@ -255,6 +285,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
               <div class="setting-label" style="margin-top:8px">Sharpness <span id="sharp-val" class="vbox">0.0</span></div>
               <input type="range" id="sharp" min="0.0" max="5.0" step="0.5" value="0.0" oninput="onImgChange('sharpness',this.value,'sharp-val','f1')">
             </div>
+
             <div class="ctrl-section">
               <div class="section-label">ORIENTATION</div>
               <div class="btn-grid">
@@ -265,20 +296,16 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
               </div>
               <div class="ctrl-hint">Rotation: <span id="rot-val" style="color:var(--accent)">0</span> deg</div>
             </div>
+
             <div class="ctrl-section">
-              <button class="btn-reset" onclick="resetImageSettings()">RESET IMAGE SETTINGS</button>
+              <button class="btn-reset" onclick="resetImageSettings()">&#8634; RESET IMAGE SETTINGS</button>
+              <button class="btn-danger-reset" onclick="confirmResetDetections()">&#128465; RESET ALL DETECTIONS</button>
             </div>
+
           </div>
         </div>
 
-        <div id="pane-camera" class="side-pane">
-          <div style="padding:10px 12px 6px;border-bottom:1px solid var(--border);flex-shrink:0;">
-            <div class="section-label" style="margin-top:0;margin-bottom:2px">SELECT ACTIVE CAMERA</div>
-            <div class="ctrl-hint">Click preview to switch. Numbers start from 1.</div>
-          </div>
-          <div class="cam-grid" id="cam-grid"></div>
-        </div>
-
+        <!-- LOG PANE -->
         <div id="pane-log" class="side-pane">
           <div class="log-top">
             <div class="class-btns">
@@ -294,8 +321,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
               <div class="dl-wrap">
                 <button class="btn-icon" onclick="toggleDlMenu(event)">EXPORT</button>
                 <div class="dl-menu" id="dl-menu">
-                  <div class="dl-item" onclick="exportCSV()">CSV Spreadsheet</div>
-                  <div class="dl-item" onclick="exportHTMLReport()">HTML Report</div>
+                  <div class="dl-item" onclick="exportCSV()">&#128196; CSV</div>
+                  <div class="dl-item" onclick="exportHTMLReport()">&#128444; HTML Report</div>
                 </div>
               </div>
             </div>
@@ -308,6 +335,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
           </div>
         </div>
 
+        <!-- STATUS PANE -->
         <div id="pane-status" class="side-pane">
           <div class="side-scroll">
             <div class="stat-chips">
@@ -340,53 +368,54 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 
 <script>
 "use strict";
-var API = window.location.origin;
+var API   = window.location.origin;
 var TOKEN = localStorage.getItem("xray_token") || "";
 var ws = null, wsTimer = null;
 var pcConnected = false, mjpegActive = false;
-var allDets = [], recentDets = [];
+var allDets = [];
 var logPage = 1;
 var selectedClasses = new Set(["Gun","Knife","Pliers","Scissors","Wrench"]);
 var activeCamIdx = 0;
-var NUM_CAMERAS = 4;
+var NUM_CAMERAS  = 4;
 var _settingTimer = null, _imgTimer = null;
-var uptimeStart = null, uptimeInterval = null;
+var pcConnectedAt = null;   // epoch ms anchored to when the PC connected (from server)
+var uptimeInterval = null;
 var imgSettings = {brightness:0,contrast:1.0,saturation:1.0,hue:0,sharpness:0.0,hflip:false,vflip:false,rotation:0};
 
-// FPS counter — counts MJPEG load events
+// ── FPS COUNTER ─────────────────────────────────────────────────────────────
+// Counts real MJPEG frame load events, resets every second.
 var _fpsCount = 0, _fpsTime = Date.now();
 function tickFps() {
   _fpsCount++;
-  var now = Date.now();
-  if (now - _fpsTime >= 1000) {
-    var fps = (_fpsCount * 1000 / (now - _fpsTime)).toFixed(1);
+  var now     = Date.now();
+  var elapsed = now - _fpsTime;
+  if (elapsed >= 1000) {
+    var fps = (_fpsCount * 1000 / elapsed).toFixed(1);
     var tag = document.getElementById("feed-fps-tag");
-    tag.textContent = fps + " FPS";
+    tag.textContent  = fps + " FPS";
     tag.style.display = "block";
-    _fpsCount = 0; _fpsTime = now;
+    _fpsCount = 0;
+    _fpsTime  = now;
   }
 }
 
+// ── TAB ──────────────────────────────────────────────────────────────────────
 function switchTab(name, el) {
   document.querySelectorAll(".side-pane").forEach(function(p){ p.classList.remove("active"); });
   document.querySelectorAll(".side-tab").forEach(function(t){ t.classList.remove("active"); });
   document.getElementById("pane-" + name).classList.add("active");
   el.classList.add("active");
   if (name === "log") renderLog();
-  if (name === "camera") buildCamGrid();
 }
 
-// AUTH
+// ── AUTH ─────────────────────────────────────────────────────────────────────
 async function doLogin() {
   var u = document.getElementById("u").value.trim();
   var p = document.getElementById("p").value;
   var err = document.getElementById("login-err");
   err.textContent = "";
   try {
-    var res = await fetch("/api/admin/login", {
-      method:"POST", headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({username:u, password:p})
-    });
+    var res  = await fetch("/api/admin/login", {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:u,password:p})});
     var data = await res.json();
     if (!res.ok) { err.textContent = data.detail || "Login failed"; return; }
     TOKEN = data.access_token;
@@ -413,12 +442,11 @@ var _appIntervals = [];
 function showApp() {
   document.getElementById("login-screen").style.display = "none";
   document.getElementById("app").style.display = "flex";
-  // Clear any leftover intervals from a previous session (e.g. logout + login)
   _appIntervals.forEach(function(id){ clearInterval(id); });
   _appIntervals = [];
   _appIntervals.push(setInterval(updateClock, 1000));
-  // BUG FIX: was 8000ms - missed detections if WS was down; now 5s
   _appIntervals.push(setInterval(refreshMiniDets, 5000));
+  buildCamBtns();
   startMjpeg();
   connectWS();
   loadSettings();
@@ -432,28 +460,33 @@ window.onload = function() {
   if (TOKEN) showApp();
 };
 
-// UPTIME
-function startUptime() {
-  uptimeStart = Date.now();
+// ── UPTIME — anchored to PC connection epoch sent by server ──────────────────
+function startUptime(connectedAtEpochSec) {
+  // connectedAtEpochSec is a Unix timestamp in seconds from the server
+  pcConnectedAt = connectedAtEpochSec ? connectedAtEpochSec * 1000 : Date.now();
+  var el = document.getElementById("hdr-uptime");
+  el.style.display = "block";
   if (uptimeInterval) clearInterval(uptimeInterval);
   uptimeInterval = setInterval(function() {
-    var s = Math.floor((Date.now() - uptimeStart) / 1000);
-    var h = String(Math.floor(s/3600)).padStart(2,"0");
-    var m = String(Math.floor((s%3600)/60)).padStart(2,"0");
-    var sec = String(s%60).padStart(2,"0");
-    document.getElementById("hdr-uptime").textContent = "UP " + h + ":" + m + ":" + sec;
+    var s = Math.max(0, Math.floor((Date.now() - pcConnectedAt) / 1000));
+    var h   = String(Math.floor(s / 3600)).padStart(2,"0");
+    var m   = String(Math.floor((s % 3600) / 60)).padStart(2,"0");
+    var sec = String(s % 60).padStart(2,"0");
+    el.textContent = "UP " + h + ":" + m + ":" + sec;
   }, 1000);
 }
 function stopUptime() {
   if (uptimeInterval) clearInterval(uptimeInterval);
-  uptimeInterval = null; uptimeStart = null;
-  document.getElementById("hdr-uptime").textContent = "UP 00:00:00";
+  uptimeInterval = null; pcConnectedAt = null;
+  var el = document.getElementById("hdr-uptime");
+  el.textContent   = "UP 00:00:00";
+  el.style.display = "none";
 }
 function updateClock() {
   document.getElementById("hdr-time").textContent = new Date().toLocaleTimeString();
 }
 
-// MJPEG — attach handlers BEFORE setting src
+// ── MJPEG ────────────────────────────────────────────────────────────────────
 function startMjpeg() {
   var img = document.getElementById("feed-img");
   img.onload = function() {
@@ -462,10 +495,10 @@ function startMjpeg() {
   };
   img.onerror = function() {
     mjpegActive = false;
-    document.getElementById("feed-fps-tag").style.display = "none";
-    document.getElementById("feed-fps-tag").textContent = "";
+    var tag = document.getElementById("feed-fps-tag");
+    tag.style.display = "none"; tag.textContent = "";
     updateFeedVis();
-    setTimeout(function(){ if(!mjpegActive) startMjpeg(); }, 4000);
+    setTimeout(function(){ if (!mjpegActive) startMjpeg(); }, 4000);
   };
   img.src = API + "/api/stream/mjpeg?token=" + TOKEN + "&_t=" + Date.now();
   img.style.display = "block";
@@ -479,396 +512,417 @@ function stopMjpeg() {
 }
 function updateFeedVis() {
   var noStream = document.getElementById("no-stream");
-  var canvas   = document.getElementById("feed-canvas");
   var feedImg  = document.getElementById("feed-img");
   var rec      = document.getElementById("feed-rec");
   if (mjpegActive) {
-    noStream.style.display="none"; canvas.style.display="none"; feedImg.style.display="block"; rec.style.display="flex";
-  } else if (pcConnected) {
-    noStream.style.display="none"; canvas.style.display="block"; feedImg.style.display="none"; rec.style.display="flex";
+    noStream.style.display = "none"; feedImg.style.display = "block"; rec.style.display = "flex";
   } else {
-    noStream.style.display="flex"; canvas.style.display="none"; feedImg.style.display="none"; rec.style.display="none";
-    document.getElementById("feed-fps-tag").style.display="none";
+    noStream.style.display = "flex"; feedImg.style.display = "none"; rec.style.display = "none";
+    document.getElementById("feed-fps-tag").style.display = "none";
   }
 }
 
-// WEBSOCKET
+// ── WEBSOCKET ────────────────────────────────────────────────────────────────
 function connectWS() {
   if (ws) { try{ws.close();}catch(e){} }
-  if (wsTimer) { clearTimeout(wsTimer); wsTimer=null; }
-  var proto = location.protocol==="https:" ? "wss" : "ws";
+  if (wsTimer) { clearTimeout(wsTimer); wsTimer = null; }
+  var proto = location.protocol === "https:" ? "wss" : "ws";
   ws = new WebSocket(proto + "://" + location.host + "/api/stream/watch?token=" + TOKEN);
   ws.binaryType = "arraybuffer";
   ws.onopen  = function(){};
-  ws.onclose = function(){ setConnected(false); wsTimer=setTimeout(connectWS,5000); };
+  ws.onclose = function(){ setConnected(false, null); wsTimer = setTimeout(connectWS, 5000); };
   ws.onerror = function(){ try{ws.close();}catch(e){} };
   ws.onmessage = function(ev) {
-    if (ev.data instanceof ArrayBuffer) { if(!mjpegActive) renderWsFrame(ev.data); return; }
-    var msg; try{ msg=JSON.parse(ev.data); }catch(e){ return; }
+    if (ev.data instanceof ArrayBuffer) return;  // binary frames not used in web UI
+    var msg; try{ msg = JSON.parse(ev.data); } catch(e){ return; }
     handleWsEvent(msg);
   };
 }
-function setConnected(c) {
+function setConnected(c, connectedAtEpochSec) {
   pcConnected = c;
   var b = document.getElementById("conn-badge");
   b.textContent = c ? "PC ONLINE" : "PC OFFLINE";
-  b.className = c ? "badge-on" : "badge-off";
-  if (c) startUptime(); else stopUptime();
-  updateFeedVis();
-}
-function renderWsFrame(buf) {
-  var canvas = document.getElementById("feed-canvas");
-  var blob = new Blob([buf], {type:"image/jpeg"});
-  var url = URL.createObjectURL(blob);
-  var img = new Image();
-  img.onload = function(){ canvas.width=img.width; canvas.height=img.height; canvas.getContext("2d").drawImage(img,0,0); URL.revokeObjectURL(url); };
-  img.src = url;
+  b.className   = c ? "badge-on" : "badge-off";
+  if (c) startUptime(connectedAtEpochSec); else stopUptime();
 }
 function handleWsEvent(msg) {
-  if (msg.type==="pc_status")       setConnected(msg.online);
-  if (msg.type==="settings_update") applySettingsToUI(msg);
-  if (msg.type==="status_update")   updateBadges(msg.status);
-  if (msg.type==="new_detection") {
+  if (msg.type === "pc_status") {
+    setConnected(msg.online, msg.connected_at || null);
+  }
+  if (msg.type === "settings_update") {
+    if (!_userEditing) applySettingsToUI(msg);
+  }
+  if (msg.type === "status_update") {
+    updateBadges(msg.status);
+  }
+  if (msg.type === "new_detection") {
     showToast("ALERT: " + msg.class_name);
-    // BUG FIX: prepend directly so log updates instantly without a full fetch
-    var det={id:msg.id,class_name:msg.class_name,time_hms:msg.time_hms,
-             date_dmy:msg.date_dmy,conf:msg.conf,image_url:msg.image_url,camera_idx:msg.camera_idx};
-    allDets.unshift(det);
-    recentDets.unshift(det); recentDets=recentDets.slice(0,20);
+    allDets.unshift({
+      id:         msg.id,
+      class_name: msg.class_name,
+      time_hms:   msg.time_hms,
+      date_dmy:   msg.date_dmy,
+      conf:       msg.conf,
+      image_url:  msg.image_url,
+      camera_idx: msg.camera_idx
+    });
     updateCounts(); renderMiniDets();
-    if(document.getElementById("pane-log").classList.contains("active")){logPage=1;renderLog();}
+    if (document.getElementById("pane-log").classList.contains("active")) { logPage=1; renderLog(); }
+  }
+  if (msg.type === "detections_reset") {
+    allDets = [];
+    updateCounts(); renderMiniDets();
+    if (document.getElementById("pane-log").classList.contains("active")) renderLog();
+    showToast("Detections reset", "info");
   }
 }
 
-// BADGES
+// ── BADGES ───────────────────────────────────────────────────────────────────
 function updateBadges(st) {
   if (!st) return;
   [["badge-main","STATUS",st.main,"si-main"],
-   ["badge-gate","GATE",st.gate,"si-gate"],
-   ["badge-belt","BELT",st.belt,"si-belt"],
+   ["badge-gate","GATE",  st.gate,"si-gate"],
+   ["badge-belt","BELT",  st.belt,"si-belt"],
    ["badge-buzzer","BUZZER",st.buzzer,"si-buzzer"]].forEach(function(row){
-    var el=document.getElementById(row[0]); var sv=document.getElementById(row[3]);
-    if (!el||row[2]==null) return;
-    var on=["OPEN","RUNNING","ON","SAFE"].indexOf(row[2])>=0;
-    el.className="s-badge "+(on?"on":"off");
-    el.innerHTML='<span class="s-badge-label">'+row[1]+'</span>'+row[2];
-    if(sv){sv.className="sts-val "+(on?"on":"off"); sv.textContent=row[2];}
+    var el = document.getElementById(row[0]);
+    var sv = document.getElementById(row[3]);
+    if (!el || row[2] == null) return;
+    var on = ["OPEN","RUNNING","ON","SAFE"].indexOf(row[2]) >= 0;
+    el.className = "s-badge " + (on ? "on" : "off");
+    el.innerHTML = '<span class="s-badge-label">' + row[1] + '</span>' + row[2];
+    if (sv) { sv.className = "sts-val " + (on ? "on" : "off"); sv.textContent = row[2]; }
   });
-  document.getElementById("feed-overlay").style.display=(st.main==="DANGER")?"flex":"none";
+  document.getElementById("feed-overlay").style.display = (st.main === "DANGER") ? "flex" : "none";
 }
 
-// DETECTION SETTINGS
+// ── SETTINGS ─────────────────────────────────────────────────────────────────
 async function loadSettings() {
   try {
     var res = await authFetch("/api/settings/");
-    var d = await res.json();
+    var d   = await res.json();
     applySettingsToUI(d);
   } catch(e) {}
 }
 function applySettingsToUI(d) {
-  if (d.confidence_threshold!=null) {
-    document.getElementById("th").value = d.confidence_threshold;
+  if (d.confidence_threshold != null) {
+    document.getElementById("th").value   = d.confidence_threshold;
     document.getElementById("th-val").textContent = parseFloat(d.confidence_threshold).toFixed(2);
   }
-  if (d.confirm_frames!=null) {
-    document.getElementById("cf").value = d.confirm_frames;
-    document.getElementById("cf-val").textContent = d.confirm_frames;
+  if (d.confirm_frames != null) {
+    document.getElementById("cf").value   = d.confirm_frames;
+    document.getElementById("cf-val").textContent = parseInt(d.confirm_frames);
   }
-  if (d.camera_index!=null) {
+  if (d.camera_index != null) {
     activeCamIdx = parseInt(d.camera_index);
-    document.getElementById("feed-cam-tag").textContent = "CAM "+(activeCamIdx+1);
-    updateCamGridActive();
+    document.getElementById("feed-cam-tag").textContent = "CAM " + (activeCamIdx + 1);
+    updateCamBtns();
   }
   if (d.image_settings) applyImgSettingsToUI(d.image_settings);
 }
-function onThChange(v) { document.getElementById("th-val").textContent=parseFloat(v).toFixed(2); clearTimeout(_settingTimer); _settingTimer=setTimeout(saveDetSettings,500); }
-function onCfChange(v) { document.getElementById("cf-val").textContent=parseInt(v); clearTimeout(_settingTimer); _settingTimer=setTimeout(saveDetSettings,500); }
-async function saveDetSettings() {
-  try {
-    await authFetch("/api/settings/update",{method:"POST",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({confidence_threshold:parseFloat(document.getElementById("th").value),
-        confirm_frames:parseInt(document.getElementById("cf").value),camera_index:activeCamIdx})});
-  } catch(e){}
-}
 
-// IMAGE SETTINGS
-function fmtVal(v,fmt) {
-  if(fmt==="int") return String(parseInt(v));
-  if(fmt==="f1")  return parseFloat(v).toFixed(1);
-  if(fmt==="f2")  return parseFloat(v).toFixed(2);
-  return v;
-}
-function onImgChange(key,val,displayId,fmt) {
-  document.getElementById(displayId).textContent = fmtVal(val,fmt);
-  imgSettings[key] = parseFloat(val);
-  clearTimeout(_imgTimer); _imgTimer=setTimeout(saveImgSettings,400);
-}
-function applyImgSettingsToUI(s) {
-  var fields=[["bright","bright-val","brightness","int"],["contrast","contrast-val","contrast","f2"],
-    ["sat","sat-val","saturation","f2"],["hue","hue-val","hue","int"],["sharp","sharp-val","sharpness","f1"]];
-  fields.forEach(function(f){
-    var val=s[f[2]]; if(val==null) return;
-    var el=document.getElementById(f[0]); var de=document.getElementById(f[1]);
-    if(el) el.value=val; if(de) de.textContent=fmtVal(val,f[3]);
-    imgSettings[f[2]]=parseFloat(val);
-  });
-  if(s.hflip!=null){imgSettings.hflip=!!s.hflip; document.getElementById("btn-hflip").classList.toggle("active",!!s.hflip);}
-  if(s.vflip!=null){imgSettings.vflip=!!s.vflip; document.getElementById("btn-vflip").classList.toggle("active",!!s.vflip);}
-  if(s.rotation!=null){imgSettings.rotation=parseInt(s.rotation); document.getElementById("rot-val").textContent=parseInt(s.rotation);}
-}
-async function saveImgSettings() {
-  try {
-    await authFetch("/api/settings/update_image",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(imgSettings)});
-  } catch(e){}
-}
-function toggleFlip(axis) {
-  if(axis==="h"){imgSettings.hflip=!imgSettings.hflip; document.getElementById("btn-hflip").classList.toggle("active",imgSettings.hflip);}
-  else{imgSettings.vflip=!imgSettings.vflip; document.getElementById("btn-vflip").classList.toggle("active",imgSettings.vflip);}
-  clearTimeout(_imgTimer); _imgTimer=setTimeout(saveImgSettings,100);
-}
-function doRotate(deg) {
-  imgSettings.rotation=(imgSettings.rotation+deg+360)%360;
-  document.getElementById("rot-val").textContent=imgSettings.rotation;
-  clearTimeout(_imgTimer); _imgTimer=setTimeout(saveImgSettings,100);
-}
-function resetImageSettings() {
-  imgSettings={brightness:0,contrast:1.0,saturation:1.0,hue:0,sharpness:0.0,hflip:false,vflip:false,rotation:0};
-  applyImgSettingsToUI(imgSettings);
-  clearTimeout(_imgTimer); _imgTimer=setTimeout(saveImgSettings,100);
-  showToast("Image settings reset","info");
-}
-
-// CAMERA GRID — use XHR to detect 204 No Content (no signal)
-function buildCamGrid() {
-  var grid = document.getElementById("cam-grid");
+// ── CAMERA BUTTONS ────────────────────────────────────────────────────────────
+function buildCamBtns() {
+  var grid = document.getElementById("cam-btn-grid");
   grid.innerHTML = "";
-  for (var i=0; i<NUM_CAMERAS; i++) {
+  for (var i = 0; i < NUM_CAMERAS; i++) {
     (function(idx){
-      var isActive = (idx===activeCamIdx);
-      var d = document.createElement("div");
-      d.className = "cam-thumb" + (isActive?" cam-active":"");
-      d.id = "ct-"+idx;
-      d.onclick = function(){ switchCamera(idx); };
-
-      var img = document.createElement("img");
-      img.id = "cp-"+idx; img.alt = "CAM "+(idx+1);
-
-      var nosig = document.createElement("div");
-      nosig.className = "cam-nosig"; nosig.id = "cns-"+idx;
-      nosig.textContent = "NO SIGNAL";
-
-      var lbl = document.createElement("div");
-      lbl.className = "cam-label"; lbl.id = "cl-"+idx;
-      var ns = document.createElement("span");
-      ns.textContent = "CAM "+(idx+1);
-      lbl.appendChild(ns);
-      if (isActive) { var dot=document.createElement("span"); dot.className="cam-active-dot"; lbl.appendChild(dot); }
-
-      d.appendChild(img); d.appendChild(nosig); d.appendChild(lbl);
-      grid.appendChild(d);
-      fetchCamSnap(idx);
+      var btn = document.createElement("button");
+      btn.id = "camb-" + idx;
+      btn.className = "cam-btn" + (idx === activeCamIdx ? " cam-active" : "");
+      btn.innerHTML = "CAM " + (idx + 1) + (idx === activeCamIdx ? '<span class="cam-active-dot"></span>' : "");
+      btn.onclick = function(){ switchCamera(idx); };
+      grid.appendChild(btn);
     })(i);
   }
 }
-function fetchCamSnap(idx) {
-  var xhr = new XMLHttpRequest();
-  xhr.open("GET", API+"/api/stream/snapshot?cam="+idx+"&token="+TOKEN+"&_t="+Date.now(), true);
-  xhr.responseType = "blob";
-  xhr.onload = function() {
-    var img=document.getElementById("cp-"+idx);
-    var nosig=document.getElementById("cns-"+idx);
-    if (!img||!nosig) return;
-    if (xhr.status===200 && xhr.response && xhr.response.size>0) {
-      var url=URL.createObjectURL(xhr.response);
-      img.onload=function(){URL.revokeObjectURL(url);};
-      img.src=url; nosig.style.display="none";
-    } else { nosig.style.display="flex"; }
-  };
-  xhr.onerror=function(){var nosig=document.getElementById("cns-"+idx); if(nosig) nosig.style.display="flex";};
-  xhr.send();
-}
-function updateCamGridActive() {
-  for (var i=0; i<NUM_CAMERAS; i++) {
-    var ct=document.getElementById("ct-"+i); var lbl=document.getElementById("cl-"+i);
-    if (!ct||!lbl) continue;
-    var isActive=(i===activeCamIdx);
-    ct.classList.toggle("cam-active",isActive);
-    lbl.innerHTML=""; var ns=document.createElement("span"); ns.textContent="CAM "+(i+1); lbl.appendChild(ns);
-    if(isActive){var dot=document.createElement("span"); dot.className="cam-active-dot"; lbl.appendChild(dot);}
+function updateCamBtns() {
+  for (var i = 0; i < NUM_CAMERAS; i++) {
+    var btn = document.getElementById("camb-" + i);
+    if (!btn) { buildCamBtns(); return; }
+    var isActive = (i === activeCamIdx);
+    btn.className = "cam-btn" + (isActive ? " cam-active" : "");
+    btn.innerHTML = "CAM " + (i + 1) + (isActive ? '<span class="cam-active-dot"></span>' : "");
   }
 }
 async function switchCamera(idx) {
-  activeCamIdx=idx;
-  document.getElementById("feed-cam-tag").textContent="CAM "+(idx+1);
-  updateCamGridActive();
+  activeCamIdx = idx;
+  document.getElementById("feed-cam-tag").textContent = "CAM " + (idx + 1);
+  updateCamBtns();
   try {
-    await authFetch("/api/settings/update",{method:"POST",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({confidence_threshold:parseFloat(document.getElementById("th").value),
-        confirm_frames:parseInt(document.getElementById("cf").value),camera_index:idx})});
-  } catch(e){}
-  setTimeout(function(){fetchCamSnap(idx);},1200);
+    await authFetch("/api/settings/update", {
+      method: "POST", headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({
+        confidence_threshold: parseFloat(document.getElementById("th").value),
+        confirm_frames:       parseInt(document.getElementById("cf").value),
+        camera_index:         idx
+      })
+    });
+  } catch(e) {}
 }
 
-// CLASS FILTER
+// ── DETECTION SETTINGS ────────────────────────────────────────────────────────
+var _userEditing = false, _editTimer = null;
+function _markEditing() {
+  _userEditing = true;
+  clearTimeout(_editTimer);
+  _editTimer = setTimeout(function(){ _userEditing = false; }, 2000);
+}
+function onThChange(v) {
+  _markEditing();
+  document.getElementById("th-val").textContent = parseFloat(v).toFixed(2);
+  clearTimeout(_settingTimer); _settingTimer = setTimeout(saveDetSettings, 500);
+}
+function onCfChange(v) {
+  _markEditing();
+  document.getElementById("cf-val").textContent = parseInt(v);
+  clearTimeout(_settingTimer); _settingTimer = setTimeout(saveDetSettings, 500);
+}
+async function saveDetSettings() {
+  try {
+    await authFetch("/api/settings/update", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({
+        confidence_threshold: parseFloat(document.getElementById("th").value),
+        confirm_frames:       parseInt(document.getElementById("cf").value),
+        camera_index:         activeCamIdx
+      })
+    });
+  } catch(e) {}
+}
+
+// ── IMAGE SETTINGS ────────────────────────────────────────────────────────────
+function fmtVal(v, fmt) {
+  if (fmt === "int") return String(parseInt(v));
+  if (fmt === "f1")  return parseFloat(v).toFixed(1);
+  if (fmt === "f2")  return parseFloat(v).toFixed(2);
+  return v;
+}
+function onImgChange(key, val, displayId, fmt) {
+  _markEditing();
+  document.getElementById(displayId).textContent = fmtVal(val, fmt);
+  imgSettings[key] = parseFloat(val);
+  clearTimeout(_imgTimer); _imgTimer = setTimeout(saveImgSettings, 400);
+}
+function applyImgSettingsToUI(s) {
+  var fields = [
+    ["bright","bright-val","brightness","int"],
+    ["contrast","contrast-val","contrast","f2"],
+    ["sat","sat-val","saturation","f2"],
+    ["hue","hue-val","hue","int"],
+    ["sharp","sharp-val","sharpness","f1"]
+  ];
+  fields.forEach(function(f){
+    var val = s[f[2]]; if (val == null) return;
+    var el = document.getElementById(f[0]); var de = document.getElementById(f[1]);
+    if (el) el.value = val;
+    if (de) de.textContent = fmtVal(val, f[3]);
+    imgSettings[f[2]] = parseFloat(val);
+  });
+  if (s.hflip  != null){ imgSettings.hflip  = !!s.hflip;  document.getElementById("btn-hflip").classList.toggle("active", !!s.hflip); }
+  if (s.vflip  != null){ imgSettings.vflip  = !!s.vflip;  document.getElementById("btn-vflip").classList.toggle("active", !!s.vflip); }
+  if (s.rotation != null){ imgSettings.rotation = parseInt(s.rotation); document.getElementById("rot-val").textContent = parseInt(s.rotation); }
+}
+async function saveImgSettings() {
+  try {
+    await authFetch("/api/settings/update_image", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify(imgSettings)
+    });
+  } catch(e) {}
+}
+function toggleFlip(axis) {
+  if (axis === "h"){ imgSettings.hflip = !imgSettings.hflip; document.getElementById("btn-hflip").classList.toggle("active", imgSettings.hflip); }
+  else             { imgSettings.vflip = !imgSettings.vflip; document.getElementById("btn-vflip").classList.toggle("active", imgSettings.vflip); }
+  clearTimeout(_imgTimer); _imgTimer = setTimeout(saveImgSettings, 100);
+}
+function doRotate(deg) {
+  imgSettings.rotation = (imgSettings.rotation + deg + 360) % 360;
+  document.getElementById("rot-val").textContent = imgSettings.rotation;
+  clearTimeout(_imgTimer); _imgTimer = setTimeout(saveImgSettings, 100);
+}
+function resetImageSettings() {
+  imgSettings = {brightness:0,contrast:1.0,saturation:1.0,hue:0,sharpness:0.0,hflip:false,vflip:false,rotation:0};
+  applyImgSettingsToUI(imgSettings);
+  clearTimeout(_imgTimer); _imgTimer = setTimeout(saveImgSettings, 100);
+  showToast("Image settings reset", "info");
+}
+
+// ── RESET ALL DETECTIONS ──────────────────────────────────────────────────────
+function confirmResetDetections() {
+  if (!confirm("DELETE all detection logs and images?\nThis cannot be undone.")) return;
+  authFetch("/api/detections/reset", {method:"DELETE"})
+    .then(function(res){
+      if (res.ok) {
+        allDets = [];
+        updateCounts(); renderMiniDets();
+        if (document.getElementById("pane-log").classList.contains("active")) renderLog();
+        showToast("All detections cleared", "info");
+      } else {
+        showToast("Reset failed");
+      }
+    })
+    .catch(function(){ showToast("Reset failed"); });
+}
+
+// ── CLASS FILTER ──────────────────────────────────────────────────────────────
 function toggleCls(btn) {
-  var c=btn.dataset.c;
-  if(c==="ALL"){
-    selectedClasses=new Set(["Gun","Knife","Pliers","Scissors","Wrench"]);
-    document.querySelectorAll(".cls-btn").forEach(function(b){b.classList.add("sel");});
+  var c = btn.dataset.c;
+  if (c === "ALL") {
+    selectedClasses = new Set(["Gun","Knife","Pliers","Scissors","Wrench"]);
+    document.querySelectorAll(".cls-btn").forEach(function(b){ b.classList.add("sel"); });
   } else {
     btn.classList.toggle("sel");
-    if(btn.classList.contains("sel")) selectedClasses.add(c); else selectedClasses.delete(c);
-    document.querySelector(".cls-btn[data-c='ALL']").classList.toggle("sel",selectedClasses.size===5);
+    if (btn.classList.contains("sel")) selectedClasses.add(c); else selectedClasses.delete(c);
+    document.querySelector(".cls-btn[data-c='ALL']").classList.toggle("sel", selectedClasses.size === 5);
   }
-  logPage=1; renderLog();
+  logPage = 1; renderLog();
 }
 
-// EXPORT
+// ── EXPORT ────────────────────────────────────────────────────────────────────
 function toggleDlMenu(e) { e.stopPropagation(); document.getElementById("dl-menu").classList.toggle("open"); }
 async function exportCSV() {
   document.getElementById("dl-menu").classList.remove("open");
   try {
-    var res=await authFetch("/api/detections/export");
-    var blob=await res.blob(); var url=URL.createObjectURL(blob);
-    var a=document.createElement("a"); a.href=url; a.download="detections.csv"; a.click(); URL.revokeObjectURL(url);
-  } catch(e){showToast("Export failed");}
+    var res  = await authFetch("/api/detections/export");
+    var blob = await res.blob();
+    var url  = URL.createObjectURL(blob);
+    var a = document.createElement("a"); a.href=url; a.download="detections.csv"; a.click(); URL.revokeObjectURL(url);
+  } catch(e) { showToast("Export failed"); }
 }
 function exportHTMLReport() {
   document.getElementById("dl-menu").classList.remove("open");
-  var filtered=getFilteredDets(); var rows="";
+  var filtered = getFilteredDets();
+  var rows = "";
   filtered.forEach(function(d){
-    var conf=d.conf?parseFloat(d.conf).toFixed(2):"-";
-    var imgSrc=resolveImgUrl(d.image_url);
-    var camNum=((d.camera_idx!=null?d.camera_idx:0)+1);
-    var imgTag=imgSrc?'<img src="'+imgSrc+'" width="80" height="60" style="border-radius:4px;object-fit:cover">':"";
-    rows+="<tr><td>"+(d.id||"")+"</td><td><b>"+(d.class_name||"-")+"</b></td><td>"+(d.date_dmy||"")+"</td><td>"+(d.time_hms||"")+"</td><td>"+conf+"</td><td>CAM "+camNum+"</td><td>"+imgTag+"</td></tr>";
+    var conf   = d.conf ? parseFloat(d.conf).toFixed(2) : "-";
+    var camNum = ((d.camera_idx != null ? d.camera_idx : 0) + 1);
+    rows += "<tr><td>" + (d.id||"") + "</td><td><b>" + (d.class_name||"-") + "</b></td>"
+          + "<td>" + (d.date_dmy||"") + "</td><td>" + (d.time_hms||"") + "</td>"
+          + "<td>" + conf + "</td><td>CAM " + camNum + "</td></tr>";
   });
-  var html="<!DOCTYPE html><html><head><meta charset='UTF-8'><title>Detection Report</title><style>body{font-family:monospace;background:#070b12;color:#c8d8f0;padding:24px}h1{color:#00d4ff}table{border-collapse:collapse;width:100%;font-size:12px;margin-top:16px}th{background:#0f1623;color:#00d4ff;padding:8px 10px;border:1px solid #1e2d42;text-align:left}td{padding:7px 10px;border:1px solid #1e2d42;vertical-align:middle}tr:nth-child(even){background:#0c1520}</style></head><body><h1>X-Ray Detection Report</h1><p style='color:#6a8aaa'>Generated: "+new Date().toLocaleString()+" | Records: "+filtered.length+"</p><table><thead><tr><th>#</th><th>Class</th><th>Date</th><th>Time</th><th>Conf</th><th>Camera</th><th>Image</th></tr></thead><tbody>"+rows+"</tbody></table></body></html>";
-  var blob=new Blob([html],{type:"text/html"}); var url=URL.createObjectURL(blob);
-  var a=document.createElement("a"); a.href=url; a.download="detection_report.html"; a.click(); URL.revokeObjectURL(url);
+  var html = "<!DOCTYPE html><html><head><meta charset='UTF-8'><title>Detection Report</title>"
+    + "<style>body{font-family:monospace;background:#070b12;color:#c8d8f0;padding:24px}"
+    + "h1{color:#00d4ff}table{border-collapse:collapse;width:100%;font-size:12px;margin-top:16px}"
+    + "th{background:#0f1623;color:#00d4ff;padding:8px 10px;border:1px solid #1e2d42;text-align:left}"
+    + "td{padding:7px 10px;border:1px solid #1e2d42}tr:nth-child(even){background:#0c1520}"
+    + "</style></head><body><h1>X-Ray Detection Report</h1>"
+    + "<p style='color:#6a8aaa'>Generated: " + new Date().toLocaleString() + " | Records: " + filtered.length + "</p>"
+    + "<table><thead><tr><th>#</th><th>Class</th><th>Date</th><th>Time</th><th>Conf</th><th>Camera</th></tr></thead>"
+    + "<tbody>" + rows + "</tbody></table></body></html>";
+  var blob = new Blob([html], {type:"text/html"});
+  var url  = URL.createObjectURL(blob);
+  var a = document.createElement("a"); a.href=url; a.download="detection_report.html"; a.click(); URL.revokeObjectURL(url);
 }
 
-// LOG
+// ── LOG — text-only rows, no images ──────────────────────────────────────────
 async function loadLog() {
   var list = document.getElementById("det-list");
   list.innerHTML = '<div style="color:var(--text3);font-size:11px;padding:16px;text-align:center">Loading...</div>';
   try {
-    var res=await authFetch("/api/detections/list?page=1&limit=500");
-    if (!res.ok) throw new Error("HTTP "+res.status);
-    allDets=await res.json();
-    logPage=1;
-    renderLog(); updateCounts(); renderMiniDets();
+    var res = await authFetch("/api/detections/list?page=1&limit=500");
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    allDets = await res.json();
+    logPage = 1; renderLog(); updateCounts(); renderMiniDets();
   } catch(e) {
-    list.innerHTML='<div style="color:var(--danger);font-size:11px;padding:16px">Failed to load — check connection</div>';
+    list.innerHTML = '<div style="color:var(--danger);font-size:11px;padding:16px">Failed to load</div>';
   }
 }
 function getFilteredDets() {
-  var tf=(document.getElementById("log-search").value||"").toLowerCase();
+  var tf = (document.getElementById("log-search").value || "").toLowerCase();
   return allDets.filter(function(d){
-    var cls=d.class_name||"";
-    var clsMatch=selectedClasses.size===0||selectedClasses.has(cls);
-    var txtMatch=!tf||cls.toLowerCase().indexOf(tf)>=0||(d.time_hms&&d.time_hms.indexOf(tf)>=0)||(d.date_dmy&&d.date_dmy.indexOf(tf)>=0);
-    return clsMatch&&txtMatch;
+    var cls      = d.class_name || "";
+    var clsMatch = selectedClasses.size === 0 || selectedClasses.has(cls);
+    var txtMatch = !tf || cls.toLowerCase().indexOf(tf) >= 0
+                       || (d.time_hms && d.time_hms.indexOf(tf) >= 0)
+                       || (d.date_dmy && d.date_dmy.indexOf(tf) >= 0);
+    return clsMatch && txtMatch;
   });
 }
-// BUG FIX: image_url stored in DB is a relative path like /static/detections/xxx.jpg
-// The web admin panel is served from Railway — prefix with API origin so images load.
-function resolveImgUrl(url) {
-  if (!url) return "";
-  if (url.startsWith("http://") || url.startsWith("https://")) return url;
-  return API + url;
-}
-
 function renderLog() {
-  var filtered=getFilteredDets();
-  var perPage=30; var start=(logPage-1)*perPage;
-  var page=filtered.slice(start,start+perPage);
-  var list=document.getElementById("det-list");
+  var filtered = getFilteredDets();
+  var perPage  = 30;
+  var start    = (logPage - 1) * perPage;
+  var page     = filtered.slice(start, start + perPage);
+  var list     = document.getElementById("det-list");
   if (!page.length) {
-    list.innerHTML='<div style="color:var(--text3);font-size:11px;padding:16px;text-align:center">No detections found</div>';
-    document.getElementById("prev-btn").style.display="none";
-    document.getElementById("next-btn").style.display="none";
-    document.getElementById("page-info").textContent=""; return;
+    list.innerHTML = '<div style="color:var(--text3);font-size:11px;padding:16px;text-align:center">No detections found</div>';
+    document.getElementById("prev-btn").style.display = "none";
+    document.getElementById("next-btn").style.display = "none";
+    document.getElementById("page-info").textContent  = "";
+    return;
   }
-  var html="";
+  var html = "";
   page.forEach(function(d){
-    var imgUrl=resolveImgUrl(d.image_url);
-    var conf=d.conf?parseFloat(d.conf).toFixed(2):null;
-    var camNum=((d.camera_idx!=null?d.camera_idx:0)+1);
-    var cls=d.class_name||"?";
-    var info=cls+" | CAM "+camNum+" | "+(d.time_hms||"")+" "+(d.date_dmy||"")+(conf?" | conf "+conf:"");
-    html+='<div class="det-item" data-img="'+imgUrl+'" data-info="'+info.replace(/"/g,"&quot;")+'">'
-      +'<img src="'+imgUrl+'" loading="lazy" onerror="this.style.opacity=\'0.15\'">'
-      +'<div class="det-item-info">'
-        +'<div class="det-item-class">'+cls+'</div>'
-        +'<div class="det-item-meta">CAM '+camNum+' &middot; '+(d.time_hms||"")+' &middot; '+(d.date_dmy||"")+'</div>'
-        +(conf?'<span class="det-item-conf">'+conf+'</span>':"")
-      +'</div></div>';
+    var conf   = d.conf ? parseFloat(d.conf).toFixed(2) : null;
+    var camNum = ((d.camera_idx != null ? d.camera_idx : 0) + 1);
+    var cls    = d.class_name || "?";
+    html += '<div class="det-row">'
+          + '<span class="det-row-class cls-' + cls + '">' + cls + '</span>'
+          + '<span class="det-row-time">' + (d.time_hms||"") + " " + (d.date_dmy||"") + '</span>'
+          + '<span class="det-row-cam">C' + camNum + '</span>'
+          + (conf ? '<span class="det-row-conf">' + conf + '</span>' : "")
+          + '</div>';
   });
-  list.innerHTML=html;
-  list.querySelectorAll(".det-item").forEach(function(el){
-    el.addEventListener("click",function(){openModal(el.dataset.img,el.dataset.info);});
-  });
-  var totalPages=Math.max(1,Math.ceil(filtered.length/perPage));
-  document.getElementById("prev-btn").style.display=logPage>1?"flex":"none";
-  document.getElementById("next-btn").style.display=page.length===perPage?"flex":"none";
-  document.getElementById("page-info").textContent="PG "+logPage+" / "+totalPages;
+  list.innerHTML = html;
+  var totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
+  document.getElementById("prev-btn").style.display = logPage > 1 ? "flex" : "none";
+  document.getElementById("next-btn").style.display = page.length === perPage ? "flex" : "none";
+  document.getElementById("page-info").textContent  = "PG " + logPage + " / " + totalPages;
 }
-function changePage(dir){ logPage=Math.max(1,logPage+dir); renderLog(); }
+function changePage(dir) { logPage = Math.max(1, logPage + dir); renderLog(); }
 function updateCounts() {
-  var today=new Date().toLocaleDateString("en-GB");
-  document.getElementById("s-total").textContent=allDets.length;
-  document.getElementById("s-today").textContent=allDets.filter(function(d){return d.date_dmy===today;}).length;
+  var today = new Date().toLocaleDateString("en-GB");
+  document.getElementById("s-total").textContent = allDets.length;
+  document.getElementById("s-today").textContent = allDets.filter(function(d){ return d.date_dmy === today; }).length;
 }
 
-// MINI DETECTIONS
-// BUG FIX: was only updating allDets if length < 20, so the mini list froze
-// after the first batch. Now always sync.
+// ── MINI DETECTIONS — text-only, no images ────────────────────────────────────
 async function refreshMiniDets() {
   try {
-    var res=await authFetch("/api/detections/list?page=1&limit=20");
-    var data=await res.json();
-    allDets=data; updateCounts();
-    renderMiniDets();
-  } catch(e){}
+    var res  = await authFetch("/api/detections/list?page=1&limit=20");
+    var data = await res.json();
+    if (data.length !== allDets.length) {
+      allDets = data; updateCounts(); renderMiniDets();
+    }
+  } catch(e) {}
 }
 function renderMiniDets() {
-  var list=document.getElementById("mini-det-list");
-  var src=recentDets.length?recentDets:allDets.slice(0,10);
-  if(!src.length){list.innerHTML='<div style="color:var(--text3);font-size:11px;text-align:center;padding:20px 0">No detections yet</div>';return;}
-  var html="";
+  var list = document.getElementById("mini-det-list");
+  var src  = allDets.slice(0, 10);
+  if (!src.length) {
+    list.innerHTML = '<div style="color:var(--text3);font-size:11px;text-align:center;padding:20px 0">No detections yet</div>';
+    return;
+  }
+  var html = "";
   src.forEach(function(d){
-    var imgUrl=resolveImgUrl(d.image_url);
-    var cls=d.class_name||d.class||"?";
-    var camNum=((d.camera_idx!=null?d.camera_idx:0)+1);
-    var info=cls+" | CAM "+camNum+" | "+(d.time_hms||"")+" "+(d.date_dmy||"");
-    html+='<div class="det-item" data-img="'+imgUrl+'" data-info="'+info.replace(/"/g,"&quot;")+'">'
-      +'<img src="'+imgUrl+'" loading="lazy" onerror="this.style.opacity=\'0.15\'">'
-      +'<div class="det-item-info"><div class="det-item-class">'+cls+'</div>'
-      +'<div class="det-item-meta">CAM '+camNum+' &middot; '+(d.time_hms||"")+' &middot; '+(d.date_dmy||"")+'</div></div></div>';
+    var cls    = d.class_name || d.class || "?";
+    var camNum = ((d.camera_idx != null ? d.camera_idx : 0) + 1);
+    html += '<div class="mini-row">'
+          + '<span class="mini-cls cls-' + cls + '">' + cls + '</span>'
+          + '<span class="mini-time">' + (d.time_hms||"") + " " + (d.date_dmy||"") + '</span>'
+          + '<span class="mini-cam">C' + camNum + '</span>'
+          + '</div>';
   });
-  list.innerHTML=html;
-  list.querySelectorAll(".det-item").forEach(function(el){
-    el.addEventListener("click",function(){openModal(el.dataset.img,el.dataset.info);});
-  });
+  list.innerHTML = html;
 }
 
-// MODAL
-// BUG FIX: resolveImgUrl already handles the prefix — no need to double-prefix
-function openModal(src,info) {
-  document.getElementById("modal-img").src=src||"";
-  document.getElementById("modal-info").textContent=info||"";
-  document.getElementById("modal").style.display="flex";
+// ── MODAL ─────────────────────────────────────────────────────────────────────
+function openModal(src, info) {
+  document.getElementById("modal-img").src = src || "";
+  document.getElementById("modal-info").textContent = info || "";
+  document.getElementById("modal").style.display = "flex";
 }
-function closeModal(){document.getElementById("modal").style.display="none";}
-document.addEventListener("keydown",function(e){if(e.key==="Escape")closeModal();});
+function closeModal() { document.getElementById("modal").style.display = "none"; }
+document.addEventListener("keydown", function(e){ if (e.key === "Escape") closeModal(); });
 
-// TOAST
-function showToast(msg,type){
-  var t=document.getElementById("toast"); t.textContent=msg;
-  t.className=(type==="info")?"info-toast":"";
-  t.style.display="block"; clearTimeout(t._t);
-  t._t=setTimeout(function(){t.style.display="none";},4000);
+// ── TOAST ─────────────────────────────────────────────────────────────────────
+function showToast(msg, type) {
+  var t = document.getElementById("toast");
+  t.textContent   = msg;
+  t.className     = (type === "info") ? "info-toast" : "";
+  t.style.display = "block";
+  clearTimeout(t._t);
+  t._t = setTimeout(function(){ t.style.display = "none"; }, 4000);
 }
 </script>
 </body>
