@@ -1077,6 +1077,33 @@ async function authFetch(url, opts = {}){
   if(res.status === 401){ logout(); throw new Error("Unauthorized"); }
   return res;
 }
+
+function startStream(){
+  const img = document.getElementById("feed-img");
+  const noStream = document.getElementById("no-stream");
+  if(!img) return;
+
+  img.onload = () => {
+    img.style.display = "block";
+    if(noStream) noStream.style.display = "none";
+  };
+
+  img.onerror = () => {
+    img.style.display = "none";
+    if(noStream) noStream.style.display = "flex";
+  };
+
+  img.src = API + "/api/stream/mjpeg?token=" + TOKEN;
+}
+
+// Auto start stream once TOKEN is available
+setInterval(()=>{
+  if(typeof TOKEN !== "undefined" && TOKEN && !window.__streamStarted){
+     window.__streamStarted = true;
+     startStream();
+  }
+},1000);
+
 </script>
 </body>
 </html>
