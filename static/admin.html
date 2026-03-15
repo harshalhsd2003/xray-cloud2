@@ -378,6 +378,7 @@ var selectedClasses = new Set(["Gun","Knife","Pliers","Scissors","Wrench"]);
 var activeCamIdx = 0;
 var NUM_CAMERAS  = 4;
 var _settingTimer = null, _imgTimer = null;
+var _userEditing = false, _editTimer = null;   // guard: don't overwrite sliders mid-drag
 var pcConnectedAt = null;   // epoch ms anchored to when the PC connected (from server)
 var uptimeInterval = null;
 var imgSettings = {brightness:0,contrast:1.0,saturation:1.0,hue:0,sharpness:0.0,hflip:false,vflip:false,rotation:0};
@@ -661,7 +662,6 @@ async function switchCamera(idx) {
 }
 
 // ── DETECTION SETTINGS ────────────────────────────────────────────────────────
-var _userEditing = false, _editTimer = null;
 function _markEditing() {
   _userEditing = true;
   clearTimeout(_editTimer);
@@ -877,13 +877,17 @@ function updateCounts() {
 }
 
 // ── MINI DETECTIONS — text-only, no images ────────────────────────────────────
+// BUG FIX: always sync — don't skip when length matches, because after a reset
+// both sides are 0 and we still need to re-render the empty state.
 async function refreshMiniDets() {
   try {
     var res  = await authFetch("/api/detections/list?page=1&limit=20");
     var data = await res.json();
-    if (data.length !== allDets.length) {
-      allDets = data; updateCounts(); renderMiniDets();
-    }
+    allDets = data;
+    updateCounts();
+    renderMiniDets();
+    // Keep log in sync if open
+    if (document.getElementById("pane-log").classList.contains("active")) renderLog();
   } catch(e) {}
 }
 function renderMiniDets() {

@@ -8,6 +8,7 @@ from auth import verify_token
 from datetime import datetime
 import cloudinary
 import cloudinary.uploader
+import cloudinary.api
 
 router = APIRouter()
 

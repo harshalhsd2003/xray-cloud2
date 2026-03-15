@@ -1,4 +1,5 @@
 import json
+import time
 import asyncio
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Query
 from fastapi.responses import StreamingResponse, Response
@@ -35,7 +36,6 @@ class ConnectionManager:
 
     # ── PC CONNECTION ─────────────────────────────────────────────────
     async def connect_pc(self, ws: WebSocket):
-        import time as _time
         await ws.accept()
         if self.pc_socket:
             try:
@@ -43,7 +43,7 @@ class ConnectionManager:
             except Exception:
                 pass
         self.pc_socket = ws
-        self.pc_connected_at = _time.time()   # record real connection epoch
+        self.pc_connected_at = time.time()   # record real connection epoch
         print("[WS] Scanner PC connected")
 
         if self._pc_ping_task:
