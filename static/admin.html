@@ -826,9 +826,15 @@ function connectWS(){
       }
 
       const cam = document.getElementById("cam-sel");
-      if(cam){
+      if(cam && msg.camera_index !== undefined){
         cam.value = msg.camera_index;
+        const camTag = document.getElementById("feed-cam");
+        if(camTag) camTag.innerText = "CAM " + msg.camera_index;
       }
+
+      applySettingsDisplay(msg);
+      document.getElementById("settings-msg").innerText = "⟳ Synced from system";
+      setTimeout(() => { const el = document.getElementById("settings-msg"); if(el) el.innerText=""; }, 2000);
 
     }
   };
