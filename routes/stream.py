@@ -100,6 +100,18 @@ class ConnectionManager:
         for ws in dead:
             self.disconnect_client(ws)
 
+    async def broadcast_settings(self, settings):
+        msg = json.dumps({
+        "type": "settings_update",
+        "data": settings
+        })
+
+        for ws in self.clients:
+            try:
+                await ws.send_text(msg)
+            except:
+                pass
+    
     async def send_command_to_pc(self, cmd):
         if not self.pc_socket:
             return False

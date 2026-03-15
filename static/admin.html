@@ -774,6 +774,7 @@ function updateFeedVisibility(){
 
 // ── WEBSOCKET (events + WS canvas fallback) ───────────────────────
 function connectWS(){
+
   if(ws){ try{ws.close();}catch(e){} }
   if(wsReconnectTimer){ clearTimeout(wsReconnectTimer); wsReconnectTimer=null; }
 
@@ -782,27 +783,64 @@ function connectWS(){
   ws.binaryType = "arraybuffer";
 
   ws.onopen  = () => setConnected(true);
+
   ws.onclose = () => {
     setConnected(false);
     wsReconnectTimer = setTimeout(connectWS, 5000);
   };
+
   ws.onerror = () => { try{ws.close();}catch(e){} };
 
   ws.onmessage = ev => {
+
+    // FRAME STREAM
     if(ev.data instanceof ArrayBuffer){
-      // Only render to canvas if MJPEG is not active
       if(!mjpegActive) renderFrame(ev.data);
-    } else {
-      try{ handleEvent(JSON.parse(ev.data)); }catch(e){}
+      return;
+    }
+
+    // EVENT MESSAGE
+    let msg;
+    try{
+      msg = JSON.parse(ev.data);
+    }catch(e){
+      return;
+    }
+
+    handleEvent(msg);
+
+    // SETTINGS SYNC
+    if(msg.type === "settings_update"){
+
+      const th = document.getElementById("th");
+      if(th){
+        th.value = msg.confidence_threshold;
+        document.getElementById("th-val").innerText =
+          parseFloat(msg.confidence_threshold).toFixed(2);
+      }
+
+      const cf = document.getElementById("cf");
+      if(cf){
+        cf.value = msg.confirm_frames;
+        document.getElementById("cf-val").innerText = msg.confirm_frames;
+      }
+
+      const cam = document.getElementById("cam-sel");
+      if(cam){
+        cam.value = msg.camera_index;
+      }
+
     }
   };
 }
 
 function setConnected(c){
   pcConnected = c;
+
   const b = document.getElementById("conn-badge");
   b.innerText = c ? "● PC ONLINE" : "● PC OFFLINE";
   b.className = c ? "connected" : "disconnected";
+
   updateFeedVisibility();
 }
 
@@ -922,21 +960,37 @@ function applySettingsDisplay(d){
 }
 
 async function applySettings(){
-  const body = {
-    confidence_threshold: parseFloat(document.getElementById("th").value),
-    confirm_frames:       parseInt(document.getElementById("cf").value),
-    camera_index:         parseInt(document.getElementById("cam-sel").value)
-  };
-  try {
-    const res = await authFetch("/api/settings/update",{
-      method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body)
+
+  const th  = parseFloat(document.getElementById("th").value);
+  const cf  = parseInt(document.getElementById("cf").value);
+  const cam = parseInt(document.getElementById("cam-sel").value);
+
+  // ⚡ Instant UI update (optimistic update)
+  document.getElementById("th-val").innerText = th.toFixed(2);
+  document.getElementById("cf-val").innerText = cf;
+
+  try{
+
+    const res = await fetch(API + "/api/settings/update",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        "Authorization":"Bearer " + TOKEN
+      },
+      body: JSON.stringify({
+        confidence_threshold: th,
+        confirm_frames: cf,
+        camera_index: cam
+      })
     });
-    const d = await res.json();
-    const m = document.getElementById("settings-msg");
-    m.innerText = "✓ Applied to system";
-    setTimeout(() => m.innerText="", 3000);
-    applySettingsDisplay(d.settings);
-  } catch(e){}
+
+    if(!res.ok) throw new Error("Failed");
+
+  }catch(err){
+
+    console.error("Settings update failed",err);
+
+  }
 }
 
 // ── DETECTION LOG ─────────────────────────────────────────────────
