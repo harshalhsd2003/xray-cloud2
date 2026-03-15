@@ -41,13 +41,35 @@ async def get_settings(
             "confidence_threshold": 0.8,
             "confirm_frames": 12,
             "camera_index": 0,
-            "updated_at": datetime.utcnow().isoformat()
+            "updated_at": datetime.utcnow().isoformat(),
+            "image_settings": {
+                "brightness":  0,
+                "contrast":    1.0,
+                "saturation":  1.0,
+                "hue":         0,
+                "sharpness":   0.0,
+                "hflip":       False,
+                "vflip":       False,
+                "rotation":    0,
+            }
         }
     return {
         "confidence_threshold": s.confidence_threshold,
         "confirm_frames":       s.confirm_frames,
         "camera_index":         s.camera_index,
-        "updated_at":           s.updated_at.isoformat()
+        "updated_at":           s.updated_at.isoformat(),
+        # Include default image_settings so admin panel sliders initialise correctly.
+        # The PC owns live values; these are just sensible defaults shown on first load.
+        "image_settings": {
+            "brightness":  0,
+            "contrast":    1.0,
+            "saturation":  1.0,
+            "hue":         0,
+            "sharpness":   0.0,
+            "hflip":       False,
+            "vflip":       False,
+            "rotation":    0,
+        }
     }
 
 

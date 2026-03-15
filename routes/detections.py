@@ -32,13 +32,31 @@ async def push_detection(
 ):
     now = datetime.utcnow()
     image_bytes = await image.read()
-    
+
     os.makedirs("static/detections", exist_ok=True)
-    
-    with open(f"static/detections/{image.filename}", "wb") as f:
+
+    # Always save locally as a fallback
+    local_path = f"static/detections/{image.filename}"
+    with open(local_path, "wb") as f:
         f.write(image_bytes)
-        
-    image_url = f"/static/detections/{image.filename}"
+
+    # BUG FIX: Railway filesystem is ephemeral — files vanish on redeploy.
+    # Upload to Cloudinary when configured so images persist and are reachable
+    # from any browser without depending on Railwayx local disk.
+    if USE_CLOUDINARY:
+        try:
+            upload_result = cloudinary.uploader.upload(
+                image_bytes,
+                folder="xray_detections",
+                public_id=image.filename.rsplit(".", 1)[0],
+                overwrite=True,
+                resource_type="image"
+            )
+            image_url = upload_result.get("secure_url", f"/static/detections/{image.filename}")
+        except Exception:
+            image_url = f"/static/detections/{image.filename}"
+    else:
+        image_url = f"/static/detections/{image.filename}"
 
     det = Detection(
         timestamp  = now,
