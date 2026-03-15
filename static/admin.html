@@ -409,15 +409,20 @@ async function authFetch(url, opts) {
   return res;
 }
 
+var _appIntervals = [];
 function showApp() {
   document.getElementById("login-screen").style.display = "none";
   document.getElementById("app").style.display = "flex";
+  // Clear any leftover intervals from a previous session (e.g. logout + login)
+  _appIntervals.forEach(function(id){ clearInterval(id); });
+  _appIntervals = [];
+  _appIntervals.push(setInterval(updateClock, 1000));
+  // BUG FIX: was 8000ms - missed detections if WS was down; now 5s
+  _appIntervals.push(setInterval(refreshMiniDets, 5000));
   startMjpeg();
   connectWS();
   loadSettings();
   loadLog();
-  setInterval(updateClock, 1000);
-  setInterval(function(){ refreshMiniDets(); }, 8000);
   updateClock();
 }
 window.onload = function() {
@@ -525,8 +530,13 @@ function handleWsEvent(msg) {
   if (msg.type==="status_update")   updateBadges(msg.status);
   if (msg.type==="new_detection") {
     showToast("ALERT: " + msg.class_name);
-    recentDets.unshift(msg); recentDets=recentDets.slice(0,20);
-    renderMiniDets(); loadLog();
+    // BUG FIX: prepend directly so log updates instantly without a full fetch
+    var det={id:msg.id,class_name:msg.class_name,time_hms:msg.time_hms,
+             date_dmy:msg.date_dmy,conf:msg.conf,image_url:msg.image_url,camera_idx:msg.camera_idx};
+    allDets.unshift(det);
+    recentDets.unshift(det); recentDets=recentDets.slice(0,20);
+    updateCounts(); renderMiniDets();
+    if(document.getElementById("pane-log").classList.contains("active")){logPage=1;renderLog();}
   }
 }
 
@@ -728,7 +738,7 @@ function exportHTMLReport() {
   var filtered=getFilteredDets(); var rows="";
   filtered.forEach(function(d){
     var conf=d.conf?parseFloat(d.conf).toFixed(2):"-";
-    var imgSrc=d.image_url?(API+d.image_url):"";
+    var imgSrc=resolveImgUrl(d.image_url);
     var camNum=((d.camera_idx!=null?d.camera_idx:0)+1);
     var imgTag=imgSrc?'<img src="'+imgSrc+'" width="80" height="60" style="border-radius:4px;object-fit:cover">':"";
     rows+="<tr><td>"+(d.id||"")+"</td><td><b>"+(d.class_name||"-")+"</b></td><td>"+(d.date_dmy||"")+"</td><td>"+(d.time_hms||"")+"</td><td>"+conf+"</td><td>CAM "+camNum+"</td><td>"+imgTag+"</td></tr>";
@@ -740,12 +750,16 @@ function exportHTMLReport() {
 
 // LOG
 async function loadLog() {
+  var list = document.getElementById("det-list");
+  list.innerHTML = '<div style="color:var(--text3);font-size:11px;padding:16px;text-align:center">Loading...</div>';
   try {
     var res=await authFetch("/api/detections/list?page=1&limit=500");
+    if (!res.ok) throw new Error("HTTP "+res.status);
     allDets=await res.json();
+    logPage=1;
     renderLog(); updateCounts(); renderMiniDets();
   } catch(e) {
-    document.getElementById("det-list").innerHTML='<div style="color:var(--danger);font-size:11px;padding:16px">Failed to load — check connection</div>';
+    list.innerHTML='<div style="color:var(--danger);font-size:11px;padding:16px">Failed to load — check connection</div>';
   }
 }
 function getFilteredDets() {
@@ -757,6 +771,14 @@ function getFilteredDets() {
     return clsMatch&&txtMatch;
   });
 }
+// BUG FIX: image_url stored in DB is a relative path like /static/detections/xxx.jpg
+// The web admin panel is served from Railway — prefix with API origin so images load.
+function resolveImgUrl(url) {
+  if (!url) return "";
+  if (url.startsWith("http://") || url.startsWith("https://")) return url;
+  return API + url;
+}
+
 function renderLog() {
   var filtered=getFilteredDets();
   var perPage=30; var start=(logPage-1)*perPage;
@@ -770,7 +792,7 @@ function renderLog() {
   }
   var html="";
   page.forEach(function(d){
-    var imgUrl=d.image_url||"";
+    var imgUrl=resolveImgUrl(d.image_url);
     var conf=d.conf?parseFloat(d.conf).toFixed(2):null;
     var camNum=((d.camera_idx!=null?d.camera_idx:0)+1);
     var cls=d.class_name||"?";
@@ -800,11 +822,13 @@ function updateCounts() {
 }
 
 // MINI DETECTIONS
+// BUG FIX: was only updating allDets if length < 20, so the mini list froze
+// after the first batch. Now always sync.
 async function refreshMiniDets() {
   try {
     var res=await authFetch("/api/detections/list?page=1&limit=20");
     var data=await res.json();
-    if(allDets.length<20){allDets=data; updateCounts();}
+    allDets=data; updateCounts();
     renderMiniDets();
   } catch(e){}
 }
@@ -814,7 +838,7 @@ function renderMiniDets() {
   if(!src.length){list.innerHTML='<div style="color:var(--text3);font-size:11px;text-align:center;padding:20px 0">No detections yet</div>';return;}
   var html="";
   src.forEach(function(d){
-    var imgUrl=d.image_url||"";
+    var imgUrl=resolveImgUrl(d.image_url);
     var cls=d.class_name||d.class||"?";
     var camNum=((d.camera_idx!=null?d.camera_idx:0)+1);
     var info=cls+" | CAM "+camNum+" | "+(d.time_hms||"")+" "+(d.date_dmy||"");
@@ -830,9 +854,9 @@ function renderMiniDets() {
 }
 
 // MODAL
+// BUG FIX: resolveImgUrl already handles the prefix — no need to double-prefix
 function openModal(src,info) {
-  var fullSrc=(src&&src.indexOf("http")!==0)?(API+src):src;
-  document.getElementById("modal-img").src=fullSrc||"";
+  document.getElementById("modal-img").src=src||"";
   document.getElementById("modal-info").textContent=info||"";
   document.getElementById("modal").style.display="flex";
 }
