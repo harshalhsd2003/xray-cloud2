@@ -36,6 +36,13 @@ async def get_settings(
 ):
     result = await db.execute(select(SystemSettings).limit(1))
     s = result.scalar()
+    if not s:
+        return {
+            "confidence_threshold": 0.8,
+            "confirm_frames": 12,
+            "camera_index": 0,
+            "updated_at": datetime.utcnow().isoformat()
+        }
     return {
         "confidence_threshold": s.confidence_threshold,
         "confirm_frames":       s.confirm_frames,
@@ -52,6 +59,9 @@ async def update_settings(
 ):
     result = await db.execute(select(SystemSettings).limit(1))
     s = result.scalar()
+    if not s:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=500, detail="SystemSettings row not found")
 
     if body.confidence_threshold is not None:
         s.confidence_threshold = body.confidence_threshold
@@ -70,6 +80,7 @@ async def update_settings(
         "camera_index":         s.camera_index,
     }
 
+    # Send to PC and broadcast to all web/mobile clients
     await manager.send_command_to_pc(cmd)
     await manager.broadcast_event(cmd)
 
@@ -92,20 +103,22 @@ async def update_image_settings(
     _=Depends(verify_token)
 ):
     """
-    Relay image processing settings to the PC over WebSocket.
-    These are NOT persisted in the DB — the PC holds the state locally.
-    The admin panel sends them here and we forward via the PC socket.
+    Relay image-processing settings to the PC via WebSocket.
+    Not persisted in DB — the PC owns this state.
+    The admin panel sends changes here; we forward to PC and broadcast to other clients.
     """
+    # Only include fields that were actually sent (exclude_none=True)
     payload = body.dict(exclude_none=True)
 
+    if not payload:
+        return {"ok": True, "image_settings": {}}
+
     cmd = {
-        "type":            "settings_update",
-        "image_settings":  payload,
+        "type":           "settings_update",
+        "image_settings": payload,
     }
 
-    # Forward to PC
     await manager.send_command_to_pc(cmd)
-    # Also broadcast so other connected clients (mobile app) see the change
     await manager.broadcast_event(cmd)
 
     return {"ok": True, "image_settings": payload}
@@ -113,13 +126,7 @@ async def update_image_settings(
 
 @router.get("/image")
 async def get_image_settings(_=Depends(verify_token)):
-    """
-    Returns the last known image settings from the PC.
-    The PC pushes its current settings periodically via status_update,
-    but this endpoint can be polled if needed.
-    """
-    # We rely on the PC to push settings; just return defaults here
-    # since we don't persist image settings on the cloud side.
+    """Return default image settings (PC holds the live values)."""
     return {
         "brightness":  0,
         "contrast":    1.0,

@@ -8,14 +8,13 @@
 <style>
 :root{
   --safe:#00ff41;--danger:#ff1744;--accent:#00d4ff;--warn:#ffab00;--purple:#a855f7;
-  --bg:#070b12;--panel:#0f1623;--panel2:#141d2e;--panel3:#0c1520;
+  --bg:#070b12;--panel:#0f1623;--panel2:#141d2e;
   --border:#1e2d42;--border2:#2a3d56;
   --text:#dde8f8;--text2:#7a9abf;--text3:#3a5070;--text-safe:#4eff8a;
   --glow-accent:0 0 14px rgba(0,212,255,.4);
   --glow-safe:0 0 10px rgba(0,255,65,.3);
   --glow-danger:0 0 10px rgba(255,23,68,.4);
-  --radius:10px;--radius-sm:6px;
-  --hdr:50px;--side:330px;
+  --radius:10px;--radius-sm:6px;--hdr:50px;--side:330px;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Share Tech Mono',monospace;overflow:hidden;}
@@ -24,7 +23,7 @@ body{display:flex;flex-direction:column;}
 ::-webkit-scrollbar-track{background:var(--bg);}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
 
-/* ── LOGIN ── */
+/* LOGIN */
 #login-screen{
   position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
   background:var(--bg);z-index:9999;
@@ -54,12 +53,10 @@ body{display:flex;flex-direction:column;}
 .btn-login:hover{background:#00eeff;box-shadow:0 0 20px rgba(0,212,255,.4);}
 #login-err{color:var(--danger);font-size:11px;margin-top:10px;min-height:16px;}
 
-/* ── HEADER ── */
-.header{
-  height:var(--hdr);background:#000;border-bottom:1px solid var(--border);
+/* HEADER */
+.header{height:var(--hdr);background:#000;border-bottom:1px solid var(--border);
   padding:0 16px;display:flex;align-items:center;justify-content:space-between;
-  flex-shrink:0;z-index:50;
-}
+  flex-shrink:0;z-index:50;}
 .hdr-logo{font-family:'Orbitron';font-size:12px;font-weight:700;color:var(--accent);
   letter-spacing:.1em;display:flex;align-items:center;gap:8px;}
 .hdr-logo-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);
@@ -68,9 +65,9 @@ body{display:flex;flex-direction:column;}
 .hdr-right{display:flex;align-items:center;gap:10px;}
 #conn-badge{padding:3px 10px;border-radius:20px;font-size:9px;font-weight:700;
   font-family:'Orbitron';letter-spacing:.08em;transition:all .3s;}
-.connected{background:rgba(0,255,65,.1);color:var(--safe);border:1px solid rgba(0,255,65,.4);box-shadow:var(--glow-safe);}
-.disconnected{background:rgba(255,23,68,.1);color:var(--danger);border:1px solid rgba(255,23,68,.4);}
-#hdr-uptime{font-size:10px;color:var(--text2);font-family:'Share Tech Mono';background:var(--panel2);
+.badge-on{background:rgba(0,255,65,.1);color:var(--safe);border:1px solid rgba(0,255,65,.4);box-shadow:var(--glow-safe);}
+.badge-off{background:rgba(255,23,68,.1);color:var(--danger);border:1px solid rgba(255,23,68,.4);}
+#hdr-uptime{font-size:10px;color:var(--text2);background:var(--panel2);
   padding:3px 8px;border-radius:4px;border:1px solid var(--border);}
 #hdr-time{font-size:11px;color:var(--text2);}
 .btn-sm{background:transparent;color:var(--text2);border:1px solid var(--border2);
@@ -78,20 +75,14 @@ body{display:flex;flex-direction:column;}
   cursor:pointer;font-family:'Orbitron';letter-spacing:.06em;transition:all .15s;}
 .btn-sm:hover{color:var(--danger);border-color:var(--danger);}
 
-/* ── MAIN LAYOUT ── */
-#app{display:none;flex-direction:column;flex:1;overflow:hidden;}
-.main-layout{display:flex;flex:1;overflow:hidden;}
+/* MAIN LAYOUT */
+#app{display:none;flex-direction:column;flex:1;min-height:0;overflow:hidden;}
+.main-layout{display:flex;flex:1;min-height:0;overflow:hidden;}
 
-/* ── LEFT: LIVE FEED ── */
-.feed-col{
-  flex:1;min-width:0;display:flex;flex-direction:column;
-  padding:10px 6px 10px 10px;gap:8px;
-}
-.feed-hud{
-  flex:1;min-height:0;background:#000;border-radius:var(--radius);overflow:hidden;
-  position:relative;display:flex;align-items:center;justify-content:center;
-  border:1px solid var(--border);
-}
+/* LIVE FEED */
+.feed-col{flex:1;min-width:0;display:flex;flex-direction:column;padding:10px 6px 10px 10px;gap:8px;}
+.feed-hud{flex:1;min-height:0;background:#000;border-radius:var(--radius);overflow:hidden;
+  position:relative;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);}
 .feed-hud::before,.feed-hud::after,.feed-hud .hud-br,.feed-hud .hud-bl{
   content:'';position:absolute;width:20px;height:20px;z-index:5;pointer-events:none;}
 .feed-hud::before{top:8px;left:8px;border-top:2px solid var(--accent);border-left:2px solid var(--accent);}
@@ -124,8 +115,6 @@ body{display:flex;flex-direction:column;}
   background:rgba(255,23,68,.25);text-shadow:0 0 20px var(--danger);
   box-shadow:0 0 40px rgba(255,23,68,.4);animation:bannerFlicker .15s ease-in-out infinite alternate;}
 @keyframes bannerFlicker{from{opacity:1;}to{opacity:.85;}}
-
-/* status row below feed */
 .status-row{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;flex-shrink:0;}
 .s-badge{border-radius:var(--radius-sm);padding:7px 4px;text-align:center;
   font-family:'Orbitron';font-size:9px;font-weight:700;letter-spacing:.04em;
@@ -134,155 +123,134 @@ body{display:flex;flex-direction:column;}
 .s-badge.off{background:rgba(255,23,68,.08);color:#ff6b6b;border-color:rgba(255,23,68,.25);}
 .s-badge-label{font-size:8px;opacity:.65;display:block;margin-bottom:2px;color:var(--text2);}
 
-/* ── RIGHT: SIDE PANEL ── */
-.side-panel{
-  width:var(--side);flex-shrink:0;
-  border-left:1px solid var(--border);
-  display:flex;flex-direction:column;
-  background:var(--panel);overflow:hidden;
-}
-.side-tabs{
-  display:flex;border-bottom:1px solid var(--border);flex-shrink:0;background:#000;
-}
-.side-tab{
-  flex:1;padding:0;height:38px;display:flex;align-items:center;justify-content:center;
-  cursor:pointer;font-size:8.5px;font-family:'Orbitron';color:var(--text3);
-  border-bottom:2px solid transparent;transition:all .2s;letter-spacing:.04em;
-  white-space:nowrap;gap:4px;
-}
+/* SIDE PANEL */
+.side-panel{width:var(--side);flex-shrink:0;border-left:1px solid var(--border);
+  display:flex;flex-direction:column;background:var(--panel);overflow:hidden;}
+.side-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;background:#000;}
+.side-tab{flex:1;height:38px;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:8px;font-family:'Orbitron';color:var(--text3);
+  border-bottom:2px solid transparent;transition:all .2s;letter-spacing:.04em;gap:3px;
+  white-space:nowrap;}
 .side-tab:hover{color:var(--text2);}
 .side-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
-.side-content{flex:1;overflow:hidden;display:flex;flex-direction:column;}
-.side-pane{display:none;flex:1;flex-direction:column;overflow:hidden;}
+.side-content{flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column;}
+.side-pane{display:none;flex:1;flex-direction:column;overflow:hidden;min-height:0;}
 .side-pane.active{display:flex;}
-.side-scroll{flex:1;overflow-y:auto;padding:12px;}
+.side-scroll{flex:1;overflow-y:auto;padding:12px;min-height:0;}
 
 .section-label{font-family:'Orbitron';font-size:9px;color:var(--accent);letter-spacing:.15em;
   margin-bottom:8px;margin-top:4px;display:flex;align-items:center;gap:6px;}
-.section-label::before{content:'';width:3px;height:9px;background:var(--accent);border-radius:2px;flex-shrink:0;opacity:.8;}
+.section-label::before{content:'';width:3px;height:9px;background:var(--accent);border-radius:2px;flex-shrink:0;}
 
-/* ── CONTROLS PANE ── */
+/* CONTROLS */
 .ctrl-section{margin-bottom:18px;}
-.setting-label{font-size:10.5px;color:var(--text2);margin-bottom:5px;display:flex;justify-content:space-between;align-items:center;}
-.setting-row{display:grid;grid-template-columns:1fr 44px;align-items:center;gap:8px;margin-bottom:10px;}
+.setting-label{font-size:10px;color:var(--text2);margin-bottom:5px;
+  display:flex;justify-content:space-between;align-items:center;}
 .vbox{font-family:'Share Tech Mono',monospace;background:#080d16;text-align:center;
-  border-radius:4px;padding:4px 2px;color:var(--accent);font-size:12px;border:1px solid var(--border);min-width:44px;}
-input[type=range]{
-  -webkit-appearance:none;appearance:none;
-  width:100%;height:4px;cursor:pointer;display:block;
-  background:var(--border2);border-radius:2px;outline:none;
-}
-input[type=range]::-webkit-slider-thumb{
-  -webkit-appearance:none;width:14px;height:14px;
-  border-radius:50%;background:var(--accent);cursor:pointer;
-  box-shadow:0 0 6px rgba(0,212,255,.5);
-}
-input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:2px;}
-
-.ctrl-hint{font-size:9.5px;color:var(--text3);margin-top:3px;}
-
-/* Flip & Rotation buttons */
-.btn-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;}
+  border-radius:4px;padding:3px 4px;color:var(--accent);font-size:11px;
+  border:1px solid var(--border);min-width:40px;flex-shrink:0;}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:4px;
+  cursor:pointer;display:block;background:var(--border2);border-radius:2px;outline:none;margin-bottom:2px;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;
+  border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 0 6px rgba(0,212,255,.5);}
+.ctrl-hint{font-size:9px;color:var(--text3);margin-top:2px;}
+.btn-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px;margin-bottom:6px;}
 .btn-ctrl{background:var(--panel2);color:var(--text2);border:1px solid var(--border2);
   border-radius:var(--radius-sm);padding:8px 4px;font-size:9px;cursor:pointer;
   font-family:'Orbitron';transition:all .15s;text-align:center;letter-spacing:.04em;}
 .btn-ctrl:hover{color:var(--accent);border-color:var(--accent);background:rgba(0,212,255,.06);}
 .btn-ctrl.active{color:var(--accent);border-color:var(--accent);background:rgba(0,212,255,.12);}
 .btn-ctrl-icon{font-size:14px;display:block;margin-bottom:3px;}
-
-/* Reset button */
 .btn-reset{width:100%;background:transparent;color:var(--text3);border:1px solid var(--border);
   border-radius:var(--radius-sm);padding:7px;font-size:9px;cursor:pointer;
-  font-family:'Orbitron';transition:all .15s;letter-spacing:.06em;margin-top:4px;}
+  font-family:'Orbitron';transition:all .15s;letter-spacing:.06em;}
 .btn-reset:hover{color:var(--warn);border-color:var(--warn);}
 
-/* ── CAMERA PANE ── */
+/* CAMERA GRID */
 .cam-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px;}
 .cam-thumb{border-radius:var(--radius-sm);overflow:hidden;position:relative;
-  cursor:pointer;border:2px solid var(--border);transition:all .2s;background:#000;aspect-ratio:16/9;}
+  cursor:pointer;border:2px solid var(--border);transition:all .2s;
+  background:#000;aspect-ratio:16/9;}
 .cam-thumb:hover{border-color:var(--accent);box-shadow:0 0 10px rgba(0,212,255,.2);}
-.cam-thumb.active{border-color:var(--accent);box-shadow:0 0 12px rgba(0,212,255,.3);}
-.cam-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
-.cam-thumb-label{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.75);
-  font-family:'Orbitron';font-size:8px;padding:3px 6px;color:var(--text2);
+.cam-thumb.cam-active{border-color:var(--accent);box-shadow:0 0 12px rgba(0,212,255,.3);}
+.cam-thumb img{width:100%;height:100%;object-fit:cover;display:none;}
+.cam-thumb img.loaded{display:block;}
+.cam-label{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.78);
+  font-family:'Orbitron';font-size:8px;padding:3px 6px;
   display:flex;justify-content:space-between;align-items:center;}
-.cam-thumb-label.active{color:var(--accent);}
+.cam-label span{color:var(--text2);}
+.cam-label.cam-active-lbl span{color:var(--accent);}
 .cam-active-dot{width:5px;height:5px;border-radius:50%;background:var(--safe);
-  box-shadow:var(--glow-safe);animation:blink .8s ease-in-out infinite;}
-.cam-no-signal{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  font-size:9px;color:var(--text3);font-family:'Orbitron';letter-spacing:.1em;
+  box-shadow:var(--glow-safe);animation:blink .8s ease-in-out infinite;flex-shrink:0;}
+.cam-nosig{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:8px;color:var(--text3);font-family:'Orbitron';letter-spacing:.1em;
   background:rgba(0,0,0,.85);}
 
-/* ── LOG PANE ── */
-.log-filter-area{padding:10px 12px 6px;border-bottom:1px solid var(--border);flex-shrink:0;}
+/* LOG */
+.log-top{padding:10px 12px 8px;border-bottom:1px solid var(--border);flex-shrink:0;}
 .class-btns{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;}
-.class-btn{padding:4px 10px;border-radius:20px;font-size:9px;font-family:'Orbitron';
+.cls-btn{padding:4px 10px;border-radius:20px;font-size:9px;font-family:'Orbitron';
   cursor:pointer;border:1px solid var(--border2);color:var(--text3);
   background:transparent;transition:all .15s;letter-spacing:.04em;}
-.class-btn:hover{border-color:var(--accent);color:var(--text2);}
-.class-btn.selected{background:rgba(0,212,255,.12);border-color:var(--accent);color:var(--accent);}
-.class-btn[data-class="Gun"].selected{background:rgba(255,23,68,.12);border-color:var(--danger);color:#ff6b6b;}
-.class-btn[data-class="Knife"].selected{background:rgba(255,171,0,.1);border-color:var(--warn);color:var(--warn);}
-.class-btn[data-class="Scissors"].selected{background:rgba(168,85,247,.1);border-color:var(--purple);color:#c084fc;}
-.class-btn[data-class="Wrench"].selected{background:rgba(0,212,255,.12);border-color:var(--accent);color:var(--accent);}
-.class-btn[data-class="Pliers"].selected{background:rgba(0,255,65,.08);border-color:rgba(0,255,65,.5);color:var(--text-safe);}
-.log-search-row{display:flex;gap:6px;}
+.cls-btn:hover{border-color:var(--accent);color:var(--text2);}
+.cls-btn.sel{background:rgba(0,212,255,.12);border-color:var(--accent);color:var(--accent);}
+.cls-btn[data-c="Gun"].sel{background:rgba(255,23,68,.12);border-color:var(--danger);color:#ff6b6b;}
+.cls-btn[data-c="Knife"].sel{background:rgba(255,171,0,.1);border-color:var(--warn);color:var(--warn);}
+.cls-btn[data-c="Scissors"].sel{background:rgba(168,85,247,.1);border-color:var(--purple);color:#c084fc;}
+.cls-btn[data-c="Pliers"].sel{background:rgba(0,255,65,.08);border-color:rgba(0,255,65,.4);color:var(--text-safe);}
+.cls-btn[data-c="Wrench"].sel{background:rgba(0,212,255,.12);border-color:var(--accent);color:var(--accent);}
+.log-row{display:flex;gap:6px;}
 .log-search{background:#080d16;border:1px solid var(--border2);border-radius:var(--radius-sm);
   color:var(--text);padding:6px 10px;font-size:11px;font-family:'Share Tech Mono',monospace;
   outline:none;flex:1;transition:border-color .2s;}
 .log-search:focus{border-color:var(--accent);}
 .btn-icon{background:transparent;color:var(--text2);border:1px solid var(--border2);
-  border-radius:var(--radius-sm);padding:6px 10px;font-size:9.5px;cursor:pointer;
-  font-family:'Orbitron';transition:all .15s;text-decoration:none;display:flex;align-items:center;
+  border-radius:var(--radius-sm);padding:6px 10px;font-size:9px;cursor:pointer;
+  font-family:'Orbitron';transition:all .15s;display:flex;align-items:center;
   white-space:nowrap;gap:4px;letter-spacing:.04em;}
 .btn-icon:hover{color:var(--accent);border-color:var(--accent);}
-.btn-icon.danger:hover{color:var(--danger);border-color:var(--danger);}
-
-/* Download dropdown */
 .dl-wrap{position:relative;}
 .dl-menu{position:absolute;right:0;top:calc(100% + 4px);background:var(--panel);
   border:1px solid var(--border2);border-radius:var(--radius-sm);z-index:100;
-  min-width:160px;display:none;box-shadow:0 8px 24px rgba(0,0,0,.5);}
+  min-width:156px;display:none;box-shadow:0 8px 24px rgba(0,0,0,.6);}
 .dl-menu.open{display:block;}
 .dl-item{padding:9px 14px;font-size:10px;font-family:'Orbitron';color:var(--text2);
   cursor:pointer;display:flex;align-items:center;gap:8px;letter-spacing:.04em;
   border-bottom:1px solid var(--border);transition:background .15s;}
 .dl-item:last-child{border-bottom:none;}
 .dl-item:hover{background:rgba(0,212,255,.08);color:var(--accent);}
-
-.det-list{flex:1;overflow-y:auto;padding:6px 8px;}
+.det-list{flex:1;overflow-y:auto;padding:6px 8px;min-height:0;}
 .det-item{display:flex;align-items:center;gap:8px;padding:7px;margin-bottom:5px;
   background:var(--panel2);border-radius:var(--radius-sm);border:1px solid var(--border);
   cursor:pointer;transition:border-color .15s;}
 .det-item:hover{border-color:var(--accent);}
-.det-item img{width:56px;height:42px;object-fit:cover;border-radius:4px;background:#000;flex-shrink:0;}
+.det-item img{width:56px;height:42px;object-fit:cover;border-radius:4px;
+  background:#111;flex-shrink:0;}
 .det-item-info{min-width:0;flex:1;}
-.det-item-class{font-size:11px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--accent);}
-.det-item-class[data-cls="Gun"]{color:#ff6b6b;}
-.det-item-class[data-cls="Knife"]{color:var(--warn);}
-.det-item-class[data-cls="Scissors"]{color:#c084fc;}
+.det-item-class{font-size:11px;font-weight:700;white-space:nowrap;overflow:hidden;
+  text-overflow:ellipsis;color:var(--accent);}
 .det-item-meta{color:var(--text2);font-size:10px;margin-top:2px;}
 .det-item-conf{display:inline-block;background:rgba(0,212,255,.08);color:var(--accent);
   border:1px solid rgba(0,212,255,.18);border-radius:3px;font-size:9px;padding:1px 5px;margin-top:3px;}
-.log-pagination{display:flex;justify-content:center;align-items:center;gap:10px;
+.log-pages{display:flex;justify-content:center;align-items:center;gap:10px;
   padding:8px;border-top:1px solid var(--border);flex-shrink:0;}
 #page-info{font-size:10px;color:var(--text2);}
 
-/* ── STATUS PANE ── */
+/* STATUS */
 .stat-chips{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
 .stat-chip{background:var(--panel2);border:1px solid var(--border);border-radius:var(--radius-sm);
   padding:12px 6px;text-align:center;}
 .stat-chip-num{font-family:'Orbitron';font-size:22px;font-weight:700;color:var(--accent);line-height:1;}
 .stat-chip-lbl{font-size:8px;color:var(--text3);margin-top:3px;letter-spacing:.1em;}
-.status-grid2{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:14px;}
-.status-item{background:var(--panel2);border:1px solid var(--border);border-radius:var(--radius-sm);
+.sts-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:14px;}
+.sts-item{background:var(--panel2);border:1px solid var(--border);border-radius:var(--radius-sm);
   padding:10px;display:flex;flex-direction:column;gap:4px;}
-.status-item-label{font-size:8px;color:var(--text3);letter-spacing:.1em;}
-.status-item-val{font-family:'Orbitron';font-size:11px;color:var(--text2);}
-.status-item-val.on{color:var(--text-safe);}
-.status-item-val.off{color:#ff6b6b;}
+.sts-lbl{font-size:8px;color:var(--text3);letter-spacing:.1em;}
+.sts-val{font-family:'Orbitron';font-size:11px;color:var(--text2);}
+.sts-val.on{color:var(--text-safe);}
+.sts-val.off{color:#ff6b6b;}
 
-/* ── MODAL ── */
+/* MODAL */
 #modal{position:fixed;inset:0;background:rgba(0,0,0,.94);display:none;
   align-items:center;justify-content:center;z-index:9998;flex-direction:column;
   gap:12px;backdrop-filter:blur(8px);}
@@ -294,19 +262,18 @@ input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:2px;}
   cursor:pointer;transition:color .15s;line-height:1;}
 .modal-close:hover{color:#fff;}
 
-/* ── TOAST ── */
+/* TOAST */
 #toast{position:fixed;bottom:20px;right:20px;background:rgba(255,23,68,.95);color:#fff;
   padding:12px 18px;border-radius:var(--radius-sm);font-family:'Orbitron';
   font-weight:700;font-size:11px;letter-spacing:.06em;display:none;z-index:99999;
   box-shadow:0 0 30px rgba(255,23,68,.5);animation:toastIn .3s ease;}
-#toast.info{background:rgba(0,212,255,.9);color:#000;}
+#toast.info-toast{background:rgba(0,212,255,.92);color:#000;}
 @keyframes toastIn{from{transform:translateY(20px);opacity:0;}to{transform:translateY(0);opacity:1;}}
 
-/* ── RESPONSIVE ── */
 @media(max-width:768px){
   :root{--side:100%;}
   .main-layout{flex-direction:column;}
-  .feed-col{flex:none;height:45vw;min-height:200px;}
+  .feed-col{flex:none;height:44vw;min-height:180px;}
   .side-panel{width:100%;border-left:none;border-top:1px solid var(--border);}
 }
 </style>
@@ -327,25 +294,21 @@ input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:2px;}
 
 <!-- MAIN APP -->
 <div id="app">
-
-  <!-- HEADER -->
   <div class="header">
     <div class="hdr-logo">
       <div class="hdr-logo-dot"></div>
       X-RAY SCANNER
     </div>
     <div class="hdr-right">
-      <span id="conn-badge" class="disconnected">● PC OFFLINE</span>
-      <span id="hdr-uptime" title="System uptime since PC connected">⏱ 00:00:00</span>
+      <span id="conn-badge" class="badge-off">&#9679; PC OFFLINE</span>
+      <span id="hdr-uptime">&#9201; 00:00:00</span>
       <span id="hdr-time"></span>
-      <button class="btn-sm" onclick="logout()">LOGOUT</button>
+      <button class="btn-sm" onclick="doLogout()">LOGOUT</button>
     </div>
   </div>
 
-  <!-- BODY -->
   <div class="main-layout">
-
-    <!-- LEFT: LIVE FEED -->
+    <!-- LIVE FEED -->
     <div class="feed-col">
       <div class="feed-hud" id="feed-hud">
         <div class="hud-br"></div><div class="hud-bl"></div>
@@ -353,17 +316,16 @@ input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:2px;}
         <img id="feed-img" alt="live feed">
         <canvas id="feed-canvas"></canvas>
         <div id="no-stream">
-          <div class="no-stream-icon">📡</div>
+          <div class="no-stream-icon">&#128225;</div>
           <div class="no-stream-text">AWAITING SCANNER CONNECTION</div>
         </div>
         <div class="feed-tag" id="feed-fps-tag"></div>
         <div class="feed-tag" id="feed-cam-tag">CAM 1</div>
         <div class="feed-tag" id="feed-rec"><span class="rec-dot"></span>LIVE</div>
         <div id="feed-overlay">
-          <div class="danger-banner">⚠ PROHIBITED ITEM DETECTED</div>
+          <div class="danger-banner">&#9888; PROHIBITED ITEM DETECTED</div>
         </div>
       </div>
-      <!-- Status badges below feed -->
       <div class="status-row">
         <div class="s-badge off" id="badge-main"><span class="s-badge-label">STATUS</span>--</div>
         <div class="s-badge off" id="badge-gate"><span class="s-badge-label">GATE</span>--</div>
@@ -372,139 +334,117 @@ input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:2px;}
       </div>
     </div>
 
-    <!-- RIGHT: SIDE PANEL -->
+    <!-- SIDE PANEL -->
     <div class="side-panel">
       <div class="side-tabs">
-        <div class="side-tab active" onclick="switchSide('controls',this)">⚙ CONTROLS</div>
-        <div class="side-tab" onclick="switchSide('camera',this)">📷 CAMERA</div>
-        <div class="side-tab" onclick="switchSide('log',this)">📋 LOGS</div>
-        <div class="side-tab" onclick="switchSide('status',this)">📊 STATUS</div>
+        <div class="side-tab active" id="tab-controls" onclick="switchTab('controls',this)">&#9881; CTRL</div>
+        <div class="side-tab" id="tab-camera"   onclick="switchTab('camera',this)">&#128247; CAM</div>
+        <div class="side-tab" id="tab-log"      onclick="switchTab('log',this)">&#128203; LOGS</div>
+        <div class="side-tab" id="tab-status"   onclick="switchTab('status',this)">&#128202; STATUS</div>
       </div>
       <div class="side-content">
 
-        <!-- ───────── CONTROLS PANE ───────── -->
-        <div id="side-controls" class="side-pane active">
+        <!-- CONTROLS PANE -->
+        <div id="pane-controls" class="side-pane active">
           <div class="side-scroll">
 
             <div class="ctrl-section">
               <div class="section-label">DETECTION SETTINGS</div>
-
               <div class="setting-label">
                 Confidence Threshold
-                <span id="th-val" class="vbox" style="width:44px">0.80</span>
+                <span id="th-val" class="vbox">0.80</span>
               </div>
               <input type="range" id="th" min="0.10" max="1.00" step="0.05" value="0.80"
                 oninput="onThChange(this.value)">
-              <div class="ctrl-hint" style="margin-bottom:10px">Min confidence to trigger alert</div>
+              <div class="ctrl-hint" style="margin-bottom:8px">Min confidence to trigger alert</div>
 
               <div class="setting-label">
                 Confirm Frames
-                <span id="cf-val" class="vbox" style="width:44px">12</span>
+                <span id="cf-val" class="vbox">12</span>
               </div>
               <input type="range" id="cf" min="1" max="30" step="1" value="12"
                 oninput="onCfChange(this.value)">
-              <div class="ctrl-hint" style="margin-bottom:0">Consecutive frames before alert fires</div>
+              <div class="ctrl-hint">Consecutive frames before alert fires</div>
             </div>
 
             <div class="ctrl-section">
               <div class="section-label">IMAGE PROCESSING</div>
-              <div class="ctrl-hint" style="margin-bottom:10px;color:var(--text2)">Applied to camera frames before YOLO inference</div>
+              <div class="ctrl-hint" style="margin-bottom:10px;color:var(--text2)">Applied to frames BEFORE YOLO inference</div>
 
-              <div class="setting-label">
-                Brightness
-                <span id="bright-val" class="vbox" style="width:44px">0</span>
-              </div>
+              <div class="setting-label">Brightness <span id="bright-val" class="vbox">0</span></div>
               <input type="range" id="bright" min="-100" max="100" step="5" value="0"
-                oninput="onImgChange('brightness',this.value,'bright-val')">
+                oninput="onImgChange('brightness',this.value,'bright-val','int')">
 
-              <div class="setting-label" style="margin-top:8px">
-                Contrast
-                <span id="contrast-val" class="vbox" style="width:44px">1.0</span>
-              </div>
-              <input type="range" id="contrast" min="0.5" max="3.0" step="0.05" value="1.0"
-                oninput="onImgChange('contrast',this.value,'contrast-val',2)">
+              <div class="setting-label" style="margin-top:8px">Contrast <span id="contrast-val" class="vbox">1.00</span></div>
+              <input type="range" id="contrast" min="0.50" max="3.00" step="0.05" value="1.00"
+                oninput="onImgChange('contrast',this.value,'contrast-val','f2')">
 
-              <div class="setting-label" style="margin-top:8px">
-                Saturation
-                <span id="sat-val" class="vbox" style="width:44px">1.0</span>
-              </div>
-              <input type="range" id="sat" min="0" max="3.0" step="0.05" value="1.0"
-                oninput="onImgChange('saturation',this.value,'sat-val',2)">
+              <div class="setting-label" style="margin-top:8px">Saturation <span id="sat-val" class="vbox">1.00</span></div>
+              <input type="range" id="sat" min="0.00" max="3.00" step="0.05" value="1.00"
+                oninput="onImgChange('saturation',this.value,'sat-val','f2')">
 
-              <div class="setting-label" style="margin-top:8px">
-                Hue Shift
-                <span id="hue-val" class="vbox" style="width:44px">0</span>
-              </div>
+              <div class="setting-label" style="margin-top:8px">Hue Shift <span id="hue-val" class="vbox">0</span></div>
               <input type="range" id="hue" min="-90" max="90" step="5" value="0"
-                oninput="onImgChange('hue',this.value,'hue-val')">
+                oninput="onImgChange('hue',this.value,'hue-val','int')">
 
-              <div class="setting-label" style="margin-top:8px">
-                Sharpness
-                <span id="sharp-val" class="vbox" style="width:44px">0</span>
-              </div>
-              <input type="range" id="sharp" min="0" max="5" step="0.5" value="0"
-                oninput="onImgChange('sharpness',this.value,'sharp-val',1)">
+              <div class="setting-label" style="margin-top:8px">Sharpness <span id="sharp-val" class="vbox">0.0</span></div>
+              <input type="range" id="sharp" min="0.0" max="5.0" step="0.5" value="0.0"
+                oninput="onImgChange('sharpness',this.value,'sharp-val','f1')">
             </div>
 
             <div class="ctrl-section">
               <div class="section-label">ORIENTATION</div>
-
               <div class="btn-grid">
                 <button class="btn-ctrl" id="btn-hflip" onclick="toggleFlip('h')">
-                  <span class="btn-ctrl-icon">↔</span>H-FLIP
+                  <span class="btn-ctrl-icon">&#8596;</span>H-FLIP
                 </button>
                 <button class="btn-ctrl" id="btn-vflip" onclick="toggleFlip('v')">
-                  <span class="btn-ctrl-icon">↕</span>V-FLIP
+                  <span class="btn-ctrl-icon">&#8597;</span>V-FLIP
                 </button>
                 <button class="btn-ctrl" onclick="doRotate(-90)">
-                  <span class="btn-ctrl-icon">↺</span>ROT −90°
+                  <span class="btn-ctrl-icon">&#8634;</span>ROT -90&#176;
                 </button>
                 <button class="btn-ctrl" onclick="doRotate(90)">
-                  <span class="btn-ctrl-icon">↻</span>ROT +90°
+                  <span class="btn-ctrl-icon">&#8635;</span>ROT +90&#176;
                 </button>
               </div>
-              <div class="ctrl-hint">Rotation ID: <span id="rot-val" style="color:var(--accent)">0°</span></div>
+              <div class="ctrl-hint">Current rotation: <span id="rot-val" style="color:var(--accent)">0&#176;</span></div>
             </div>
 
             <div class="ctrl-section">
-              <button class="btn-reset" onclick="resetImageSettings()">↺ RESET ALL IMAGE SETTINGS</button>
+              <button class="btn-reset" onclick="resetImageSettings()">&#8634; RESET ALL IMAGE SETTINGS</button>
             </div>
 
           </div>
         </div>
 
-        <!-- ───────── CAMERA PANE ───────── -->
-        <div id="side-camera" class="side-pane">
-          <div class="side-scroll" style="padding:0">
-            <div style="padding:10px 12px 6px;border-bottom:1px solid var(--border);flex-shrink:0;">
-              <div class="section-label" style="margin-bottom:0">SELECT ACTIVE CAMERA</div>
-              <div class="ctrl-hint" style="margin-top:4px">Click a preview to switch live feed · Cameras numbered from 1</div>
-            </div>
-            <div class="cam-grid" id="cam-grid">
-              <!-- Generated by JS -->
-            </div>
+        <!-- CAMERA PANE -->
+        <div id="pane-camera" class="side-pane">
+          <div style="padding:10px 12px 6px;border-bottom:1px solid var(--border);flex-shrink:0;">
+            <div class="section-label" style="margin-top:0;margin-bottom:2px">SELECT ACTIVE CAMERA</div>
+            <div class="ctrl-hint">Click a preview to switch live feed &middot; Cameras shown from 1</div>
           </div>
+          <div class="cam-grid" id="cam-grid"></div>
         </div>
 
-        <!-- ───────── LOG PANE ───────── -->
-        <div id="side-log" class="side-pane">
-          <div class="log-filter-area">
-            <div class="class-btns" id="class-btn-row">
-              <button class="class-btn selected" data-class="ALL" onclick="toggleClassFilter(this)">ALL</button>
-              <button class="class-btn selected" data-class="Gun" onclick="toggleClassFilter(this)">GUN</button>
-              <button class="class-btn selected" data-class="Knife" onclick="toggleClassFilter(this)">KNIFE</button>
-              <button class="class-btn selected" data-class="Pliers" onclick="toggleClassFilter(this)">PLIERS</button>
-              <button class="class-btn selected" data-class="Scissors" onclick="toggleClassFilter(this)">SCISSORS</button>
-              <button class="class-btn selected" data-class="Wrench" onclick="toggleClassFilter(this)">WRENCH</button>
+        <!-- LOG PANE -->
+        <div id="pane-log" class="side-pane">
+          <div class="log-top">
+            <div class="class-btns">
+              <button class="cls-btn sel" data-c="ALL"      onclick="toggleCls(this)">ALL</button>
+              <button class="cls-btn sel" data-c="Gun"      onclick="toggleCls(this)">GUN</button>
+              <button class="cls-btn sel" data-c="Knife"    onclick="toggleCls(this)">KNIFE</button>
+              <button class="cls-btn sel" data-c="Pliers"   onclick="toggleCls(this)">PLIERS</button>
+              <button class="cls-btn sel" data-c="Scissors" onclick="toggleCls(this)">SCISSORS</button>
+              <button class="cls-btn sel" data-c="Wrench"   onclick="toggleCls(this)">WRENCH</button>
             </div>
-            <div class="log-search-row">
-              <input id="log-filter" class="log-search" placeholder="Search class / time...">
+            <div class="log-row">
+              <input id="log-search" class="log-search" placeholder="Search class / date / time...">
               <div class="dl-wrap">
-                <button class="btn-icon" onclick="toggleDlMenu(event)">⬇ EXPORT ▾</button>
+                <button class="btn-icon" onclick="toggleDlMenu(event)">&#8595; EXPORT</button>
                 <div class="dl-menu" id="dl-menu">
-                  <div class="dl-item" onclick="exportCSV()">📄 CSV Spreadsheet</div>
-                  <div class="dl-item" onclick="exportZIP()">📦 ZIP (CSV + Images)</div>
-                  <div class="dl-item" onclick="exportHTML()">🖼 HTML Report</div>
+                  <div class="dl-item" onclick="exportCSV()">&#128196; CSV</div>
+                  <div class="dl-item" onclick="exportHTMLReport()">&#128444; HTML Report</div>
                 </div>
               </div>
             </div>
@@ -512,47 +452,33 @@ input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:2px;}
           <div class="det-list" id="det-list">
             <div style="color:var(--text3);font-size:11px;padding:16px">Loading...</div>
           </div>
-          <div class="log-pagination">
-            <button class="btn-icon" id="prev-btn" onclick="changePage(-1)" style="display:none">◀</button>
+          <div class="log-pages">
+            <button class="btn-icon" id="prev-btn" onclick="changePage(-1)" style="display:none">&#9664;</button>
             <span id="page-info"></span>
-            <button class="btn-icon" id="next-btn" onclick="changePage(1)" style="display:none">▶</button>
+            <button class="btn-icon" id="next-btn" onclick="changePage(1)" style="display:none">&#9654;</button>
           </div>
         </div>
 
-        <!-- ───────── STATUS PANE ───────── -->
-        <div id="side-status" class="side-pane">
+        <!-- STATUS PANE -->
+        <div id="pane-status" class="side-pane">
           <div class="side-scroll">
             <div class="stat-chips">
               <div class="stat-chip">
-                <div class="stat-chip-num" id="s-total">—</div>
-                <div class="stat-chip-lbl">TOTAL DETECTIONS</div>
+                <div class="stat-chip-num" id="s-total">&#8212;</div>
+                <div class="stat-chip-lbl">TOTAL</div>
               </div>
               <div class="stat-chip">
-                <div class="stat-chip-num" id="s-today">—</div>
+                <div class="stat-chip-num" id="s-today">&#8212;</div>
                 <div class="stat-chip-lbl">TODAY</div>
               </div>
             </div>
-
             <div class="section-label">SYSTEM STATUS</div>
-            <div class="status-grid2" style="margin-bottom:14px">
-              <div class="status-item">
-                <div class="status-item-label">MAIN STATUS</div>
-                <div class="status-item-val" id="si-main">--</div>
-              </div>
-              <div class="status-item">
-                <div class="status-item-label">GATE</div>
-                <div class="status-item-val" id="si-gate">--</div>
-              </div>
-              <div class="status-item">
-                <div class="status-item-label">BELT</div>
-                <div class="status-item-val" id="si-belt">--</div>
-              </div>
-              <div class="status-item">
-                <div class="status-item-label">BUZZER</div>
-                <div class="status-item-val" id="si-buzzer">--</div>
-              </div>
+            <div class="sts-grid">
+              <div class="sts-item"><div class="sts-lbl">MAIN STATUS</div><div class="sts-val" id="si-main">--</div></div>
+              <div class="sts-item"><div class="sts-lbl">GATE</div><div class="sts-val" id="si-gate">--</div></div>
+              <div class="sts-item"><div class="sts-lbl">BELT</div><div class="sts-val" id="si-belt">--</div></div>
+              <div class="sts-item"><div class="sts-lbl">BUZZER</div><div class="sts-val" id="si-buzzer">--</div></div>
             </div>
-
             <div class="section-label">RECENT DETECTIONS</div>
             <div id="mini-det-list">
               <div style="color:var(--text3);font-size:11px;text-align:center;padding:20px 0">No detections yet</div>
@@ -561,14 +487,13 @@ input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:2px;}
         </div>
 
       </div>
-    </div><!-- /side-panel -->
-
-  </div><!-- /main-layout -->
-</div><!-- /#app -->
+    </div>
+  </div>
+</div>
 
 <!-- MODAL -->
 <div id="modal" onclick="closeModal()">
-  <span class="modal-close" onclick="closeModal()">✕</span>
+  <span class="modal-close" onclick="closeModal()">&#10005;</span>
   <img id="modal-img" src="" onclick="event.stopPropagation()">
   <div class="modal-info" id="modal-info"></div>
 </div>
@@ -576,592 +501,579 @@ input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:2px;}
 
 <script>
 const API = window.location.origin;
-let TOKEN  = localStorage.getItem("xray_token") || "";
+let TOKEN = localStorage.getItem("xray_token") || "";
 let ws = null, wsReconnectTimer = null;
 let pcConnected = false, mjpegActive = false;
-let recentDets = [], allDets = [];
+let allDets = [];        // full list from /api/detections/list
+let recentDets = [];     // ws pushed detections for mini list
 let logPage = 1;
-let filterClass = "";
 let selectedClasses = new Set(["Gun","Knife","Pliers","Scissors","Wrench"]);
-let _settingTimer = null;
-let uptimeStart = null, uptimeInterval = null;
-
-// ── Image processing state ──────────────────────────────────────────
-let imgSettings = {
-  brightness: 0,
-  contrast: 1.0,
-  saturation: 1.0,
-  hue: 0,
-  sharpness: 0,
-  hflip: false,
-  vflip: false,
-  rotation: 0  // 0, 90, 180, 270
-};
+let activeCamIdx = 0;    // 0-based backend index
 const NUM_CAMERAS = 4;
-let activeCamIdx = 0; // 0-indexed backend
+let _settingTimer = null, _imgTimer = null;
+let uptimeStart = null, uptimeInterval = null;
+let imgSettings = {brightness:0, contrast:1.0, saturation:1.0, hue:0, sharpness:0.0, hflip:false, vflip:false, rotation:0};
 
-// ── SIDE TAB SWITCH ─────────────────────────────────────────────────
-function switchSide(name, el){
-  document.querySelectorAll(".side-pane").forEach(p=>p.classList.remove("active"));
-  document.querySelectorAll(".side-tab").forEach(t=>t.classList.remove("active"));
-  document.getElementById("side-"+name).classList.add("active");
+// ── FPS tracking (MJPEG load events) ────────────────────────────────
+let _fpsCount = 0, _fpsT = Date.now();
+function tickFps(){
+  _fpsCount++;
+  const now = Date.now();
+  if(now - _fpsT >= 1000){
+    document.getElementById("feed-fps-tag").innerText = (_fpsCount * 1000 / (now - _fpsT)).toFixed(1) + " FPS";
+    _fpsCount = 0; _fpsT = now;
+  }
+}
+
+// ── TAB SWITCHING ────────────────────────────────────────────────────
+function switchTab(name, el){
+  document.querySelectorAll(".side-pane").forEach(p => p.classList.remove("active"));
+  document.querySelectorAll(".side-tab").forEach(t => t.classList.remove("active"));
+  document.getElementById("pane-" + name).classList.add("active");
   el.classList.add("active");
-  if(name==="log") renderLog();
-  if(name==="camera") refreshCamPreviews();
+  if(name === "log")    renderLog();
+  if(name === "camera") buildCamGrid();
 }
 
-// ── AUTH ────────────────────────────────────────────────────────────
+// ── AUTH ─────────────────────────────────────────────────────────────
 async function doLogin(){
-  const u=document.getElementById("u").value.trim();
-  const p=document.getElementById("p").value;
-  const err=document.getElementById("login-err");
-  err.innerText="";
+  const u = document.getElementById("u").value.trim();
+  const p = document.getElementById("p").value;
+  const err = document.getElementById("login-err");
+  err.innerText = "";
   try{
-    const res=await fetch("/api/admin/login",{method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({username:u,password:p})});
-    const data=await res.json();
-    if(!res.ok){err.innerText=data.detail||"Login failed";return;}
-    TOKEN=data.access_token;
-    localStorage.setItem("xray_token",TOKEN);
+    const res = await fetch("/api/admin/login", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({username:u, password:p})
+    });
+    const data = await res.json();
+    if(!res.ok){ err.innerText = data.detail || "Login failed"; return; }
+    TOKEN = data.access_token;
+    localStorage.setItem("xray_token", TOKEN);
     showApp();
-  }catch(e){err.innerText="Server unreachable";}
+  }catch(e){ err.innerText = "Server unreachable"; }
 }
-function logout(){
-  TOKEN="";localStorage.removeItem("xray_token");
-  document.getElementById("app").style.display="none";
-  document.getElementById("login-screen").style.display="flex";
-  if(ws){ws.close();ws=null;}
+function doLogout(){
+  TOKEN = "";
+  localStorage.removeItem("xray_token");
+  document.getElementById("app").style.display = "none";
+  document.getElementById("login-screen").style.display = "flex";
+  if(ws){ try{ ws.close(); }catch(e){} ws = null; }
   stopMjpeg();
   stopUptime();
 }
-async function authFetch(url,opts={}){
-  opts.headers={...(opts.headers||{}),"Authorization":`Bearer ${TOKEN}`};
-  const res=await fetch(API+url,opts);
-  if(res.status===401){logout();throw new Error("Unauthorized");}
+async function authFetch(url, opts={}){
+  opts.headers = {...(opts.headers||{}), "Authorization": `Bearer ${TOKEN}`};
+  const res = await fetch(API + url, opts);
+  if(res.status === 401){ doLogout(); throw new Error("Unauthorized"); }
   return res;
 }
 
-// ── STARTUP ──────────────────────────────────────────────────────────
+// ── APP STARTUP ──────────────────────────────────────────────────────
 function showApp(){
-  document.getElementById("login-screen").style.display="none";
-  document.getElementById("app").style.display="flex";
-  connectWS(); startMjpeg();
-  loadSettings(); loadLog(); updateMiniDets();
-  buildCamGrid();
-  setInterval(updateClock,1000);
-  setInterval(updateMiniDets,2000);
+  document.getElementById("login-screen").style.display = "none";
+  document.getElementById("app").style.display = "flex";
+  connectWS();
+  startMjpeg();
+  loadSettings();
+  loadLog();
+  updateMiniDets();
+  setInterval(updateClock, 1000);
+  setInterval(updateMiniDets, 3000);
   updateClock();
 }
-window.onload=()=>{
-  document.getElementById("p").addEventListener("keydown",e=>{if(e.key==="Enter")doLogin();});
+window.onload = () => {
+  document.getElementById("p").addEventListener("keydown", e => { if(e.key === "Enter") doLogin(); });
+  document.getElementById("log-search").addEventListener("input", () => { logPage = 1; renderLog(); });
+  document.addEventListener("click", () => document.getElementById("dl-menu").classList.remove("open"));
   if(TOKEN) showApp();
 };
 
 // ── UPTIME ───────────────────────────────────────────────────────────
 function startUptime(){
-  uptimeStart=Date.now();
+  uptimeStart = Date.now();
   if(uptimeInterval) clearInterval(uptimeInterval);
-  uptimeInterval=setInterval(()=>{
-    const s=Math.floor((Date.now()-uptimeStart)/1000);
-    const h=String(Math.floor(s/3600)).padStart(2,"0");
-    const m=String(Math.floor((s%3600)/60)).padStart(2,"0");
-    const sec=String(s%60).padStart(2,"0");
-    document.getElementById("hdr-uptime").innerText=`⏱ ${h}:${m}:${sec}`;
-  },1000);
+  uptimeInterval = setInterval(() => {
+    const s = Math.floor((Date.now() - uptimeStart) / 1000);
+    const h = String(Math.floor(s / 3600)).padStart(2,"0");
+    const m = String(Math.floor((s % 3600) / 60)).padStart(2,"0");
+    const sec = String(s % 60).padStart(2,"0");
+    document.getElementById("hdr-uptime").innerText = `\u23F1 ${h}:${m}:${sec}`;
+  }, 1000);
 }
 function stopUptime(){
   if(uptimeInterval) clearInterval(uptimeInterval);
-  uptimeInterval=null;uptimeStart=null;
-  document.getElementById("hdr-uptime").innerText="⏱ 00:00:00";
+  uptimeInterval = null; uptimeStart = null;
+  document.getElementById("hdr-uptime").innerText = "\u23F1 00:00:00";
 }
 
-// ── CLOCK ────────────────────────────────────────────────────────────
+// ── CLOCK ─────────────────────────────────────────────────────────────
 function updateClock(){
-  document.getElementById("hdr-time").innerText=new Date().toLocaleTimeString();
+  document.getElementById("hdr-time").innerText = new Date().toLocaleTimeString();
 }
 
-// ── MJPEG STREAM ─────────────────────────────────────────────────────
+// ── MJPEG ─────────────────────────────────────────────────────────────
 function startMjpeg(){
-  const img=document.getElementById("feed-img");
-  img.onload=()=>{mjpegActive=true;updateFeedVis();updateFpsMjpeg();};
-  img.onerror=()=>{img.style.display="none";mjpegActive=false;updateFeedVis();};
-  img.src=`${API}/api/stream/mjpeg?token=${TOKEN}`;
-  img.style.display="block";
-  updateFeedVis();
+  const img = document.getElementById("feed-img");
+  // Each time the MJPEG img fires 'load' a new frame has arrived — use for FPS
+  img.addEventListener("load", () => {
+    if(!mjpegActive){ mjpegActive = true; updateFeedVis(); }
+    tickFps();
+  });
+  img.addEventListener("error", () => {
+    mjpegActive = false;
+    document.getElementById("feed-fps-tag").innerText = "";
+    updateFeedVis();
+  });
+  img.src = `${API}/api/stream/mjpeg?token=${TOKEN}&_=${Date.now()}`;
+  img.style.display = "block";
 }
 function stopMjpeg(){
-  const img=document.getElementById("feed-img");
-  img.src="";img.style.display="none";mjpegActive=false;
-  document.getElementById("feed-fps-tag").innerText="";
+  const img = document.getElementById("feed-img");
+  img.src = ""; img.style.display = "none"; mjpegActive = false;
+  document.getElementById("feed-fps-tag").innerText = "";
   updateFeedVis();
 }
 function updateFeedVis(){
-  const noStream=document.getElementById("no-stream");
-  const canvas=document.getElementById("feed-canvas");
-  const feedImg=document.getElementById("feed-img");
-  const rec=document.getElementById("feed-rec");
+  const noStream = document.getElementById("no-stream");
+  const canvas   = document.getElementById("feed-canvas");
+  const feedImg  = document.getElementById("feed-img");
+  const rec      = document.getElementById("feed-rec");
   if(mjpegActive){
-    noStream.style.display="none";canvas.style.display="none";
-    feedImg.style.display="block";rec.style.display="flex";
-  }else if(pcConnected){
-    noStream.style.display="none";canvas.style.display="block";
-    feedImg.style.display="none";rec.style.display="flex";
-  }else{
-    noStream.style.display="flex";canvas.style.display="none";
-    feedImg.style.display="none";rec.style.display="none";
-    document.getElementById("feed-fps-tag").innerText="";
+    noStream.style.display = "none"; canvas.style.display = "none";
+    feedImg.style.display = "block"; rec.style.display = "flex";
+  } else if(pcConnected){
+    noStream.style.display = "none"; canvas.style.display = "block";
+    feedImg.style.display = "none";  rec.style.display = "flex";
+  } else {
+    noStream.style.display = "flex"; canvas.style.display = "none";
+    feedImg.style.display = "none";  rec.style.display = "none";
+    document.getElementById("feed-fps-tag").innerText = "";
   }
-}
-
-// FPS tracking for live feed only
-let _fpsFrameCount=0,_fpsLast=Date.now();
-function updateFpsMjpeg(){
-  _fpsFrameCount++;
-  const now=Date.now();
-  if(now-_fpsLast>=1000){
-    const fps=(_fpsFrameCount*1000/(now-_fpsLast)).toFixed(1);
-    document.getElementById("feed-fps-tag").innerText=fps+" FPS";
-    _fpsFrameCount=0;_fpsLast=now;
-  }
-  if(mjpegActive) requestAnimationFrame(updateFpsMjpeg);
 }
 
 // ── WEBSOCKET ─────────────────────────────────────────────────────────
 function connectWS(){
-  if(ws){try{ws.close();}catch(e){}}
-  if(wsReconnectTimer){clearTimeout(wsReconnectTimer);wsReconnectTimer=null;}
-  const proto=location.protocol==="https:"?"wss":"ws";
-  ws=new WebSocket(`${proto}://${location.host}/api/stream/watch?token=${TOKEN}`);
-  ws.binaryType="arraybuffer";
-  ws.onopen=()=>{};
-  ws.onclose=()=>{setConnected(false);wsReconnectTimer=setTimeout(connectWS,5000);};
-  ws.onerror=()=>{try{ws.close();}catch(e){}};
-  ws.onmessage=ev=>{
-    if(ev.data instanceof ArrayBuffer){if(!mjpegActive)renderFrame(ev.data);return;}
-    let msg;try{msg=JSON.parse(ev.data);}catch(e){return;}
-    handleEvent(msg);
-    if(msg.type==="settings_update") applySettingsToUI(msg);
+  if(ws){ try{ ws.close(); }catch(e){} }
+  if(wsReconnectTimer){ clearTimeout(wsReconnectTimer); wsReconnectTimer = null; }
+  const proto = location.protocol === "https:" ? "wss" : "ws";
+  ws = new WebSocket(`${proto}://${location.host}/api/stream/watch?token=${TOKEN}`);
+  ws.binaryType = "arraybuffer";
+  ws.onopen    = () => {};
+  ws.onclose   = () => { setConnected(false); wsReconnectTimer = setTimeout(connectWS, 5000); };
+  ws.onerror   = () => { try{ ws.close(); }catch(e){} };
+  ws.onmessage = ev => {
+    if(ev.data instanceof ArrayBuffer){ if(!mjpegActive) renderWsFrame(ev.data); return; }
+    let msg; try{ msg = JSON.parse(ev.data); }catch(e){ return; }
+    handleWsEvent(msg);
   };
 }
 function setConnected(c){
-  pcConnected=c;
-  const b=document.getElementById("conn-badge");
-  b.innerText=c?"● PC ONLINE":"● PC OFFLINE";
-  b.className=c?"connected":"disconnected";
-  if(c){ startUptime(); } else { stopUptime(); }
+  pcConnected = c;
+  const b = document.getElementById("conn-badge");
+  b.innerText = c ? "\u25CF PC ONLINE" : "\u25CF PC OFFLINE";
+  b.className = c ? "badge-on" : "badge-off";
+  if(c) startUptime(); else stopUptime();
   updateFeedVis();
-  // Update camera grid status
-  updateCamGridStatus(c);
 }
-function renderFrame(buf){
-  const canvas=document.getElementById("feed-canvas");
-  const blob=new Blob([buf],{type:"image/jpeg"});
-  const url=URL.createObjectURL(blob);
-  const img=new Image();
-  img.onload=()=>{
-    canvas.width=img.width;canvas.height=img.height;
+function renderWsFrame(buf){
+  const canvas = document.getElementById("feed-canvas");
+  const blob = new Blob([buf], {type:"image/jpeg"});
+  const url = URL.createObjectURL(blob);
+  const img = new Image();
+  img.onload = () => {
+    canvas.width = img.width; canvas.height = img.height;
     canvas.getContext("2d").drawImage(img,0,0);
     URL.revokeObjectURL(url);
   };
-  img.src=url;
+  img.src = url;
 }
-function handleEvent(msg){
-  if(msg.type==="pc_status") setConnected(msg.online);
-  if(msg.type==="new_detection"){
-    showToast(`⚠ ${msg.class_name}`);
-    recentDets.unshift(msg); recentDets=recentDets.slice(0,20);
+function handleWsEvent(msg){
+  if(msg.type === "pc_status")     setConnected(msg.online);
+  if(msg.type === "settings_update") applySettingsToUI(msg);
+  if(msg.type === "status_update") updateBadges(msg.status);
+  if(msg.type === "new_detection"){
+    showToast("\u26A0 " + msg.class_name);
+    recentDets.unshift(msg); recentDets = recentDets.slice(0,20);
     renderMiniDets();
     loadLog();
   }
-  if(msg.type==="status_update") updateBadges(msg.status);
 }
 
-// ── BADGES ────────────────────────────────────────────────────────────
+// ── STATUS BADGES ─────────────────────────────────────────────────────
 function updateBadges(st){
-  if(!st)return;
-  [["badge-main","STATUS",st.main,"si-main"],
-   ["badge-gate","GATE",st.gate,"si-gate"],
-   ["badge-belt","BELT",st.belt,"si-belt"],
-   ["badge-buzzer","BUZZER",st.buzzer,"si-buzzer"]].forEach(([id,lbl,val,sid])=>{
-    const el=document.getElementById(id);
-    const sel=document.getElementById(sid);
-    if(!el||!val)return;
-    const on=["OPEN","RUNNING","ON","SAFE"].includes(val);
-    el.className="s-badge "+(on?"on":"off");
-    el.innerHTML=`<span class="s-badge-label">${lbl}</span>${val}`;
-    if(sel){sel.className="status-item-val "+(on?"on":"off");sel.innerText=val;}
+  if(!st) return;
+  const map = [
+    ["badge-main","STATUS",st.main,"si-main"],
+    ["badge-gate","GATE",  st.gate,"si-gate"],
+    ["badge-belt","BELT",  st.belt,"si-belt"],
+    ["badge-buzzer","BUZZER",st.buzzer,"si-buzzer"]
+  ];
+  map.forEach(([id,lbl,val,sid]) => {
+    const el = document.getElementById(id);
+    const sv = document.getElementById(sid);
+    if(!el || val == null) return;
+    const on = ["OPEN","RUNNING","ON","SAFE"].includes(val);
+    el.className = "s-badge " + (on ? "on" : "off");
+    el.innerHTML = `<span class="s-badge-label">${lbl}</span>${val}`;
+    if(sv){ sv.className = "sts-val " + (on ? "on" : "off"); sv.innerText = val; }
   });
-  document.getElementById("feed-overlay").style.display=st.main==="DANGER"?"flex":"none";
+  document.getElementById("feed-overlay").style.display = (st.main === "DANGER") ? "flex" : "none";
 }
 
-// ── SETTINGS ──────────────────────────────────────────────────────────
+// ── DETECTION SETTINGS ────────────────────────────────────────────────
 async function loadSettings(){
   try{
-    const res=await authFetch("/api/settings/");
-    const d=await res.json();
+    const res = await authFetch("/api/settings/");
+    const d = await res.json();
     applySettingsToUI(d);
   }catch(e){}
 }
 function applySettingsToUI(d){
-  if(d.confidence_threshold!=null){
-    document.getElementById("th").value=d.confidence_threshold;
-    document.getElementById("th-val").innerText=parseFloat(d.confidence_threshold).toFixed(2);
+  if(d.confidence_threshold != null){
+    document.getElementById("th").value = d.confidence_threshold;
+    document.getElementById("th-val").innerText = parseFloat(d.confidence_threshold).toFixed(2);
   }
-  if(d.confirm_frames!=null){
-    document.getElementById("cf").value=d.confirm_frames;
-    document.getElementById("cf-val").innerText=d.confirm_frames;
+  if(d.confirm_frames != null){
+    document.getElementById("cf").value = d.confirm_frames;
+    document.getElementById("cf-val").innerText = d.confirm_frames;
   }
-  if(d.camera_index!=null){
-    activeCamIdx=parseInt(d.camera_index);
-    // UI shows +1
-    document.getElementById("feed-cam-tag").innerText="CAM "+(activeCamIdx+1);
+  if(d.camera_index != null){
+    activeCamIdx = parseInt(d.camera_index);
+    document.getElementById("feed-cam-tag").innerText = "CAM " + (activeCamIdx + 1);
     updateCamGridActive();
   }
+  if(d.image_settings) applyImgSettingsToUI(d.image_settings);
 }
 function onThChange(v){
-  document.getElementById("th-val").innerText=parseFloat(v).toFixed(2);
-  scheduleSettingsSave();
+  document.getElementById("th-val").innerText = parseFloat(v).toFixed(2);
+  clearTimeout(_settingTimer); _settingTimer = setTimeout(saveDetSettings, 400);
 }
 function onCfChange(v){
-  document.getElementById("cf-val").innerText=v;
-  scheduleSettingsSave();
+  document.getElementById("cf-val").innerText = parseInt(v);
+  clearTimeout(_settingTimer); _settingTimer = setTimeout(saveDetSettings, 400);
 }
-function scheduleSettingsSave(){
-  clearTimeout(_settingTimer);
-  _settingTimer=setTimeout(saveSettings,400);
-}
-async function saveSettings(){
-  const th=parseFloat(document.getElementById("th").value);
-  const cf=parseInt(document.getElementById("cf").value);
+async function saveDetSettings(){
+  const th = parseFloat(document.getElementById("th").value);
+  const cf = parseInt(document.getElementById("cf").value);
   try{
-    await authFetch("/api/settings/update",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({confidence_threshold:th,confirm_frames:cf,camera_index:activeCamIdx})
+    await authFetch("/api/settings/update", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({confidence_threshold:th, confirm_frames:cf, camera_index:activeCamIdx})
     });
   }catch(e){}
 }
 
 // ── IMAGE PROCESSING SETTINGS ─────────────────────────────────────────
-function onImgChange(key, val, displayId, decimals){
-  const num = decimals ? parseFloat(val).toFixed(decimals) : parseInt(val);
-  document.getElementById(displayId).innerText = num;
-  imgSettings[key] = parseFloat(val);
-  scheduleImgSettingsSave();
+// fmt: 'int' | 'f1' | 'f2'
+function fmtVal(v, fmt){
+  if(fmt === "int") return String(parseInt(v));
+  if(fmt === "f1")  return parseFloat(v).toFixed(1);
+  if(fmt === "f2")  return parseFloat(v).toFixed(2);
+  return v;
 }
-let _imgTimer=null;
-function scheduleImgSettingsSave(){
-  clearTimeout(_imgTimer);
-  _imgTimer=setTimeout(saveImgSettings,350);
+function onImgChange(key, val, displayId, fmt){
+  document.getElementById(displayId).innerText = fmtVal(val, fmt);
+  imgSettings[key] = parseFloat(val);
+  clearTimeout(_imgTimer); _imgTimer = setTimeout(saveImgSettings, 350);
 }
 async function saveImgSettings(){
   try{
-    await authFetch("/api/settings/update_image",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify(imgSettings)
+    await authFetch("/api/settings/update_image", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify(imgSettings)
     });
   }catch(e){}
 }
-
+function applyImgSettingsToUI(s){
+  // [ sliderElementId, displayElementId, imgSettingsKey, formatType ]
+  const fields = [
+    ["bright",   "bright-val",   "brightness", "int"],
+    ["contrast", "contrast-val", "contrast",   "f2"],
+    ["sat",      "sat-val",      "saturation", "f2"],
+    ["hue",      "hue-val",      "hue",        "int"],
+    ["sharp",    "sharp-val",    "sharpness",  "f1"]
+  ];
+  fields.forEach(([rangeId, dispId, key, fmt]) => {
+    const val = s[key];
+    if(val == null) return;
+    const el = document.getElementById(rangeId);
+    const de = document.getElementById(dispId);
+    if(el) el.value = val;
+    if(de) de.innerText = fmtVal(val, fmt);
+    imgSettings[key] = parseFloat(val);
+  });
+  if(s.hflip  != null){ imgSettings.hflip  = !!s.hflip;  document.getElementById("btn-hflip").classList.toggle("active", !!s.hflip); }
+  if(s.vflip  != null){ imgSettings.vflip  = !!s.vflip;  document.getElementById("btn-vflip").classList.toggle("active", !!s.vflip); }
+  if(s.rotation != null){ imgSettings.rotation = parseInt(s.rotation); document.getElementById("rot-val").innerText = parseInt(s.rotation) + "\u00B0"; }
+}
 function toggleFlip(axis){
-  if(axis==="h"){
-    imgSettings.hflip=!imgSettings.hflip;
-    document.getElementById("btn-hflip").classList.toggle("active", imgSettings.hflip);
-  }else{
-    imgSettings.vflip=!imgSettings.vflip;
-    document.getElementById("btn-vflip").classList.toggle("active", imgSettings.vflip);
-  }
-  scheduleImgSettingsSave();
+  if(axis === "h"){ imgSettings.hflip = !imgSettings.hflip; document.getElementById("btn-hflip").classList.toggle("active", imgSettings.hflip); }
+  else            { imgSettings.vflip = !imgSettings.vflip; document.getElementById("btn-vflip").classList.toggle("active", imgSettings.vflip); }
+  clearTimeout(_imgTimer); _imgTimer = setTimeout(saveImgSettings, 100);
 }
 function doRotate(deg){
-  imgSettings.rotation=(imgSettings.rotation+deg+360)%360;
-  document.getElementById("rot-val").innerText=imgSettings.rotation+"°";
-  scheduleImgSettingsSave();
+  imgSettings.rotation = (imgSettings.rotation + deg + 360) % 360;
+  document.getElementById("rot-val").innerText = imgSettings.rotation + "\u00B0";
+  clearTimeout(_imgTimer); _imgTimer = setTimeout(saveImgSettings, 100);
 }
 function resetImageSettings(){
-  imgSettings={brightness:0,contrast:1.0,saturation:1.0,hue:0,sharpness:0,hflip:false,vflip:false,rotation:0};
-  document.getElementById("bright").value=0;document.getElementById("bright-val").innerText=0;
-  document.getElementById("contrast").value=1.0;document.getElementById("contrast-val").innerText="1.00";
-  document.getElementById("sat").value=1.0;document.getElementById("sat-val").innerText="1.00";
-  document.getElementById("hue").value=0;document.getElementById("hue-val").innerText=0;
-  document.getElementById("sharp").value=0;document.getElementById("sharp-val").innerText="0.0";
-  document.getElementById("btn-hflip").classList.remove("active");
-  document.getElementById("btn-vflip").classList.remove("active");
-  document.getElementById("rot-val").innerText="0°";
-  saveImgSettings();
-  showToast("Image settings reset","info");
+  imgSettings = {brightness:0, contrast:1.0, saturation:1.0, hue:0, sharpness:0.0, hflip:false, vflip:false, rotation:0};
+  applyImgSettingsToUI({brightness:0,contrast:1.0,saturation:1.0,hue:0,sharpness:0.0,hflip:false,vflip:false,rotation:0});
+  clearTimeout(_imgTimer); _imgTimer = setTimeout(saveImgSettings, 100);
+  showToast("Image settings reset", "info");
 }
 
 // ── CAMERA GRID ───────────────────────────────────────────────────────
 function buildCamGrid(){
-  const grid=document.getElementById("cam-grid");
-  grid.innerHTML="";
-  for(let i=0;i<NUM_CAMERAS;i++){
-    const div=document.createElement("div");
-    div.className="cam-thumb"+(i===activeCamIdx?" active":"");
-    div.id="cam-thumb-"+i;
-    div.onclick=()=>switchCamera(i);
-    div.innerHTML=`
-      <img id="cam-preview-${i}" src="" alt="cam${i}" style="display:none">
-      <div class="cam-no-signal" id="cam-nosig-${i}">NO SIGNAL</div>
-      <div class="cam-thumb-label ${i===activeCamIdx?'active':''}" id="cam-lbl-${i}">
+  const grid = document.getElementById("cam-grid");
+  grid.innerHTML = "";
+  for(let i = 0; i < NUM_CAMERAS; i++){
+    const isActive = (i === activeCamIdx);
+    const d = document.createElement("div");
+    d.className = "cam-thumb" + (isActive ? " cam-active" : "");
+    d.id = "ct-" + i;
+    d.onclick = () => switchCamera(i);
+    d.innerHTML = `
+      <img id="cp-${i}" alt="CAM ${i+1}"
+        onload="this.classList.add('loaded');document.getElementById('cns-${i}').style.display='none'"
+        onerror="this.classList.remove('loaded');document.getElementById('cns-${i}').style.display='flex'">
+      <div class="cam-nosig" id="cns-${i}">NO SIGNAL</div>
+      <div class="cam-label ${isActive ? 'cam-active-lbl' : ''}" id="cl-${i}">
         <span>CAM ${i+1}</span>
-        ${i===activeCamIdx?'<span class="cam-active-dot"></span>':''}
+        ${isActive ? '<span class="cam-active-dot"></span>' : ''}
       </div>`;
-    grid.appendChild(div);
+    grid.appendChild(d);
+    // Load snapshot for this camera
+    loadCamSnap(i);
   }
+}
+function loadCamSnap(i){
+  const img = document.getElementById("cp-" + i);
+  if(!img) return;
+  // Append cache-busting timestamp so browser re-fetches
+  img.src = `${API}/api/stream/snapshot?cam=${i}&token=${TOKEN}&t=${Date.now()}`;
 }
 function updateCamGridActive(){
-  for(let i=0;i<NUM_CAMERAS;i++){
-    const thumb=document.getElementById("cam-thumb-"+i);
-    const lbl=document.getElementById("cam-lbl-"+i);
-    if(!thumb||!lbl)continue;
-    if(i===activeCamIdx){
-      thumb.classList.add("active");
-      lbl.className="cam-thumb-label active";
-      lbl.innerHTML=`<span>CAM ${i+1}</span><span class="cam-active-dot"></span>`;
-    }else{
-      thumb.classList.remove("active");
-      lbl.className="cam-thumb-label";
-      lbl.innerHTML=`<span>CAM ${i+1}</span>`;
-    }
-  }
-}
-function updateCamGridStatus(online){
-  for(let i=0;i<NUM_CAMERAS;i++){
-    const nosig=document.getElementById("cam-nosig-"+i);
-    if(nosig) nosig.innerText=online?"":"NO SIGNAL";
+  for(let i = 0; i < NUM_CAMERAS; i++){
+    const ct = document.getElementById("ct-" + i);
+    const cl = document.getElementById("cl-" + i);
+    if(!ct || !cl) return; // grid not built yet — that's fine
+    const isActive = (i === activeCamIdx);
+    ct.classList.toggle("cam-active", isActive);
+    cl.className = "cam-label" + (isActive ? " cam-active-lbl" : "");
+    cl.innerHTML = `<span>CAM ${i+1}</span>${isActive ? '<span class="cam-active-dot"></span>' : ''}`;
   }
 }
 async function switchCamera(idx){
-  activeCamIdx=idx;
-  document.getElementById("feed-cam-tag").innerText="CAM "+(idx+1);
+  activeCamIdx = idx;
+  document.getElementById("feed-cam-tag").innerText = "CAM " + (idx + 1);
   updateCamGridActive();
-  await saveSettings();
-  refreshCamPreviews();
-}
-let _camPreviewTimer=null;
-function refreshCamPreviews(){
-  clearTimeout(_camPreviewTimer);
-  _camPreviewTimer=setTimeout(async()=>{
-    for(let i=0;i<NUM_CAMERAS;i++){
-      // Show a snapshot frame for each camera index if available
-      // Camera previews use a dedicated endpoint /api/stream/snapshot?cam=INDEX
-      try{
-        const url=`${API}/api/stream/snapshot?cam=${i}&token=${TOKEN}&t=${Date.now()}`;
-        const img=document.getElementById("cam-preview-"+i);
-        const nosig=document.getElementById("cam-nosig-"+i);
-        if(img){
-          img.onerror=()=>{img.style.display="none";if(nosig)nosig.style.display="flex";};
-          img.onload=()=>{img.style.display="block";if(nosig)nosig.style.display="none";};
-          img.src=url;
-        }
-      }catch(e){}
-    }
-  },100);
+  // Save to backend — sends camera_index along with current detection settings
+  try{
+    await authFetch("/api/settings/update", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({
+        confidence_threshold: parseFloat(document.getElementById("th").value),
+        confirm_frames: parseInt(document.getElementById("cf").value),
+        camera_index: idx
+      })
+    });
+  }catch(e){}
+  // Refresh snapshots after a moment for the new active cam
+  setTimeout(() => loadCamSnap(idx), 800);
 }
 
-// ── LOG FILTER — CLASS BUTTONS ─────────────────────────────────────────
-function toggleClassFilter(btn){
-  const cls=btn.dataset.class;
-  if(cls==="ALL"){
-    // Select all
-    selectedClasses=new Set(["Gun","Knife","Pliers","Scissors","Wrench"]);
-    document.querySelectorAll(".class-btn").forEach(b=>b.classList.add("selected"));
-  }else{
-    btn.classList.toggle("selected");
-    if(btn.classList.contains("selected")){
-      selectedClasses.add(cls);
-    }else{
-      selectedClasses.delete(cls);
-    }
-    // Sync ALL button
-    const allBtn=document.querySelector(".class-btn[data-class='ALL']");
-    if(selectedClasses.size===5) allBtn.classList.add("selected");
-    else allBtn.classList.remove("selected");
+// ── CLASS FILTER ──────────────────────────────────────────────────────
+function toggleCls(btn){
+  const c = btn.dataset.c;
+  if(c === "ALL"){
+    selectedClasses = new Set(["Gun","Knife","Pliers","Scissors","Wrench"]);
+    document.querySelectorAll(".cls-btn").forEach(b => b.classList.add("sel"));
+  } else {
+    btn.classList.toggle("sel");
+    if(btn.classList.contains("sel")) selectedClasses.add(c);
+    else selectedClasses.delete(c);
+    const allBtn = document.querySelector(".cls-btn[data-c='ALL']");
+    allBtn.classList.toggle("sel", selectedClasses.size === 5);
   }
-  logPage=1;renderLog();
+  logPage = 1; renderLog();
 }
 
-// ── DOWNLOAD EXPORT MENU ───────────────────────────────────────────────
+// ── EXPORT MENU ────────────────────────────────────────────────────────
 function toggleDlMenu(e){
   e.stopPropagation();
   document.getElementById("dl-menu").classList.toggle("open");
 }
-document.addEventListener("click",()=>document.getElementById("dl-menu").classList.remove("open"));
-
 async function exportCSV(){
   document.getElementById("dl-menu").classList.remove("open");
-  const res=await authFetch("/api/detections/export");
-  const blob=await res.blob();
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement("a");a.href=url;a.download="detections.csv";a.click();
-  URL.revokeObjectURL(url);
-}
-async function exportZIP(){
-  document.getElementById("dl-menu").classList.remove("open");
-  showToast("Preparing ZIP archive…","info");
   try{
-    const res=await authFetch("/api/detections/export_zip");
-    if(!res.ok){showToast("ZIP export not available on server");return;}
-    const blob=await res.blob();
-    const url=URL.createObjectURL(blob);
-    const a=document.createElement("a");a.href=url;a.download="detections_archive.zip";a.click();
+    const res = await authFetch("/api/detections/export");
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a"); a.href = url; a.download = "detections.csv"; a.click();
     URL.revokeObjectURL(url);
-  }catch(e){showToast("ZIP export failed");}
+  }catch(e){ showToast("CSV export failed"); }
 }
-async function exportHTML(){
+function exportHTMLReport(){
   document.getElementById("dl-menu").classList.remove("open");
-  // Build a nice HTML report from current allDets
-  const filtered=getFilteredDets();
-  const rows=filtered.map(d=>{
-    const conf=d.conf?parseFloat(d.conf).toFixed(2):"—";
-    const imgSrc=d.image_url?`${API}${d.image_url}`:"";
+  const filtered = getFilteredDets();
+  const rows = filtered.map(d => {
+    const conf = d.conf ? parseFloat(d.conf).toFixed(2) : "—";
+    const imgSrc = d.image_url ? (API + d.image_url) : "";
+    const camNum = ((d.camera_idx != null ? d.camera_idx : 0) + 1);
     return `<tr>
       <td>${d.id}</td>
-      <td><span class="cls-tag cls-${d.class_name}">${d.class_name}</span></td>
+      <td><span class="tag tag-${d.class_name}">${d.class_name}</span></td>
       <td>${d.date_dmy}</td><td>${d.time_hms}</td>
-      <td>${conf}</td><td>CAM ${(d.camera_idx||0)+1}</td>
-      <td>${imgSrc?`<img src="${imgSrc}" width="80" height="60" style="border-radius:4px;object-fit:cover">`:""}</td>
+      <td>${conf}</td><td>CAM ${camNum}</td>
+      <td>${imgSrc ? `<img src="${imgSrc}" width="80" height="60" style="border-radius:4px;object-fit:cover;display:block">` : ""}</td>
     </tr>`;
   }).join("");
-  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>X-Ray Detection Report</title>
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Detection Report</title>
 <style>
-  body{font-family:monospace;background:#070b12;color:#c8d8f0;padding:24px;}
-  h1{color:#00d4ff;font-family:sans-serif;margin-bottom:4px;}
+  body{font-family:monospace;background:#070b12;color:#c8d8f0;padding:24px;margin:0;}
+  h1{color:#00d4ff;margin-bottom:4px;font-family:sans-serif;}
   p{color:#6a8aaa;font-size:13px;margin-bottom:20px;}
   table{border-collapse:collapse;width:100%;font-size:12px;}
   th{background:#0f1623;color:#00d4ff;padding:8px 10px;border:1px solid #1e2d42;text-align:left;}
   td{padding:7px 10px;border:1px solid #1e2d42;vertical-align:middle;}
   tr:nth-child(even){background:#0c1520;}
-  .cls-tag{padding:2px 8px;border-radius:10px;font-weight:700;font-size:11px;}
-  .cls-Gun{background:rgba(255,23,68,.2);color:#ff6b6b;}
-  .cls-Knife{background:rgba(255,171,0,.15);color:#ffab00;}
-  .cls-Scissors{background:rgba(168,85,247,.15);color:#c084fc;}
-  .cls-Pliers{background:rgba(0,255,65,.1);color:#4eff8a;}
-  .cls-Wrench{background:rgba(0,212,255,.12);color:#00d4ff;}
+  .tag{padding:2px 8px;border-radius:10px;font-weight:700;font-size:11px;}
+  .tag-Gun{background:rgba(255,23,68,.2);color:#ff6b6b;}
+  .tag-Knife{background:rgba(255,171,0,.15);color:#ffab00;}
+  .tag-Scissors{background:rgba(168,85,247,.15);color:#c084fc;}
+  .tag-Pliers{background:rgba(0,255,65,.1);color:#4eff8a;}
+  .tag-Wrench{background:rgba(0,212,255,.12);color:#00d4ff;}
 </style></head><body>
-  <h1>🔍 X-Ray Detection Report</h1>
-  <p>Generated: ${new Date().toLocaleString()} · Total records: ${filtered.length}</p>
+  <h1>X-Ray Detection Report</h1>
+  <p>Generated: ${new Date().toLocaleString()} &nbsp;&middot;&nbsp; Records: ${filtered.length}</p>
   <table><thead><tr><th>#</th><th>Class</th><th>Date</th><th>Time</th><th>Conf</th><th>Camera</th><th>Image</th></tr></thead>
   <tbody>${rows}</tbody></table>
 </body></html>`;
-  const blob=new Blob([html],{type:"text/html"});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement("a");a.href=url;a.download="detection_report.html";a.click();
+  const blob = new Blob([html], {type:"text/html"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a"); a.href = url; a.download = "detection_report.html"; a.click();
   URL.revokeObjectURL(url);
 }
 
-// ── DETECTION LOG ──────────────────────────────────────────────────────
+// ── LOG ────────────────────────────────────────────────────────────────
 async function loadLog(){
   try{
-    const res=await authFetch(`/api/detections/list?page=1&limit=500`);
-    allDets=await res.json();
+    const res = await authFetch("/api/detections/list?page=1&limit=500");
+    allDets = await res.json();
     renderLog();
     updateCounts();
   }catch(e){}
 }
 function getFilteredDets(){
-  const textFilter=(document.getElementById("log-filter").value||"").toLowerCase();
-  return allDets.filter(d=>{
-    const clsMatch=selectedClasses.size===0||selectedClasses.has(d.class_name);
-    const textMatch=!textFilter||d.class_name.toLowerCase().includes(textFilter)||
-      (d.time_hms&&d.time_hms.toLowerCase().includes(textFilter))||
-      (d.date_dmy&&d.date_dmy.includes(textFilter));
-    return clsMatch&&textMatch;
+  const tf = (document.getElementById("log-search").value || "").toLowerCase();
+  return allDets.filter(d => {
+    const cls = d.class_name || "";
+    const clsMatch = selectedClasses.size === 0 || selectedClasses.has(cls);
+    const textMatch = !tf
+      || cls.toLowerCase().includes(tf)
+      || (d.time_hms && d.time_hms.toLowerCase().includes(tf))
+      || (d.date_dmy && d.date_dmy.includes(tf));
+    return clsMatch && textMatch;
   });
 }
 function renderLog(){
-  const filtered=getFilteredDets();
-  const perPage=30;const start=(logPage-1)*perPage;
-  const page=filtered.slice(start,start+perPage);
-  const list=document.getElementById("det-list");
+  const filtered = getFilteredDets();
+  const perPage = 30;
+  const start = (logPage - 1) * perPage;
+  const page = filtered.slice(start, start + perPage);
+  const list = document.getElementById("det-list");
   if(!page.length){
-    list.innerHTML=`<div style="color:var(--text3);font-size:11px;padding:16px;text-align:center">No detections found</div>`;
-    document.getElementById("prev-btn").style.display="none";
-    document.getElementById("next-btn").style.display="none";
-    document.getElementById("page-info").innerText="";return;
+    list.innerHTML = `<div style="color:var(--text3);font-size:11px;padding:16px;text-align:center">No detections found</div>`;
+    document.getElementById("prev-btn").style.display = "none";
+    document.getElementById("next-btn").style.display = "none";
+    document.getElementById("page-info").innerText = ""; return;
   }
-  list.innerHTML=page.map(d=>{
-    const img=d.image_url||"";
-    const conf=d.conf?parseFloat(d.conf).toFixed(2):null;
-    const info=`${d.class_name} | CAM ${(d.camera_idx||0)+1} | ${d.time_hms} ${d.date_dmy}${conf?" | conf "+conf:""}`;
-    return `<div class="det-item" onclick="openModal('${img}','${info}')">
-      <img src="${img}" onerror="this.style.opacity='.15'">
+  list.innerHTML = page.map(d => {
+    const imgUrl = d.image_url || "";
+    const conf = d.conf ? parseFloat(d.conf).toFixed(2) : null;
+    const camNum = ((d.camera_idx != null ? d.camera_idx : 0) + 1);
+    const info = `${d.class_name} | CAM ${camNum} | ${d.time_hms} ${d.date_dmy}${conf ? " | conf " + conf : ""}`;
+    // Escape single quotes in info/url for onclick attributes
+    const safeInfo = info.replace(/'/g, "&#39;");
+    const safeUrl  = imgUrl.replace(/'/g, "&#39;");
+    return `<div class="det-item" onclick="openModal('${safeUrl}','${safeInfo}')">
+      <img src="${imgUrl}" onerror="this.style.opacity='.15'" loading="lazy">
       <div class="det-item-info">
-        <div class="det-item-class" data-cls="${d.class_name}">${d.class_name}</div>
-        <div class="det-item-meta">CAM ${(d.camera_idx||0)+1} · ${d.time_hms} · ${d.date_dmy}</div>
-        ${conf?`<span class="det-item-conf">${conf}</span>`:""}
+        <div class="det-item-class">${d.class_name}</div>
+        <div class="det-item-meta">CAM ${camNum} &middot; ${d.time_hms} &middot; ${d.date_dmy}</div>
+        ${conf ? `<span class="det-item-conf">${conf}</span>` : ""}
       </div></div>`;
   }).join("");
-  document.getElementById("prev-btn").style.display=logPage>1?"flex":"none";
-  document.getElementById("next-btn").style.display=page.length===perPage?"flex":"none";
-  document.getElementById("page-info").innerText=`PG ${logPage} / ${Math.ceil(filtered.length/perPage)}`;
+  const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
+  document.getElementById("prev-btn").style.display = logPage > 1 ? "flex" : "none";
+  document.getElementById("next-btn").style.display = page.length === perPage ? "flex" : "none";
+  document.getElementById("page-info").innerText = `PG ${logPage} / ${totalPages}`;
 }
-function changePage(dir){logPage=Math.max(1,logPage+dir);renderLog();}
-document.addEventListener("DOMContentLoaded",()=>{
-  const f=document.getElementById("log-filter");
-  if(f) f.oninput=()=>{logPage=1;renderLog();};
-});
+function changePage(dir){ logPage = Math.max(1, logPage + dir); renderLog(); }
 
 // ── COUNTS ─────────────────────────────────────────────────────────────
 function updateCounts(){
-  const today=new Date().toLocaleDateString("en-GB");
-  const todayCount=allDets.filter(d=>d.date_dmy===today).length;
-  document.getElementById("s-total").innerText=allDets.length;
-  document.getElementById("s-today").innerText=todayCount;
+  const today = new Date().toLocaleDateString("en-GB");
+  document.getElementById("s-total").innerText = allDets.length;
+  document.getElementById("s-today").innerText = allDets.filter(d => d.date_dmy === today).length;
 }
 
-// ── MINI DETECTIONS (STATUS pane) ──────────────────────────────────────
+// ── MINI DETECTIONS ────────────────────────────────────────────────────
 async function updateMiniDets(){
   try{
-    const res=await authFetch("/api/detections/list?page=1&limit=20");
-    const data=await res.json();
-    allDets=data;
+    const res = await authFetch("/api/detections/list?page=1&limit=20");
+    const data = await res.json();
+    // Merge into allDets only if loadLog hasn't loaded more
+    if(allDets.length < 20) allDets = data;
     updateCounts();
     renderMiniDets();
   }catch(e){}
 }
 function renderMiniDets(){
-  const list=document.getElementById("mini-det-list");
-  const src=recentDets.length?recentDets:allDets.slice(0,10);
+  const list = document.getElementById("mini-det-list");
+  const src = recentDets.length ? recentDets : allDets.slice(0,10);
   if(!src.length){
-    list.innerHTML=`<div style="color:var(--text3);font-size:11px;text-align:center;padding:20px 0">No detections yet</div>`;return;
+    list.innerHTML = `<div style="color:var(--text3);font-size:11px;text-align:center;padding:20px 0">No detections yet</div>`;
+    return;
   }
-  list.innerHTML=src.map(d=>{
-    const img=d.image_url||"";
-    const cls=d.class_name||d.class||"?";
-    const time=d.time_hms||"";const date=d.date_dmy||"";
-    const camNum=(d.camera_idx!=null?d.camera_idx:0)+1;
-    const info=`${cls} | CAM ${camNum} | ${time} ${date}`;
-    return `<div class="det-item" onclick="openModal('${img}','${info}')">
-      <img src="${img}" onerror="this.style.opacity='.15'">
+  list.innerHTML = src.map(d => {
+    const imgUrl = d.image_url || "";
+    const cls = d.class_name || d.class || "?";
+    const time = d.time_hms || ""; const date = d.date_dmy || "";
+    const camNum = ((d.camera_idx != null ? d.camera_idx : 0) + 1);
+    const info = `${cls} | CAM ${camNum} | ${time} ${date}`;
+    const safeInfo = info.replace(/'/g, "&#39;");
+    const safeUrl  = imgUrl.replace(/'/g, "&#39;");
+    return `<div class="det-item" onclick="openModal('${safeUrl}','${safeInfo}')">
+      <img src="${imgUrl}" onerror="this.style.opacity='.15'" loading="lazy">
       <div class="det-item-info">
-        <div class="det-item-class" data-cls="${cls}">${cls}</div>
-        <div class="det-item-meta">CAM ${camNum} · ${time} · ${date}</div>
+        <div class="det-item-class">${cls}</div>
+        <div class="det-item-meta">CAM ${camNum} &middot; ${time} &middot; ${date}</div>
       </div></div>`;
   }).join("");
 }
 
 // ── MODAL ───────────────────────────────────────────────────────────────
-function openModal(src,info){
-  const fullSrc=src.startsWith("http")?src:(src?API+src:"");
-  document.getElementById("modal-img").src=fullSrc;
-  document.getElementById("modal-info").innerText=info||"";
-  document.getElementById("modal").style.display="flex";
+function openModal(src, info){
+  // src may be relative path like /static/detections/xxx.jpg
+  const fullSrc = src && !src.startsWith("http") ? (API + src) : src;
+  document.getElementById("modal-img").src = fullSrc || "";
+  document.getElementById("modal-info").innerText = info || "";
+  document.getElementById("modal").style.display = "flex";
 }
-function closeModal(){document.getElementById("modal").style.display="none";}
-document.addEventListener("keydown",e=>{if(e.key==="Escape")closeModal();});
+function closeModal(){ document.getElementById("modal").style.display = "none"; }
+document.addEventListener("keydown", e => { if(e.key === "Escape") closeModal(); });
 
 // ── TOAST ────────────────────────────────────────────────────────────────
-function showToast(msg,type){
-  const t=document.getElementById("toast");
-  t.innerText=msg;
-  t.className=type==="info"?"info":"";
-  t.style.display="block";
-  clearTimeout(t._t);t._t=setTimeout(()=>t.style.display="none",4000);
+function showToast(msg, type){
+  const t = document.getElementById("toast");
+  t.innerText = msg;
+  t.className = (type === "info") ? "info-toast" : "";
+  t.style.display = "block";
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.style.display = "none", 4000);
 }
 </script>
 </body>
