@@ -47,6 +47,13 @@ class ConnectionManager:
         # Notify all watch clients that PC is now online
         await self.broadcast_event({"type": "pc_status", "online": True})
 
+        # Push notification to all browsers + mobile
+        try:
+            from routes.notifications import notify_pc_online
+            asyncio.create_task(notify_pc_online())
+        except Exception:
+            pass
+
     async def disconnect_pc(self):
         print("[WS] Scanner PC disconnected")
         self.pc_socket = None
@@ -59,6 +66,13 @@ class ConnectionManager:
 
         # Immediately tell all watch clients PC went offline
         await self.broadcast_event({"type": "pc_status", "online": False})
+
+        # Push notification to all browsers + mobile
+        try:
+            from routes.notifications import notify_pc_offline
+            asyncio.create_task(notify_pc_offline())
+        except Exception:
+            pass
 
     async def _ping_pc_loop(self):
         """Send periodic pings to the PC. If ping fails, mark PC offline immediately."""

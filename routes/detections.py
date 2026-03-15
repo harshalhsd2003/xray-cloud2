@@ -67,6 +67,20 @@ async def push_detection(
         "camera_idx": det.camera_idx
     })
 
+    # Send Web Push + Expo notification to all subscribed devices
+    try:
+        from routes.notifications import notify_detection
+        await notify_detection(
+            class_name=det.class_name,
+            conf=det.conf or 0,
+            camera_idx=det.camera_idx,
+            time_hms=det.time_hms,
+            image_url=det.image_url,
+            det_id=det.id
+        )
+    except Exception:
+        pass  # Push is best-effort — never block the detection save
+
     return {"id": det.id, "image_url": image_url}
 
 # ── Admin / App fetches detection list ───────────────────────────────────────

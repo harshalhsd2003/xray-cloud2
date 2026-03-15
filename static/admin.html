@@ -3,30 +3,27 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>HSD — XRay Scanner Admin</title>
+<title>X-Ray Scanner</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
-/* ── VARIABLES ──────────────────────────────────────────────── */
 :root{
-  --safe:#00ff41; --danger:#ff1744; --accent:#00d4ff; --warn:#ffab00;
-  --bg:#070b12; --panel:#0f1623; --panel2:#141d2e; --border:#1e2d42;
-  --border2:#2a3d56; --text:#c8d8f0; --text2:#6a8aaa; --text3:#3a5070;
+  --safe:#00ff41;--danger:#ff1744;--accent:#00d4ff;--warn:#ffab00;
+  --bg:#070b12;--panel:#0f1623;--panel2:#141d2e;--border:#1e2d42;
+  --border2:#2a3d56;--text:#c8d8f0;--text2:#6a8aaa;--text3:#3a5070;
   --glow-accent:0 0 12px rgba(0,212,255,.35);
   --glow-safe:0 0 10px rgba(0,255,65,.3);
   --glow-danger:0 0 10px rgba(255,23,68,.4);
-  --radius:10px; --radius-sm:6px;
-  --hdr:52px; --tab:44px;
+  --radius:10px;--radius-sm:6px;
+  --hdr:50px;--side:320px;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Share Tech Mono',monospace;overflow:hidden;}
 body{display:flex;flex-direction:column;}
-
-/* ── SCROLLBARS ─────────────────────────────────────────────── */
 ::-webkit-scrollbar{width:4px;height:4px;}
 ::-webkit-scrollbar-track{background:var(--bg);}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
 
-/* ── LOGIN ──────────────────────────────────────────────────── */
+/* ── LOGIN ── */
 #login-screen{
   position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
   background:var(--bg);z-index:9999;
@@ -37,409 +34,227 @@ body{display:flex;flex-direction:column;}
 }
 .login-box{
   background:var(--panel);border:1px solid var(--border2);border-radius:16px;
-  padding:40px 36px;width:min(360px,92vw);text-align:center;
+  padding:40px 36px;width:min(340px,92vw);text-align:center;
   box-shadow:0 0 60px rgba(0,212,255,.08),0 24px 48px rgba(0,0,0,.6);
   position:relative;overflow:hidden;
 }
-.login-box::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:2px;
-  background:linear-gradient(90deg,transparent,var(--accent),transparent);
-}
-.login-logo{
-  font-family:'Orbitron';font-size:28px;font-weight:900;color:var(--accent);
-  letter-spacing:.12em;margin-bottom:4px;text-shadow:var(--glow-accent);
-}
+.login-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--accent),transparent);}
+.login-logo{font-family:'Orbitron';font-size:22px;font-weight:900;color:var(--accent);
+  letter-spacing:.12em;margin-bottom:4px;text-shadow:var(--glow-accent);}
 .login-sub{font-size:10px;color:var(--text2);letter-spacing:.2em;margin-bottom:28px;}
-.inp{
-  width:100%;background:#080d16;border:1px solid var(--border2);border-radius:var(--radius-sm);
+.inp{width:100%;background:#080d16;border:1px solid var(--border2);border-radius:var(--radius-sm);
   color:var(--text);padding:11px 14px;font-size:13px;font-family:'Share Tech Mono',monospace;
-  margin-bottom:10px;outline:none;transition:border-color .2s,box-shadow .2s;
-}
+  margin-bottom:10px;outline:none;transition:border-color .2s,box-shadow .2s;}
 .inp:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(0,212,255,.12);}
-.btn-login{
-  width:100%;background:var(--accent);color:#000;border:none;border-radius:var(--radius-sm);
+.btn-login{width:100%;background:var(--accent);color:#000;border:none;border-radius:var(--radius-sm);
   padding:12px;font-weight:700;font-family:'Orbitron';font-size:11px;cursor:pointer;
-  letter-spacing:.1em;transition:background .15s,transform .1s,box-shadow .15s;
-  margin-top:4px;
-}
+  letter-spacing:.1em;transition:background .15s,box-shadow .15s;margin-top:4px;}
 .btn-login:hover{background:#00eeff;box-shadow:0 0 20px rgba(0,212,255,.4);}
-.btn-login:active{transform:scale(.98);}
-#login-err{color:var(--danger);font-size:11px;margin-top:10px;min-height:16px;letter-spacing:.05em;}
+#login-err{color:var(--danger);font-size:11px;margin-top:10px;min-height:16px;}
 
-/* ── HEADER ─────────────────────────────────────────────────── */
+/* ── HEADER ── */
 .header{
   height:var(--hdr);background:#000;border-bottom:1px solid var(--border);
   padding:0 16px;display:flex;align-items:center;justify-content:space-between;
-  flex-shrink:0;position:relative;z-index:50;
+  flex-shrink:0;z-index:50;
 }
-.hdr-logo{font-family:'Orbitron';font-size:13px;font-weight:700;color:var(--accent);letter-spacing:.1em;display:flex;align-items:center;gap:8px;}
-.hdr-logo-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:var(--glow-accent);animation:blink 2s ease-in-out infinite;}
+.hdr-logo{font-family:'Orbitron';font-size:12px;font-weight:700;color:var(--accent);
+  letter-spacing:.1em;display:flex;align-items:center;gap:8px;}
+.hdr-logo-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);
+  box-shadow:var(--glow-accent);animation:blink 2s ease-in-out infinite;}
 @keyframes blink{0%,100%{opacity:1;}50%{opacity:.3;}}
-.hdr-right{display:flex;align-items:center;gap:10px;}
-#conn-badge{
-  padding:3px 10px;border-radius:20px;font-size:9px;font-weight:700;font-family:'Orbitron';
-  letter-spacing:.08em;transition:all .3s;
-}
+.hdr-right{display:flex;align-items:center;gap:12px;}
+#conn-badge{padding:3px 10px;border-radius:20px;font-size:9px;font-weight:700;
+  font-family:'Orbitron';letter-spacing:.08em;transition:all .3s;}
 .connected{background:rgba(0,255,65,.1);color:var(--safe);border:1px solid rgba(0,255,65,.4);box-shadow:var(--glow-safe);}
 .disconnected{background:rgba(255,23,68,.1);color:var(--danger);border:1px solid rgba(255,23,68,.4);}
+#hdr-fps{font-size:11px;color:var(--accent);}
 #hdr-time{font-size:11px;color:var(--text2);}
-.btn-sm{
-  background:transparent;color:var(--text2);border:1px solid var(--border2);border-radius:var(--radius-sm);
-  padding:5px 12px;font-weight:700;font-size:10px;cursor:pointer;font-family:'Orbitron';
-  letter-spacing:.06em;transition:all .15s;
-}
+.btn-sm{background:transparent;color:var(--text2);border:1px solid var(--border2);
+  border-radius:var(--radius-sm);padding:5px 12px;font-weight:700;font-size:10px;
+  cursor:pointer;font-family:'Orbitron';letter-spacing:.06em;transition:all .15s;}
 .btn-sm:hover{color:var(--danger);border-color:var(--danger);}
-.btn-sm.btn-red{color:var(--danger);border-color:rgba(255,23,68,.4);}
 
-/* ── TABS ───────────────────────────────────────────────────── */
-.tabs{
-  display:flex;background:#000;border-bottom:1px solid var(--border);
-  flex-shrink:0;overflow-x:auto;scrollbar-width:none;
-}
-.tabs::-webkit-scrollbar{display:none;}
-.tab{
-  padding:0 20px;height:var(--tab);display:flex;align-items:center;gap:6px;
-  cursor:pointer;font-size:10px;font-family:'Orbitron';color:var(--text3);
-  border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;flex-shrink:0;
-  letter-spacing:.06em;
-}
-.tab:hover{color:var(--text2);}
-.tab.active{color:var(--accent);border-bottom-color:var(--accent);}
-.tab-icon{font-size:13px;}
-
-/* ── MAIN CONTENT AREA ──────────────────────────────────────── */
+/* ── MAIN LAYOUT ── */
 #app{display:none;flex-direction:column;flex:1;overflow:hidden;}
-.tab-panel{display:none;flex:1;overflow:hidden;}
-.tab-panel.active{display:flex;flex-direction:column;}
-.scroll-area{flex:1;overflow-y:auto;padding:14px;}
+.main-layout{display:flex;flex:1;overflow:hidden;gap:0;}
 
-/* ── LIVE FEED TAB ──────────────────────────────────────────── */
-#tab-live{flex-direction:column;padding:12px;gap:12px;}
-
-.feed-layout{
-  display:grid;
-  grid-template-columns:1fr 260px;
-  gap:12px;flex:1;min-height:0;
+/* ── LEFT — LIVE FEED (always visible) ── */
+.feed-col{
+  flex:1;min-width:0;display:flex;flex-direction:column;
+  padding:10px;gap:8px;
 }
-
-/* Feed container */
 .feed-hud{
-  background:#000;border-radius:var(--radius);overflow:hidden;
+  flex:1;min-height:0;background:#000;border-radius:var(--radius);overflow:hidden;
   position:relative;display:flex;align-items:center;justify-content:center;
-  border:1px solid var(--border);min-height:0;
+  border:1px solid var(--border);
 }
-
-/* HUD corner brackets */
-.feed-hud::before,.feed-hud::after,
-.feed-hud .hud-br,.feed-hud .hud-bl{
-  content:'';position:absolute;width:20px;height:20px;z-index:5;pointer-events:none;
-}
+.feed-hud::before,.feed-hud::after,.feed-hud .hud-br,.feed-hud .hud-bl{
+  content:'';position:absolute;width:20px;height:20px;z-index:5;pointer-events:none;}
 .feed-hud::before{top:8px;left:8px;border-top:2px solid var(--accent);border-left:2px solid var(--accent);}
 .feed-hud::after{top:8px;right:8px;border-top:2px solid var(--accent);border-right:2px solid var(--accent);}
 .feed-hud .hud-br{bottom:8px;right:8px;border-bottom:2px solid var(--accent);border-right:2px solid var(--accent);}
 .feed-hud .hud-bl{bottom:8px;left:8px;border-bottom:2px solid var(--accent);border-left:2px solid var(--accent);}
-
-/* Scanline effect */
-.feed-hud .scanlines{
-  position:absolute;inset:0;z-index:4;pointer-events:none;
-  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.06) 3px);
-}
-
-/* MJPEG stream — primary feed */
-#feed-img{
-  width:100%;height:100%;object-fit:contain;background:#000;display:none;
-  position:relative;z-index:2;
-}
-
-/* Canvas — WS binary frame fallback */
-#feed-canvas{
-  width:100%;height:100%;object-fit:contain;background:#000;display:none;
-  position:relative;z-index:2;
-}
-
-/* Offline placeholder */
-#no-stream{
-  position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:10px;z-index:3;background:#000;
-}
+.feed-hud .scanlines{position:absolute;inset:0;z-index:4;pointer-events:none;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.06) 3px);}
+#feed-img{width:100%;height:100%;object-fit:contain;background:#000;display:none;position:relative;z-index:2;}
+#feed-canvas{width:100%;height:100%;object-fit:contain;background:#000;display:none;position:relative;z-index:2;}
+#no-stream{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:10px;z-index:3;background:#000;}
 .no-stream-icon{font-size:36px;opacity:.2;}
 .no-stream-text{font-family:'Orbitron';font-size:11px;color:var(--text3);letter-spacing:.15em;}
-
-/* FPS / CAM tags */
-.feed-tag{
-  position:absolute;z-index:6;background:rgba(0,0,0,.7);
-  border-radius:4px;padding:2px 8px;font-size:10px;pointer-events:none;
-  backdrop-filter:blur(4px);
-}
-#feed-fps{top:10px;right:12px;color:var(--accent);}
-#feed-cam{top:10px;left:12px;color:var(--text2);}
-#feed-rec{
-  top:10px;left:50%;transform:translateX(-50%);
-  color:var(--danger);display:none;align-items:center;gap:5px;
-}
+.feed-tag{position:absolute;z-index:6;background:rgba(0,0,0,.75);border-radius:4px;
+  padding:2px 8px;font-size:10px;pointer-events:none;backdrop-filter:blur(4px);}
+#feed-fps-tag{top:10px;right:12px;color:var(--accent);}
+#feed-cam-tag{top:10px;left:12px;color:var(--text2);}
+#feed-rec{top:10px;left:50%;transform:translateX(-50%);color:var(--danger);
+  display:none;align-items:center;gap:5px;}
 .rec-dot{width:6px;height:6px;border-radius:50%;background:var(--danger);animation:blink .8s ease-in-out infinite;}
-
-/* DANGER overlay */
-#feed-overlay{
-  position:absolute;inset:0;display:none;align-items:center;justify-content:center;
-  background:rgba(255,23,68,.12);animation:dangerPulse 1s ease-in-out infinite;z-index:7;
-}
+#feed-overlay{position:absolute;inset:0;display:none;align-items:center;justify-content:center;
+  background:rgba(255,23,68,.12);animation:dangerPulse 1s ease-in-out infinite;z-index:7;}
 @keyframes dangerPulse{
   0%,100%{background:rgba(255,23,68,.12);box-shadow:inset 0 0 60px rgba(255,23,68,.15);}
   50%{background:rgba(255,23,68,.22);box-shadow:inset 0 0 100px rgba(255,23,68,.3);}
 }
-.danger-banner{
-  font-family:'Orbitron';font-size:clamp(14px,2.5vw,28px);font-weight:900;
-  color:#fff;letter-spacing:.15em;
-  border:2px solid var(--danger);padding:10px 24px;
+.danger-banner{font-family:'Orbitron';font-size:clamp(13px,2vw,24px);font-weight:900;color:#fff;
+  letter-spacing:.15em;border:2px solid var(--danger);padding:10px 24px;
   background:rgba(255,23,68,.25);text-shadow:0 0 20px var(--danger);
-  box-shadow:0 0 40px rgba(255,23,68,.4);
-  animation:bannerFlicker .15s ease-in-out infinite alternate;
-}
+  box-shadow:0 0 40px rgba(255,23,68,.4);animation:bannerFlicker .15s ease-in-out infinite alternate;}
 @keyframes bannerFlicker{from{opacity:1;}to{opacity:.85;}}
 
-/* Right side panel */
-.feed-side{display:flex;flex-direction:column;gap:10px;}
-
-.hud-card{
-  background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);
-  padding:12px;
-}
-.hud-card-title{
-  font-family:'Orbitron';font-size:9px;color:var(--text2);letter-spacing:.15em;
-  margin-bottom:10px;display:flex;align-items:center;gap:6px;
-}
-.hud-card-title::before{content:'';width:3px;height:10px;background:var(--accent);border-radius:2px;flex-shrink:0;}
-
-/* Status badges */
-.status-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
-.s-badge{
-  border-radius:var(--radius-sm);padding:7px 6px;text-align:center;
+/* status row below feed */
+.status-row{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;flex-shrink:0;}
+.s-badge{border-radius:var(--radius-sm);padding:6px 4px;text-align:center;
   font-family:'Orbitron';font-size:9px;font-weight:700;letter-spacing:.04em;
-  border:1px solid transparent;transition:all .3s;
-}
+  border:1px solid transparent;transition:all .3s;}
 .s-badge.on{background:rgba(0,255,65,.1);color:var(--safe);border-color:rgba(0,255,65,.3);box-shadow:var(--glow-safe);}
 .s-badge.off{background:rgba(255,23,68,.1);color:var(--danger);border-color:rgba(255,23,68,.3);}
-.s-badge.warn{background:rgba(255,171,0,.1);color:var(--warn);border-color:rgba(255,171,0,.3);}
 .s-badge-label{font-size:8px;opacity:.6;display:block;margin-bottom:2px;}
 
-/* Recent detection in side panel */
-.mini-det-list{display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto;}
-.mini-det{
-  display:flex;align-items:center;gap:8px;padding:6px;
-  background:var(--panel2);border-radius:var(--radius-sm);border:1px solid var(--border);
-  cursor:pointer;transition:border-color .15s;
+/* ── RIGHT — SIDE PANEL with mini-tabs ── */
+.side-panel{
+  width:var(--side);flex-shrink:0;
+  border-left:1px solid var(--border);
+  display:flex;flex-direction:column;
+  background:var(--panel);overflow:hidden;
 }
-.mini-det:hover{border-color:var(--accent);}
-.mini-det img{width:44px;height:34px;object-fit:cover;border-radius:4px;background:#000;flex-shrink:0;}
-.mini-det-info{min-width:0;}
-.mini-det-cls{color:var(--accent);font-size:11px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.mini-det-time{color:var(--text3);font-size:10px;}
+.side-tabs{
+  display:flex;border-bottom:1px solid var(--border);flex-shrink:0;background:#000;
+}
+.side-tab{
+  flex:1;padding:0;height:38px;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:9px;font-family:'Orbitron';color:var(--text3);
+  border-bottom:2px solid transparent;transition:all .2s;letter-spacing:.05em;
+  white-space:nowrap;
+}
+.side-tab:hover{color:var(--text2);}
+.side-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.side-content{flex:1;overflow:hidden;display:flex;flex-direction:column;}
+.side-pane{display:none;flex:1;flex-direction:column;overflow:hidden;}
+.side-pane.active{display:flex;}
+.side-scroll{flex:1;overflow-y:auto;padding:12px;}
 
-/* ── BOTTOM BADGES (mobile) ─────────────────────────────────── */
-.badges-bar{
-  display:none;
-  grid-template-columns:repeat(4,1fr);
-  gap:6px;
-}
+/* ── STATUS PANE ── */
+.stat-chips{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px;}
+.stat-chip{background:var(--panel2);border:1px solid var(--border);border-radius:var(--radius-sm);
+  padding:10px 6px;text-align:center;}
+.stat-chip-num{font-family:'Orbitron';font-size:20px;font-weight:700;color:var(--accent);line-height:1;}
+.stat-chip-lbl{font-size:8px;color:var(--text3);margin-top:3px;letter-spacing:.1em;}
+.section-label{font-family:'Orbitron';font-size:9px;color:var(--text2);letter-spacing:.15em;
+  margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.section-label::before{content:'';width:3px;height:9px;background:var(--accent);border-radius:2px;flex-shrink:0;}
+.status-grid2{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
 
-/* ── CONTROLS TAB ───────────────────────────────────────────── */
-.controls-grid{
-  display:grid;grid-template-columns:1fr 1fr;gap:14px;
-}
-.card{
-  background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);
-  padding:16px;
-}
-.card-title{
-  font-family:'Orbitron';font-size:10px;color:var(--accent);
-  letter-spacing:.1em;margin-bottom:14px;
-  display:flex;align-items:center;gap:6px;
-}
-.card-title::before{content:'';width:3px;height:12px;background:var(--accent);border-radius:2px;}
-.setting-row{
-  display:grid;grid-template-columns:120px 1fr 52px;
-  align-items:center;gap:10px;font-size:12px;color:var(--text2);margin-bottom:12px;
-}
-.vbox{
-  font-family:'Share Tech Mono',monospace;background:#000;text-align:center;
-  border-radius:4px;padding:4px 2px;color:var(--accent);font-size:12px;
-  border:1px solid var(--border);
-}
-input[type=range]{
-  accent-color:var(--accent);width:100%;height:4px;cursor:pointer;
-}
-select.inp-sel{
-  background:#080d16;border:1px solid var(--border2);border-radius:var(--radius-sm);
+/* ── CONTROLS PANE ── */
+.ctrl-section{margin-bottom:16px;}
+.setting-row{display:grid;grid-template-columns:1fr 44px;align-items:center;
+  gap:8px;margin-bottom:10px;}
+.setting-label{font-size:11px;color:var(--text2);margin-bottom:5px;}
+.vbox{font-family:'Share Tech Mono',monospace;background:#080d16;text-align:center;
+  border-radius:4px;padding:4px 2px;color:var(--accent);font-size:12px;border:1px solid var(--border);}
+input[type=range]{accent-color:var(--accent);width:100%;height:4px;cursor:pointer;display:block;}
+select.inp-sel{background:#080d16;border:1px solid var(--border2);border-radius:var(--radius-sm);
   color:var(--text);padding:7px 10px;font-size:12px;font-family:'Share Tech Mono',monospace;
-  width:100%;outline:none;cursor:pointer;
-}
+  width:100%;outline:none;cursor:pointer;}
 select.inp-sel:focus{border-color:var(--accent);}
-.btn-apply{
-  background:var(--accent);color:#000;border:none;border-radius:var(--radius-sm);
-  padding:10px 16px;font-weight:700;font-family:'Orbitron';font-size:10px;
-  cursor:pointer;width:100%;margin-top:8px;letter-spacing:.08em;
-  transition:background .15s,box-shadow .15s;
-}
-.btn-apply:hover{background:#00eeff;box-shadow:0 0 16px rgba(0,212,255,.35);}
-#settings-msg{font-size:10px;color:var(--safe);margin-top:6px;min-height:14px;letter-spacing:.04em;}
-.settings-readout{font-size:12px;line-height:2;color:var(--text2);}
-.settings-readout span{color:var(--accent);}
+.ctrl-hint{font-size:10px;color:var(--text3);margin-top:4px;}
 
-/* ── LOG TAB ────────────────────────────────────────────────── */
-.log-toolbar{
-  display:flex;justify-content:space-between;align-items:center;
-  gap:10px;margin-bottom:12px;flex-wrap:wrap;
-}
-.log-search{
-  background:#080d16;border:1px solid var(--border2);border-radius:var(--radius-sm);
-  color:var(--text);padding:8px 12px;font-size:12px;font-family:'Share Tech Mono',monospace;
-  outline:none;width:min(220px,100%);transition:border-color .2s;
-}
+/* ── LOG PANE ── */
+.log-filter-row{display:flex;gap:6px;padding:10px 12px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.log-search{background:#080d16;border:1px solid var(--border2);border-radius:var(--radius-sm);
+  color:var(--text);padding:6px 10px;font-size:11px;font-family:'Share Tech Mono',monospace;
+  outline:none;flex:1;transition:border-color .2s;}
 .log-search:focus{border-color:var(--accent);}
-.log-btns{display:flex;gap:8px;flex-shrink:0;}
-.det-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
-  gap:10px;
-}
-.det-card{
-  background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);
-  overflow:hidden;cursor:pointer;transition:border-color .2s,transform .15s,box-shadow .2s;
-}
-.det-card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.4);}
-.det-card img{
-  width:100%;aspect-ratio:4/3;object-fit:cover;background:#050a12;
-  display:block;border-bottom:1px solid var(--border);
-}
-.det-info{padding:8px 10px;}
-.det-class{color:var(--accent);font-weight:700;font-size:12px;margin-bottom:3px;}
-.det-meta{color:var(--text3);font-size:10px;margin-top:1px;}
-.det-conf{
-  display:inline-block;background:rgba(0,212,255,.1);color:var(--accent);
-  border:1px solid rgba(0,212,255,.2);border-radius:3px;
-  font-size:9px;padding:1px 5px;margin-top:4px;
-}
-.log-pagination{
-  display:flex;justify-content:center;align-items:center;gap:12px;
-  margin-top:14px;padding-top:14px;border-top:1px solid var(--border);
-}
-#page-info{font-size:11px;color:var(--text2);}
+.btn-icon{background:transparent;color:var(--text2);border:1px solid var(--border2);
+  border-radius:var(--radius-sm);padding:6px 10px;font-size:10px;cursor:pointer;
+  font-family:'Orbitron';transition:all .15s;text-decoration:none;display:flex;align-items:center;white-space:nowrap;}
+.btn-icon:hover{color:var(--accent);border-color:var(--accent);}
+.det-list{flex:1;overflow-y:auto;padding:8px;}
+.det-item{display:flex;align-items:center;gap:8px;padding:7px;margin-bottom:6px;
+  background:var(--panel2);border-radius:var(--radius-sm);border:1px solid var(--border);
+  cursor:pointer;transition:border-color .15s;}
+.det-item:hover{border-color:var(--accent);}
+.det-item img{width:52px;height:40px;object-fit:cover;border-radius:4px;background:#000;flex-shrink:0;}
+.det-item-info{min-width:0;flex:1;}
+.det-item-class{color:var(--accent);font-size:11px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.det-item-meta{color:var(--text3);font-size:10px;margin-top:2px;}
+.det-item-conf{display:inline-block;background:rgba(0,212,255,.1);color:var(--accent);
+  border:1px solid rgba(0,212,255,.2);border-radius:3px;font-size:9px;padding:1px 4px;margin-top:3px;}
+.log-pagination{display:flex;justify-content:center;align-items:center;gap:10px;
+  padding:8px;border-top:1px solid var(--border);flex-shrink:0;}
+#page-info{font-size:10px;color:var(--text2);}
 
-/* ── STATS TAB ──────────────────────────────────────────────── */
-.stats-top{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:12px;}
-.stat-card{
-  background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);
-  padding:18px 14px;text-align:center;position:relative;overflow:hidden;
-}
-.stat-card::after{
-  content:'';position:absolute;bottom:0;left:0;right:0;height:2px;
-  background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:.4;
-}
-.stat-num{font-family:'Orbitron';font-size:30px;font-weight:700;color:var(--accent);line-height:1;}
-.stat-lbl{font-size:9px;color:var(--text2);margin-top:6px;letter-spacing:.15em;}
-.recent-card{
-  background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:16px;
-}
-.recent-item{
-  display:flex;align-items:center;gap:10px;padding:7px 0;
-  border-bottom:1px solid var(--border);font-size:11px;
-}
+/* ── STATS PANE ── */
+.stats-cards{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
+.stats-card{background:var(--panel2);border:1px solid var(--border);border-radius:var(--radius);
+  padding:14px;text-align:center;position:relative;overflow:hidden;}
+.stats-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:.4;}
+.stats-num{font-family:'Orbitron';font-size:26px;font-weight:700;color:var(--accent);line-height:1;}
+.stats-lbl{font-size:8px;color:var(--text2);margin-top:5px;letter-spacing:.12em;}
+.recent-list-wrap{flex:1;overflow-y:auto;}
+.recent-item{display:flex;align-items:center;gap:8px;padding:8px 0;
+  border-bottom:1px solid var(--border);font-size:11px;}
 .recent-item:last-child{border-bottom:none;}
-.recent-cls{color:var(--accent);font-weight:700;min-width:90px;}
-.recent-meta{color:var(--text2);}
+.recent-cls{color:var(--accent);font-weight:700;min-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.recent-meta{color:var(--text2);font-size:10px;}
 
-/* ── MODAL ──────────────────────────────────────────────────── */
-#modal{
-  position:fixed;inset:0;background:rgba(0,0,0,.92);
-  display:none;align-items:center;justify-content:center;
-  z-index:9998;flex-direction:column;gap:12px;
-  backdrop-filter:blur(6px);
-}
-#modal img{
-  max-width:min(90vw,900px);max-height:75vh;
-  border:1px solid var(--accent);border-radius:var(--radius);
-  box-shadow:0 0 60px rgba(0,212,255,.2);
-}
-.modal-info{
-  color:var(--text2);font-size:12px;text-align:center;
-  background:rgba(0,0,0,.6);padding:8px 16px;border-radius:var(--radius-sm);
-  border:1px solid var(--border);
-}
-.modal-close{
-  position:absolute;top:16px;right:20px;color:var(--text2);font-size:24px;
-  cursor:pointer;transition:color .15s;line-height:1;
-}
+/* ── MODAL ── */
+#modal{position:fixed;inset:0;background:rgba(0,0,0,.92);display:none;
+  align-items:center;justify-content:center;z-index:9998;flex-direction:column;
+  gap:12px;backdrop-filter:blur(6px);}
+#modal img{max-width:min(90vw,900px);max-height:75vh;border:1px solid var(--accent);
+  border-radius:var(--radius);box-shadow:0 0 60px rgba(0,212,255,.2);}
+.modal-info{color:var(--text2);font-size:12px;text-align:center;background:rgba(0,0,0,.6);
+  padding:8px 16px;border-radius:var(--radius-sm);border:1px solid var(--border);}
+.modal-close{position:absolute;top:16px;right:20px;color:var(--text2);font-size:24px;
+  cursor:pointer;transition:color .15s;line-height:1;}
 .modal-close:hover{color:#fff;}
 
-/* ── TOAST ──────────────────────────────────────────────────── */
-#toast{
-  position:fixed;bottom:20px;right:20px;
-  background:var(--danger);color:#fff;
-  padding:12px 18px;border-radius:var(--radius-sm);
-  font-family:'Orbitron';font-weight:700;font-size:11px;letter-spacing:.06em;
-  display:none;z-index:99999;
-  box-shadow:0 0 30px rgba(255,23,68,.5);
-  animation:toastIn .3s ease;
-}
+/* ── TOAST ── */
+#toast{position:fixed;bottom:20px;right:20px;background:var(--danger);color:#fff;
+  padding:12px 18px;border-radius:var(--radius-sm);font-family:'Orbitron';
+  font-weight:700;font-size:11px;letter-spacing:.06em;display:none;z-index:99999;
+  box-shadow:0 0 30px rgba(255,23,68,.5);animation:toastIn .3s ease;}
 @keyframes toastIn{from{transform:translateY(20px);opacity:0;}to{transform:translateY(0);opacity:1;}}
 
-/* ── RESPONSIVE ─────────────────────────────────────────────── */
-
-/* Tablet portrait: ~768px */
-@media(max-width:900px){
-  .feed-layout{grid-template-columns:1fr;}
-  .feed-side{flex-direction:row;flex-wrap:wrap;}
-  .hud-card{flex:1;min-width:200px;}
-  .controls-grid{grid-template-columns:1fr;}
-  .stats-top{grid-template-columns:repeat(3,1fr);}
-}
-
-/* Phone landscape / small tablet */
-@media(max-width:640px){
-  :root{--hdr:46px;--tab:38px;}
-  .tab{padding:0 14px;font-size:9px;}
-  .scroll-area{padding:10px;}
-  .controls-grid{grid-template-columns:1fr;}
-  .stats-top{grid-template-columns:1fr 1fr 1fr;}
-  .stat-num{font-size:22px;}
-  .det-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));}
-  .setting-row{grid-template-columns:100px 1fr 46px;}
-  .feed-side{display:none;}
-  .badges-bar{display:grid;}
-  #tab-live{padding:8px;gap:8px;}
-}
-
-/* Very small phones */
-@media(max-width:400px){
-  .stats-top{grid-template-columns:1fr 1fr;}
-  .det-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));}
-  .tab{padding:0 10px;}
-}
-
-/* Landscape phone — maximize feed height */
-@media(max-height:500px) and (orientation:landscape){
-  :root{--hdr:40px;--tab:34px;}
-  #tab-live{flex-direction:row;padding:6px;}
-  .feed-hud{flex:1;}
-  .badges-bar{display:flex;flex-direction:column;width:90px;gap:4px;}
-  .s-badge{font-size:8px;padding:5px 4px;}
-}
-
-/* Large screens */
-@media(min-width:1400px){
-  .feed-layout{grid-template-columns:1fr 300px;}
-  .det-grid{grid-template-columns:repeat(auto-fill,minmax(220px,1fr));}
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  :root{--side:100%;}
+  .main-layout{flex-direction:column;}
+  .feed-col{flex:none;height:50vh;}
+  .side-panel{width:100%;border-left:none;border-top:1px solid var(--border);}
 }
 </style>
 </head>
 <body>
 
-<!-- ═══ LOGIN ═══════════════════════════════════════════════════ -->
+<!-- LOGIN -->
 <div id="login-screen">
   <div class="login-box">
-    <div class="login-logo">HSD</div>
-    <div class="login-sub">XRAY SCANNER — ADMIN ACCESS</div>
+    <div class="login-logo">X-RAY SCANNER</div>
+    <div class="login-sub">ADMIN ACCESS</div>
     <input class="inp" id="u" type="text" placeholder="USERNAME" autocomplete="username">
     <input class="inp" id="p" type="password" placeholder="PASSWORD" autocomplete="current-password">
     <button class="btn-login" onclick="doLogin()">AUTHENTICATE</button>
@@ -447,723 +262,491 @@ select.inp-sel:focus{border-color:var(--accent);}
   </div>
 </div>
 
-<!-- ═══ MAIN APP ═════════════════════════════════════════════════ -->
+<!-- MAIN APP -->
 <div id="app">
 
   <!-- HEADER -->
   <div class="header">
     <div class="hdr-logo">
       <div class="hdr-logo-dot"></div>
-      HSD XRAY SCANNER
+      X-RAY SCANNER
     </div>
     <div class="hdr-right">
       <span id="conn-badge" class="disconnected">● PC OFFLINE</span>
+      <span id="hdr-fps"></span>
       <span id="hdr-time"></span>
-      <button class="btn-sm btn-red" onclick="logout()">LOGOUT</button>
+      <button class="btn-sm" onclick="logout()">LOGOUT</button>
     </div>
   </div>
 
-  <!-- TABS -->
-  <div class="tabs">
-    <div class="tab active" onclick="switchTab('live',event)"><span class="tab-icon">📹</span>LIVE FEED</div>
-    <div class="tab" onclick="switchTab('controls',event)"><span class="tab-icon">⚙</span>CONTROLS</div>
-    <div class="tab" onclick="switchTab('log',event)"><span class="tab-icon">📋</span>DETECTIONS</div>
-    <div class="tab" onclick="switchTab('stats',event)"><span class="tab-icon">📊</span>STATS</div>
-  </div>
+  <!-- BODY -->
+  <div class="main-layout">
 
-  <!-- ── LIVE FEED ──────────────────────────────────────────── -->
-  <div id="tab-live" class="tab-panel active">
-
-    <div class="feed-layout" style="flex:1;min-height:0;">
-
-      <!-- HUD Feed -->
+    <!-- LEFT: LIVE FEED always visible -->
+    <div class="feed-col">
       <div class="feed-hud" id="feed-hud">
         <div class="hud-br"></div><div class="hud-bl"></div>
         <div class="scanlines"></div>
-
-        <!-- MJPEG image stream (primary — direct from PC) -->
         <img id="feed-img" alt="live feed">
-
-        <!-- Canvas (WS binary frames fallback) -->
         <canvas id="feed-canvas"></canvas>
-
-        <!-- Offline state -->
         <div id="no-stream">
           <div class="no-stream-icon">📡</div>
           <div class="no-stream-text">AWAITING SCANNER CONNECTION</div>
         </div>
-
-        <!-- HUD tags -->
-        <div class="feed-tag" id="feed-fps"></div>
-        <div class="feed-tag" id="feed-cam">CAM 0</div>
-        <div class="feed-tag" id="feed-rec" style="display:none"><span class="rec-dot"></span>LIVE</div>
-
-        <!-- Danger overlay -->
+        <div class="feed-tag" id="feed-fps-tag"></div>
+        <div class="feed-tag" id="feed-cam-tag">CAM 0</div>
+        <div class="feed-tag" id="feed-rec"><span class="rec-dot"></span>LIVE</div>
         <div id="feed-overlay">
           <div class="danger-banner">⚠ PROHIBITED ITEM DETECTED</div>
         </div>
       </div>
+      <!-- Status badges below feed -->
+      <div class="status-row">
+        <div class="s-badge off" id="badge-main"><span class="s-badge-label">STATUS</span>--</div>
+        <div class="s-badge off" id="badge-gate"><span class="s-badge-label">GATE</span>--</div>
+        <div class="s-badge off" id="badge-belt"><span class="s-badge-label">BELT</span>--</div>
+        <div class="s-badge off" id="badge-buzzer"><span class="s-badge-label">BUZZER</span>--</div>
+      </div>
+    </div>
 
-      <!-- Side panel (desktop/tablet) -->
-      <div class="feed-side">
+    <!-- RIGHT: SIDE PANEL with mini-tabs -->
+    <div class="side-panel">
+      <div class="side-tabs">
+        <div class="side-tab active" onclick="switchSide('status',this)">STATUS</div>
+        <div class="side-tab" onclick="switchSide('controls',this)">CONTROLS</div>
+        <div class="side-tab" onclick="switchSide('log',this)">LOG</div>
+        <div class="side-tab" onclick="switchSide('stats',this)">STATS</div>
+      </div>
+      <div class="side-content">
 
-        <!-- System status -->
-        <div class="hud-card">
-          <div class="hud-card-title">SYSTEM STATUS</div>
-          <div class="status-grid">
-            <div class="s-badge off" id="badge-main">
-              <span class="s-badge-label">STATUS</span>--
+        <!-- STATUS PANE -->
+        <div id="side-status" class="side-pane active">
+          <div class="side-scroll">
+            <div class="stat-chips">
+              <div class="stat-chip"><div class="stat-chip-num" id="s-total">—</div><div class="stat-chip-lbl">TOTAL</div></div>
+              <div class="stat-chip"><div class="stat-chip-num" id="s-today">—</div><div class="stat-chip-lbl">TODAY</div></div>
+              <div class="stat-chip"><div class="stat-chip-num" id="s-fps">—</div><div class="stat-chip-lbl">FPS</div></div>
             </div>
-            <div class="s-badge off" id="badge-gate">
-              <span class="s-badge-label">GATE</span>--
-            </div>
-            <div class="s-badge off" id="badge-belt">
-              <span class="s-badge-label">BELT</span>--
-            </div>
-            <div class="s-badge off" id="badge-buzzer">
-              <span class="s-badge-label">BUZZER</span>--
+            <div class="section-label">RECENT DETECTIONS</div>
+            <div id="mini-det-list">
+              <div style="color:var(--text3);font-size:11px;text-align:center;padding:20px 0">No detections yet</div>
             </div>
           </div>
         </div>
 
-        <!-- Recent detections mini list -->
-        <div class="hud-card" style="flex:1;min-height:0;display:flex;flex-direction:column;">
-          <div class="hud-card-title">RECENT DETECTIONS</div>
-          <div class="mini-det-list" id="mini-det-list">
-            <div style="color:var(--text3);font-size:11px;text-align:center;padding:16px">No detections yet</div>
+        <!-- CONTROLS PANE -->
+        <div id="side-controls" class="side-pane">
+          <div class="side-scroll">
+            <div class="ctrl-section">
+              <div class="section-label">DETECTION SETTINGS</div>
+
+              <div class="setting-label">Confidence Threshold</div>
+              <div class="setting-row">
+                <input type="range" id="th" min="0.1" max="1" step="0.05" value="0.80"
+                  oninput="onThChange(this.value)">
+                <span id="th-val" class="vbox">0.80</span>
+              </div>
+
+              <div class="setting-label">Confirm Frames</div>
+              <div class="setting-row">
+                <input type="range" id="cf" min="1" max="30" step="1" value="12"
+                  oninput="onCfChange(this.value)">
+                <span id="cf-val" class="vbox">12</span>
+              </div>
+            </div>
+
+            <div class="ctrl-section">
+              <div class="section-label">CAMERA</div>
+              <select id="cam-sel" class="inp-sel" onchange="onCamChange(this.value)">
+                <option value="0">Camera 0</option>
+                <option value="1">Camera 1</option>
+                <option value="2">Camera 2</option>
+                <option value="3">Camera 3</option>
+              </select>
+              <div class="ctrl-hint">Changes apply instantly</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- LOG PANE -->
+        <div id="side-log" class="side-pane">
+          <div class="log-filter-row">
+            <input id="log-filter" class="log-search" placeholder="Filter by class...">
+            <a href="#" onclick="exportCSV(event)" class="btn-icon">⬇ CSV</a>
+          </div>
+          <div class="det-list" id="det-list">
+            <div style="color:var(--text3);font-size:11px;padding:16px">Loading...</div>
+          </div>
+          <div class="log-pagination">
+            <button class="btn-icon" id="prev-btn" onclick="changePage(-1)" style="display:none">◀</button>
+            <span id="page-info"></span>
+            <button class="btn-icon" id="next-btn" onclick="changePage(1)" style="display:none">▶</button>
+          </div>
+        </div>
+
+        <!-- STATS PANE -->
+        <div id="side-stats" class="side-pane">
+          <div class="side-scroll" style="display:flex;flex-direction:column;">
+            <div class="stats-cards">
+              <div class="stats-card"><div class="stats-num" id="ss-total">—</div><div class="stats-lbl">TOTAL</div></div>
+              <div class="stats-card"><div class="stats-num" id="ss-today">—</div><div class="stats-lbl">TODAY</div></div>
+              <div class="stats-card"><div class="stats-num" id="ss-classes">—</div><div class="stats-lbl">CLASSES</div></div>
+              <div class="stats-card"><div class="stats-num" id="ss-fps">—</div><div class="stats-lbl">FPS</div></div>
+            </div>
+            <div class="section-label">RECENT ACTIVITY</div>
+            <div class="recent-list-wrap" id="recent-list">
+              <div style="color:var(--text3);font-size:11px;padding:10px">Loading...</div>
+            </div>
           </div>
         </div>
 
       </div>
     </div>
 
-    <!-- Mobile badges bar (shown only on small screens) -->
-    <div class="badges-bar">
-      <div class="s-badge off" id="mbadge-main"><span class="s-badge-label">STATUS</span>--</div>
-      <div class="s-badge off" id="mbadge-gate"><span class="s-badge-label">GATE</span>--</div>
-      <div class="s-badge off" id="mbadge-belt"><span class="s-badge-label">BELT</span>--</div>
-      <div class="s-badge off" id="mbadge-buzzer"><span class="s-badge-label">BUZ</span>--</div>
-    </div>
-
-  </div>
-
-  <!-- ── CONTROLS ───────────────────────────────────────────── -->
-  <div id="tab-controls" class="tab-panel">
-    <div class="scroll-area">
-      <div class="controls-grid">
-
-        <div class="card">
-          <div class="card-title">DETECTION SETTINGS</div>
-
-          <div class="setting-row">
-            <label>Confidence</label>
-            <input type="range" id="th" min="0.1" max="1" step="0.05" value="0.80"
-              oninput="document.getElementById('th-val').innerText=parseFloat(this.value).toFixed(2)">
-            <span id="th-val" class="vbox">0.80</span>
-          </div>
-
-          <div class="setting-row">
-            <label>Confirm Frames</label>
-            <input type="range" id="cf" min="1" max="30" step="1" value="12"
-              oninput="document.getElementById('cf-val').innerText=this.value">
-            <span id="cf-val" class="vbox">12</span>
-          </div>
-
-          <div class="setting-row">
-            <label>Camera</label>
-            <select id="cam-sel" class="inp-sel">
-              <option value="0">Camera 0</option>
-              <option value="1">Camera 1</option>
-              <option value="2">Camera 2</option>
-              <option value="3">Camera 3</option>
-            </select>
-            <div></div>
-          </div>
-
-          <button class="btn-apply" onclick="applySettings()">▶ APPLY TO SYSTEM</button>
-          <div id="settings-msg"></div>
-        </div>
-
-        <div class="card">
-          <div class="card-title">CURRENT SYSTEM SETTINGS</div>
-          <div class="settings-readout" id="live-settings">Loading...</div>
-          <button class="btn-apply" style="margin-top:14px;background:#1a2535;color:var(--accent)" onclick="loadSettings()">↻ REFRESH</button>
-        </div>
-
-
-      </div>
-    </div>
-  </div>
-
-  <!-- ── DETECTION LOG ──────────────────────────────────────── -->
-  <div id="tab-log" class="tab-panel">
-    <div class="scroll-area">
-
-      <div class="log-toolbar">
-        <input id="log-filter" class="log-search" placeholder="Filter by class name...">
-        <div class="log-btns">
-          <button class="btn-sm" onclick="loadLog(1)">↻ REFRESH</button>
-          <a href="#" onclick="exportCSV(event)" class="btn-sm" style="text-decoration:none;display:inline-flex;align-items:center">⬇ CSV</a>
-        </div>
-      </div>
-
-      <div id="det-grid" class="det-grid">
-        <div style="color:var(--text3);font-size:12px;padding:20px">Loading detections...</div>
-      </div>
-
-      <div class="log-pagination">
-        <button class="btn-sm" id="prev-btn" onclick="changePage(-1)" style="display:none">◀ PREV</button>
-        <span id="page-info"></span>
-        <button class="btn-sm" id="next-btn" onclick="changePage(1)" style="display:none">NEXT ▶</button>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- ── STATS ──────────────────────────────────────────────── -->
-  <div id="tab-stats" class="tab-panel">
-    <div class="scroll-area">
-
-      <div class="stats-top">
-        <div class="stat-card">
-          <div class="stat-num" id="s-total">—</div>
-          <div class="stat-lbl">TOTAL DETECTIONS</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-num" id="s-today">—</div>
-          <div class="stat-lbl">TODAY</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-num" id="s-classes">—</div>
-          <div class="stat-lbl">UNIQUE CLASSES</div>
-        </div>
-      </div>
-
-      <div class="recent-card">
-        <div class="card-title">RECENT ACTIVITY</div>
-        <div id="recent-list">
-          <div style="color:var(--text3);font-size:12px;padding:10px">Loading...</div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
+  </div><!-- /main-layout -->
 </div><!-- /#app -->
 
-<!-- IMAGE MODAL -->
+<!-- MODAL -->
 <div id="modal" onclick="closeModal()">
   <span class="modal-close" onclick="closeModal()">✕</span>
-  <img id="modal-img" src="" onclick="e=>e.stopPropagation()">
+  <img id="modal-img" src="" onclick="event.stopPropagation()">
   <div class="modal-info" id="modal-info"></div>
 </div>
-
-<!-- TOAST -->
 <div id="toast"></div>
 
 <script>
 const API = window.location.origin;
-let TOKEN   = localStorage.getItem("xray_token") || "";
-let ws      = null;
-let wsReconnectTimer = null;
-let currentPage  = 1;
-let filterClass  = "";
-let recentDets   = [];
-let pcConnected  = false;
-let mjpegActive  = false;
+let TOKEN  = localStorage.getItem("xray_token") || "";
+let ws     = null, wsReconnectTimer = null;
+let pcConnected = false, mjpegActive = false;
+let recentDets  = [];
+let allDets     = [];
+let logPage     = 1;
+let filterClass = "";
 
-// ── MJPEG STREAM via Railway proxy (no mixed-content issues) ────
-function getMjpegUrl(){
-  return `${API}/api/stream/mjpeg?token=${TOKEN}`;
+// ── SIDE TAB SWITCH ───────────────────────────────────────────────
+function switchSide(name, el){
+  document.querySelectorAll(".side-pane").forEach(p=>p.classList.remove("active"));
+  document.querySelectorAll(".side-tab").forEach(t=>t.classList.remove("active"));
+  document.getElementById("side-"+name).classList.add("active");
+  el.classList.add("active");
+  if(name==="log")   renderLog();
+  if(name==="stats") renderStats();
 }
 
-function startMjpeg(){
-  const img = document.getElementById("feed-img");
-  img.onload  = () => { mjpegActive = true; updateFeedVisibility(); };
-  img.onerror = () => {
-    img.style.display = "none";
-    mjpegActive = false;
-    updateFeedVisibility();
-  };
-  img.src = getMjpegUrl();
-  img.style.display = "block";
-  updateFeedVisibility();
-}
-
-function stopMjpeg(){
-  const img = document.getElementById("feed-img");
-  img.src = "";
-  img.style.display = "none";
-  mjpegActive = false;
-  updateFeedVisibility();
-}
-// ── AUTH ────────────────────────────────────────────────────────
+// ── AUTH ──────────────────────────────────────────────────────────
 async function doLogin(){
-  const u = document.getElementById("u").value.trim();
-  const p = document.getElementById("p").value;
-  const err = document.getElementById("login-err");
-  err.innerText = "";
-  try {
-    const res = await fetch("/api/admin/login",{
-      method:"POST",
+  const u=document.getElementById("u").value.trim();
+  const p=document.getElementById("p").value;
+  const err=document.getElementById("login-err");
+  err.innerText="";
+  try{
+    const res=await fetch("/api/admin/login",{method:"POST",
       headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({username:u,password:p})
-    });
-    const data = await res.json();
-    if(!res.ok){ err.innerText = data.detail||"Login failed"; return; }
-    TOKEN = data.access_token;
-    localStorage.setItem("xray_token", TOKEN);
+      body:JSON.stringify({username:u,password:p})});
+    const data=await res.json();
+    if(!res.ok){err.innerText=data.detail||"Login failed";return;}
+    TOKEN=data.access_token;
+    localStorage.setItem("xray_token",TOKEN);
     showApp();
-  } catch(e){
-    err.innerText = "Server unreachable";
-  }
+  }catch(e){err.innerText="Server unreachable";}
 }
-
 function logout(){
-  TOKEN = "";
-  localStorage.removeItem("xray_token");
-  document.getElementById("app").style.display = "none";
-  document.getElementById("login-screen").style.display = "flex";
-  if(ws){ ws.close(); ws = null; }
-  if(wsReconnectTimer){ clearTimeout(wsReconnectTimer); }
+  TOKEN="";localStorage.removeItem("xray_token");
+  document.getElementById("app").style.display="none";
+  document.getElementById("login-screen").style.display="flex";
+  if(ws){ws.close();ws=null;}
   stopMjpeg();
 }
-
-// ── STARTUP ─────────────────────────────────────────────────────
-function showApp(){
-  document.getElementById("login-screen").style.display = "none";
-  document.getElementById("app").style.display = "flex";
-  connectWS();
-  startMjpeg();
-  loadSettings();
-  loadLog(1);
-  loadStats();
-  setInterval(updateClock, 1000);
-  setInterval(loadStats, 30000);
-}
-
-window.onload = () => {
-  document.getElementById("p").addEventListener("keydown", e => { if(e.key==="Enter") doLogin(); });
-  if(TOKEN) showApp();
-};
-
-// Show/hide feed elements based on what's available
-function updateFeedVisibility(){
-  const noStream = document.getElementById("no-stream");
-  const canvas   = document.getElementById("feed-canvas");
-  const feedImg  = document.getElementById("feed-img");
-  const rec      = document.getElementById("feed-rec");
-
-  if(mjpegActive){
-    noStream.style.display = "none";
-    canvas.style.display   = "none";
-    feedImg.style.display  = "block";
-    rec.style.display      = "flex";
-  } else if(pcConnected){
-    noStream.style.display = "none";
-    canvas.style.display   = "block";
-    feedImg.style.display  = "none";
-    rec.style.display      = "flex";
-  } else {
-    noStream.style.display = "flex";
-    canvas.style.display   = "none";
-    feedImg.style.display  = "none";
-    rec.style.display      = "none";
-  }
-}
-
-// ── WEBSOCKET (events + WS canvas fallback) ───────────────────────
-function connectWS(){
-
-  if(ws){ try{ws.close();}catch(e){} }
-  if(wsReconnectTimer){ clearTimeout(wsReconnectTimer); wsReconnectTimer=null; }
-
-  const proto = location.protocol === "https:" ? "wss" : "ws";
-  ws = new WebSocket(`${proto}://${location.host}/api/stream/watch?token=${TOKEN}`);
-  ws.binaryType = "arraybuffer";
-
-  ws.onopen  = () => setConnected(true);
-
-  ws.onclose = () => {
-    setConnected(false);
-    wsReconnectTimer = setTimeout(connectWS, 5000);
-  };
-
-  ws.onerror = () => { try{ws.close();}catch(e){} };
-
-  ws.onmessage = ev => {
-
-    // FRAME STREAM
-    if(ev.data instanceof ArrayBuffer){
-      if(!mjpegActive) renderFrame(ev.data);
-      return;
-    }
-
-    // EVENT MESSAGE
-    let msg;
-    try{
-      msg = JSON.parse(ev.data);
-    }catch(e){
-      return;
-    }
-
-    handleEvent(msg);
-
-    // SETTINGS SYNC
-    if(msg.type === "settings_update"){
-
-      const th = document.getElementById("th");
-      if(th){
-        th.value = msg.confidence_threshold;
-        document.getElementById("th-val").innerText =
-          parseFloat(msg.confidence_threshold).toFixed(2);
-      }
-
-      const cf = document.getElementById("cf");
-      if(cf){
-        cf.value = msg.confirm_frames;
-        document.getElementById("cf-val").innerText = msg.confirm_frames;
-      }
-
-      const cam = document.getElementById("cam-sel");
-      if(cam && msg.camera_index !== undefined){
-        cam.value = msg.camera_index;
-        const camTag = document.getElementById("feed-cam");
-        if(camTag) camTag.innerText = "CAM " + msg.camera_index;
-      }
-
-      applySettingsDisplay(msg);
-      document.getElementById("settings-msg").innerText = "⟳ Synced from system";
-      setTimeout(() => { const el = document.getElementById("settings-msg"); if(el) el.innerText=""; }, 2000);
-
-    }
-  };
-}
-
-function setConnected(c){
-  pcConnected = c;
-
-  const b = document.getElementById("conn-badge");
-  b.innerText = c ? "● PC ONLINE" : "● PC OFFLINE";
-  b.className = c ? "connected" : "disconnected";
-
-  updateFeedVisibility();
-}
-
-// ── FRAME RENDER (WS canvas fallback) ────────────────────────────
-function renderFrame(buf){
-  const canvas = document.getElementById("feed-canvas");
-  const blob   = new Blob([buf], {type:"image/jpeg"});
-  const url    = URL.createObjectURL(blob);
-  const img    = new Image();
-  img.onload = () => {
-    canvas.width  = img.width;
-    canvas.height = img.height;
-    canvas.getContext("2d").drawImage(img,0,0);
-    URL.revokeObjectURL(url);
-  };
-  img.src = url;
-}
-
-// ── EVENTS ───────────────────────────────────────────────────────
-function handleEvent(msg){
-  if(msg.type === "pc_status"){
-    setConnected(msg.online);
-  }
-  if(msg.type === "new_detection"){
-    showToast(`⚠ DANGER: ${msg.class_name}`);
-    loadLog(1);
-    loadStats();
-    addMiniDet(msg);
-  }
-  if(msg.type === "status_update"){
-    updateBadges(msg.status);
-    if(msg.fps !== undefined){
-      document.getElementById("feed-fps").innerText = msg.fps.toFixed(1) + " fps";
-    }
-  }
-  if(msg.type === "settings_update"){
-    applySettingsDisplay(msg);
-  }
-}
-
-function updateBadges(st){
-  if(!st) return;
-  const sets = [
-    ["badge-main",   "mbadge-main",   st.main,   st.main],
-    ["badge-gate",   "mbadge-gate",   st.gate,   "GATE: "+st.gate],
-    ["badge-belt",   "mbadge-belt",   st.belt,   "BELT: "+st.belt],
-    ["badge-buzzer", "mbadge-buzzer", st.buzzer, "BUZ: "+st.buzzer],
-  ];
-  sets.forEach(([sid, mid, val, label]) => {
-    const on = ["OPEN","RUNNING","ON","SAFE"].includes(val);
-    const cls = "s-badge " + (on ? "on" : (["DANGER","CLOSED","STOPPED"].includes(val) ? "off" : "warn"));
-    [sid, mid].forEach(id => {
-      const el = document.getElementById(id);
-      if(!el) return;
-      el.className = cls;
-      // keep label span, update text
-      const lbl = el.querySelector(".s-badge-label");
-      el.childNodes[el.childNodes.length-1].textContent = val;
-    });
-  });
-  // Main badge special text
-  const mainEl = document.getElementById("badge-main");
-  if(mainEl) mainEl.childNodes[mainEl.childNodes.length-1].textContent = st.main;
-  const mMainEl = document.getElementById("mbadge-main");
-  if(mMainEl) mMainEl.childNodes[mMainEl.childNodes.length-1].textContent = st.main;
-
-  // Danger overlay
-  const overlay = document.getElementById("feed-overlay");
-  if(overlay) overlay.style.display = st.main === "DANGER" ? "flex" : "none";
-}
-
-// Mini detection list in live panel
-function addMiniDet(det){
-  recentDets.unshift(det);
-  recentDets = recentDets.slice(0,5);
-  renderMiniDets();
-}
-
-function renderMiniDets(){
-  const list = document.getElementById("mini-det-list");
-  if(!recentDets.length){
-    list.innerHTML = `<div style="color:var(--text3);font-size:11px;text-align:center;padding:16px">No detections yet</div>`;
-    return;
-  }
-  list.innerHTML = recentDets.map(d => {
-    const img = d.image_url ? d.image_url : "/static/no-image.png";
-    const info = encodeURIComponent(`${d.class_name} | ${d.time_hms} ${d.date_dmy}`);
-    return `<div class="mini-det" data-img="${encodeURIComponent(img)}" data-info="${info}">
-      <img src="${img}" onerror="this.src='/static/no-image.png'">
-      <div class="mini-det-info">
-        <div class="mini-det-cls">${d.class_name}</div>
-        <div class="mini-det-time">${d.time_hms||''} ${d.date_dmy||''}</div>
-      </div>
-    </div>`;
-  }).join("");
-}
-
-// ── SETTINGS ─────────────────────────────────────────────────────
-async function loadSettings(){
-  try {
-    const res = await authFetch("/api/settings/");
-    const d   = await res.json();
-    document.getElementById("th").value = d.confidence_threshold;
-    document.getElementById("th-val").innerText = parseFloat(d.confidence_threshold).toFixed(2);
-    document.getElementById("cf").value = d.confirm_frames;
-    document.getElementById("cf-val").innerText = d.confirm_frames;
-    document.getElementById("cam-sel").value = d.camera_index;
-    applySettingsDisplay(d);
-  } catch(e){}
-}
-
-function applySettingsDisplay(d){
-  document.getElementById("live-settings").innerHTML =
-    `Confidence: <span>${parseFloat(d.confidence_threshold).toFixed(2)}</span><br>
-     Confirm Frames: <span>${d.confirm_frames}</span><br>
-     Camera Index: <span>${d.camera_index}</span>`;
-}
-
-async function applySettings(){
-
-  const th  = parseFloat(document.getElementById("th").value);
-  const cf  = parseInt(document.getElementById("cf").value);
-  const cam = parseInt(document.getElementById("cam-sel").value);
-
-  // ⚡ Instant UI update (optimistic update)
-  document.getElementById("th-val").innerText = th.toFixed(2);
-  document.getElementById("cf-val").innerText = cf;
-
-  try{
-
-    const res = await fetch(API + "/api/settings/update",{
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json",
-        "Authorization":"Bearer " + TOKEN
-      },
-      body: JSON.stringify({
-        confidence_threshold: th,
-        confirm_frames: cf,
-        camera_index: cam
-      })
-    });
-
-    if(!res.ok) throw new Error("Failed");
-
-  }catch(err){
-
-    console.error("Settings update failed",err);
-
-  }
-}
-
-// ── DETECTION LOG ─────────────────────────────────────────────────
-async function loadLog(page){
-  currentPage = page;
-  filterClass = document.getElementById("log-filter").value.toLowerCase();
-  try {
-    const res  = await authFetch(`/api/detections/list?page=${page}&limit=30`);
-    const data = await res.json();
-    renderLog(data);
-  } catch(e){}
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  const f = document.getElementById("log-filter");
-  if(f) f.oninput = () => loadLog(1);
-
-  // Delegated click: detection cards
-  document.getElementById("det-grid").addEventListener("click", e => {
-    const card = e.target.closest(".det-card");
-    if(!card) return;
-    openModal(decodeURIComponent(card.dataset.img), decodeURIComponent(card.dataset.info));
-  });
-
-  // Delegated click: mini detection list
-  document.getElementById("mini-det-list").addEventListener("click", e => {
-    const card = e.target.closest(".mini-det");
-    if(!card) return;
-    openModal(decodeURIComponent(card.dataset.img), decodeURIComponent(card.dataset.info));
-  });
-});
-
-function renderLog(data){
-  const grid     = document.getElementById("det-grid");
-  const filtered = filterClass ? data.filter(d => d.class_name.toLowerCase().includes(filterClass)) : data;
-
-  if(!filtered.length){
-    grid.innerHTML = `<div style="color:var(--text3);font-size:12px;padding:20px;grid-column:1/-1">No detections found</div>`;
-    document.getElementById("prev-btn").style.display = "none";
-    document.getElementById("next-btn").style.display = "none";
-    document.getElementById("page-info").innerText = "";
-    return;
-  }
-
-  grid.innerHTML = filtered.map(d => {
-    const imgSrc = d.image_url ? d.image_url : "/static/no-image.png";
-    const conf   = d.conf ? parseFloat(d.conf).toFixed(2) : null;
-    const info   = `${d.class_name} | ${d.time_hms} ${d.date_dmy} | cam ${d.camera_idx}`;
-    return `
-    <div class="det-card"
-      data-img="${encodeURIComponent(imgSrc)}"
-      data-info="${encodeURIComponent(info)}">
-      <img src="${imgSrc}" onerror="this.src='/static/no-image.png'" loading="lazy">
-      <div class="det-info">
-        <div class="det-class">${d.class_name}</div>
-        <div class="det-meta">${d.time_hms} &nbsp;${d.date_dmy}</div>
-        <div class="det-meta">Cam ${d.camera_idx}${conf ? ` &nbsp;<span class="det-conf">${conf}</span>` : ''}</div>
-      </div>
-    </div>`;
-  }).join("");
-
-  document.getElementById("prev-btn").style.display = currentPage > 1 ? "inline-flex" : "none";
-  document.getElementById("next-btn").style.display = data.length === 30 ? "inline-flex" : "none";
-  document.getElementById("page-info").innerText = `Page ${currentPage}`;
-}
-
-function changePage(dir){ loadLog(currentPage + dir); }
-
-async function exportCSV(e){
-  e.preventDefault();
-  const res  = await authFetch("/api/detections/export");
-  const blob = await res.blob();
-  const url  = URL.createObjectURL(blob);
-  const a    = document.createElement("a");
-  a.href = url; a.download = "detections.csv"; a.click();
-  URL.revokeObjectURL(url);
-}
-
-// ── STATS ──────────────────────────────────────────────────────
-async function loadStats(){
-  try {
-    const res  = await authFetch("/api/detections/list?page=1&limit=100");
-    const data = await res.json();
-    document.getElementById("s-total").innerText = data.length < 100 ? data.length : "100+";
-    const today = new Date().toLocaleDateString("en-GB");
-    document.getElementById("s-today").innerText = data.filter(d => d.date_dmy === today).length;
-    const classes = [...new Set(data.map(d => d.class_name))];
-    document.getElementById("s-classes").innerText = classes.length;
-
-    const recList = document.getElementById("recent-list");
-    if(!data.length){
-      recList.innerHTML = `<div style="color:var(--text3);font-size:12px;padding:10px">No data yet</div>`;
-      return;
-    }
-    recList.innerHTML = data.slice(0,10).map(d => `
-      <div class="recent-item">
-        <span class="recent-cls">${d.class_name}</span>
-        <span class="recent-meta">${d.time_hms} &nbsp;${d.date_dmy} &nbsp;cam ${d.camera_idx}</span>
-      </div>`).join("");
-  } catch(e){}
-}
-
-// ── TABS ────────────────────────────────────────────────────────
-function switchTab(name, ev){
-  document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
-  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-  document.getElementById("tab-"+name).classList.add("active");
-  ev.currentTarget.classList.add("active");
-}
-
-// ── MODAL ────────────────────────────────────────────────────────
-function openModal(src, info){
-  document.getElementById("modal-img").src = src;
-  document.getElementById("modal-info").innerText = info;
-  document.getElementById("modal").style.display = "flex";
-}
-function closeModal(){ document.getElementById("modal").style.display = "none"; }
-document.addEventListener("keydown", e => { if(e.key==="Escape") closeModal(); });
-
-// ── TOAST ────────────────────────────────────────────────────────
-function showToast(msg){
-  const t = document.getElementById("toast");
-  t.innerText = msg;
-  t.style.display = "block";
-  clearTimeout(t._timer);
-  t._timer = setTimeout(() => t.style.display = "none", 4000);
-}
-
-// ── CLOCK ────────────────────────────────────────────────────────
-function updateClock(){
-  document.getElementById("hdr-time").innerText = new Date().toLocaleTimeString();
-}
-
-// ── AUTH FETCH ───────────────────────────────────────────────────
-async function authFetch(url, opts = {}){
-  opts.headers = {...(opts.headers||{}), "Authorization":`Bearer ${TOKEN}`};
-  const res = await fetch(API + url, opts);
-  if(res.status === 401){ logout(); throw new Error("Unauthorized"); }
+async function authFetch(url,opts={}){
+  opts.headers={...(opts.headers||{}),"Authorization":`Bearer ${TOKEN}`};
+  const res=await fetch(API+url,opts);
+  if(res.status===401){logout();throw new Error("Unauthorized");}
   return res;
 }
 
-function startStream(){
-  const img = document.getElementById("feed-img");
-  const noStream = document.getElementById("no-stream");
-  if(!img) return;
+// ── STARTUP ───────────────────────────────────────────────────────
+function showApp(){
+  document.getElementById("login-screen").style.display="none";
+  document.getElementById("app").style.display="flex";
+  connectWS(); startMjpeg();
+  loadSettings(); loadLog(); updateMiniDets();
+  setInterval(updateClock,1000);
+  setInterval(updateMiniDets,2000);
+}
+window.onload=()=>{
+  document.getElementById("p").addEventListener("keydown",e=>{if(e.key==="Enter")doLogin();});
+  if(TOKEN) showApp();
+};
 
-  img.onload = () => {
-    img.style.display = "block";
-    if(noStream) noStream.style.display = "none";
-  };
-
-  img.onerror = () => {
-    img.style.display = "none";
-    if(noStream) noStream.style.display = "flex";
-  };
-
-  img.src = API + "/api/stream/mjpeg?token=" + TOKEN;
+// ── MJPEG STREAM ──────────────────────────────────────────────────
+function startMjpeg(){
+  const img=document.getElementById("feed-img");
+  img.onload=()=>{mjpegActive=true;updateFeedVis();};
+  img.onerror=()=>{img.style.display="none";mjpegActive=false;updateFeedVis();};
+  img.src=`${API}/api/stream/mjpeg?token=${TOKEN}`;
+  img.style.display="block";
+  updateFeedVis();
+}
+function stopMjpeg(){
+  const img=document.getElementById("feed-img");
+  img.src="";img.style.display="none";mjpegActive=false;updateFeedVis();
+}
+function updateFeedVis(){
+  const noStream=document.getElementById("no-stream");
+  const canvas=document.getElementById("feed-canvas");
+  const feedImg=document.getElementById("feed-img");
+  const rec=document.getElementById("feed-rec");
+  if(mjpegActive){
+    noStream.style.display="none";canvas.style.display="none";
+    feedImg.style.display="block";rec.style.display="flex";
+  }else if(pcConnected){
+    noStream.style.display="none";canvas.style.display="block";
+    feedImg.style.display="none";rec.style.display="flex";
+  }else{
+    noStream.style.display="flex";canvas.style.display="none";
+    feedImg.style.display="none";rec.style.display="none";
+  }
 }
 
-// Auto start stream once TOKEN is available
-setInterval(()=>{
-  if(typeof TOKEN !== "undefined" && TOKEN && !window.__streamStarted){
-     window.__streamStarted = true;
-     startStream();
+// ── WEBSOCKET ─────────────────────────────────────────────────────
+function connectWS(){
+  if(ws){try{ws.close();}catch(e){}}
+  if(wsReconnectTimer){clearTimeout(wsReconnectTimer);wsReconnectTimer=null;}
+  const proto=location.protocol==="https:"?"wss":"ws";
+  ws=new WebSocket(`${proto}://${location.host}/api/stream/watch?token=${TOKEN}`);
+  ws.binaryType="arraybuffer";
+  ws.onopen=()=>setConnected(true);
+  ws.onclose=()=>{setConnected(false);wsReconnectTimer=setTimeout(connectWS,5000);};
+  ws.onerror=()=>{try{ws.close();}catch(e){}};
+  ws.onmessage=ev=>{
+    if(ev.data instanceof ArrayBuffer){if(!mjpegActive)renderFrame(ev.data);return;}
+    let msg;try{msg=JSON.parse(ev.data);}catch(e){return;}
+    handleEvent(msg);
+    if(msg.type==="settings_update") applySettingsToUI(msg);
+  };
+}
+function setConnected(c){
+  pcConnected=c;
+  const b=document.getElementById("conn-badge");
+  b.innerText=c?"● PC ONLINE":"● PC OFFLINE";
+  b.className=c?"connected":"disconnected";
+  updateFeedVis();
+}
+function renderFrame(buf){
+  const canvas=document.getElementById("feed-canvas");
+  const blob=new Blob([buf],{type:"image/jpeg"});
+  const url=URL.createObjectURL(blob);
+  const img=new Image();
+  img.onload=()=>{canvas.width=img.width;canvas.height=img.height;
+    canvas.getContext("2d").drawImage(img,0,0);URL.revokeObjectURL(url);};
+  img.src=url;
+}
+function handleEvent(msg){
+  if(msg.type==="pc_status") setConnected(msg.online);
+  if(msg.type==="new_detection"){
+    showToast(`⚠ ${msg.class_name}`);
+    recentDets.unshift(msg); recentDets=recentDets.slice(0,20);
+    renderMiniDets();
+    loadLog();
   }
-},1000);
+  if(msg.type==="status_update") updateBadges(msg.status,msg.fps);
+}
 
+// ── BADGES ────────────────────────────────────────────────────────
+function updateBadges(st,f){
+  if(!st)return;
+  [["badge-main","STATUS",st.main],["badge-gate","GATE",st.gate],
+   ["badge-belt","BELT",st.belt],["badge-buzzer","BUZZER",st.buzzer]].forEach(([id,lbl,val])=>{
+    const el=document.getElementById(id);if(!el)return;
+    const on=["OPEN","RUNNING","ON","SAFE"].includes(val);
+    el.className="s-badge "+(on?"on":"off");
+    el.innerHTML=`<span class="s-badge-label">${lbl}</span>${val}`;
+  });
+  document.getElementById("feed-overlay").style.display=st.main==="DANGER"?"flex":"none";
+  if(f!==undefined){
+    const fStr=parseFloat(f).toFixed(1)+" fps";
+    document.getElementById("hdr-fps").innerText=fStr;
+    document.getElementById("feed-fps-tag").innerText=fStr;
+    document.getElementById("s-fps").innerText=parseFloat(f).toFixed(1);
+    document.getElementById("ss-fps").innerText=parseFloat(f).toFixed(1);
+  }
+}
+
+// ── SETTINGS ─────────────────────────────────────────────────────
+let _settingTimer=null;
+async function loadSettings(){
+  try{
+    const res=await authFetch("/api/settings/");
+    const d=await res.json();
+    applySettingsToUI(d);
+  }catch(e){}
+}
+function applySettingsToUI(d){
+  if(d.confidence_threshold!=null){
+    document.getElementById("th").value=d.confidence_threshold;
+    document.getElementById("th-val").innerText=parseFloat(d.confidence_threshold).toFixed(2);
+  }
+  if(d.confirm_frames!=null){
+    document.getElementById("cf").value=d.confirm_frames;
+    document.getElementById("cf-val").innerText=d.confirm_frames;
+  }
+  if(d.camera_index!=null){
+    document.getElementById("cam-sel").value=d.camera_index;
+    document.getElementById("feed-cam-tag").innerText="CAM "+d.camera_index;
+  }
+}
+function onThChange(v){
+  document.getElementById("th-val").innerText=parseFloat(v).toFixed(2);
+  scheduleSettingsSave();
+}
+function onCfChange(v){
+  document.getElementById("cf-val").innerText=v;
+  scheduleSettingsSave();
+}
+function onCamChange(v){
+  document.getElementById("feed-cam-tag").innerText="CAM "+v;
+  scheduleSettingsSave();
+}
+function scheduleSettingsSave(){
+  clearTimeout(_settingTimer);
+  _settingTimer=setTimeout(saveSettings,400);
+}
+async function saveSettings(){
+  const th=parseFloat(document.getElementById("th").value);
+  const cf=parseInt(document.getElementById("cf").value);
+  const cam=parseInt(document.getElementById("cam-sel").value);
+  try{
+    await authFetch("/api/settings/update",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({confidence_threshold:th,confirm_frames:cf,camera_index:cam})
+    });
+  }catch(e){}
+}
+
+// ── DETECTION LOG ─────────────────────────────────────────────────
+async function loadLog(){
+  try{
+    const res=await authFetch(`/api/detections/list?page=1&limit=200`);
+    allDets=await res.json();
+    renderLog();
+    updateCounts();
+  }catch(e){}
+}
+function renderLog(){
+  filterClass=(document.getElementById("log-filter").value||"").toLowerCase();
+  const filtered=filterClass?allDets.filter(d=>d.class_name.toLowerCase().includes(filterClass)):allDets;
+  const perPage=30;const start=(logPage-1)*perPage;
+  const page=filtered.slice(start,start+perPage);
+  const list=document.getElementById("det-list");
+  if(!page.length){
+    list.innerHTML=`<div style="color:var(--text3);font-size:11px;padding:16px;text-align:center">No detections found</div>`;
+    document.getElementById("prev-btn").style.display="none";
+    document.getElementById("next-btn").style.display="none";
+    document.getElementById("page-info").innerText="";return;
+  }
+  list.innerHTML=page.map(d=>{
+    const img=d.image_url||"";
+    const conf=d.conf?parseFloat(d.conf).toFixed(2):null;
+    const info=`${d.class_name} | ${d.time_hms} ${d.date_dmy}${conf?" | conf "+conf:""}`;
+    return `<div class="det-item" onclick="openModal('${img}','${info}')">
+      <img src="${img}" onerror="this.src=''">
+      <div class="det-item-info">
+        <div class="det-item-class">${d.class_name}</div>
+        <div class="det-item-meta">${d.time_hms} · ${d.date_dmy}</div>
+        ${conf?`<span class="det-item-conf">${conf}</span>`:""}
+      </div></div>`;
+  }).join("");
+  document.getElementById("prev-btn").style.display=logPage>1?"flex":"none";
+  document.getElementById("next-btn").style.display=page.length===perPage?"flex":"none";
+  document.getElementById("page-info").innerText=`${logPage}`;
+}
+function changePage(dir){logPage=Math.max(1,logPage+dir);renderLog();}
+document.addEventListener("DOMContentLoaded",()=>{
+  const f=document.getElementById("log-filter");
+  if(f) f.oninput=()=>{logPage=1;renderLog();};
+});
+async function exportCSV(e){
+  e.preventDefault();
+  const res=await authFetch("/api/detections/export");
+  const blob=await res.blob();
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");a.href=url;a.download="detections.csv";a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ── STATS ─────────────────────────────────────────────────────────
+function updateCounts(){
+  const today=new Date().toLocaleDateString("en-GB");
+  const todayCount=allDets.filter(d=>d.date_dmy===today).length;
+  const classes=[...new Set(allDets.map(d=>d.class_name))].length;
+  document.getElementById("s-total").innerText=allDets.length;
+  document.getElementById("s-today").innerText=todayCount;
+  document.getElementById("ss-total").innerText=allDets.length;
+  document.getElementById("ss-today").innerText=todayCount;
+  document.getElementById("ss-classes").innerText=classes;
+}
+function renderStats(){
+  updateCounts();
+  const list=document.getElementById("recent-list");
+  if(!allDets.length){list.innerHTML=`<div style="color:var(--text3);font-size:11px;padding:10px">No data yet</div>`;return;}
+  list.innerHTML=allDets.slice(0,20).map(d=>`
+    <div class="recent-item">
+      <span class="recent-cls">${d.class_name}</span>
+      <span class="recent-meta">${d.time_hms} · ${d.date_dmy}</span>
+    </div>`).join("");
+}
+
+// ── MINI DETECTIONS (STATUS pane) ─────────────────────────────────
+async function updateMiniDets(){
+  try{
+    const res=await authFetch("/api/detections/list?page=1&limit=20");
+    const data=await res.json();
+    allDets=data;
+    updateCounts();
+    renderMiniDets();
+  }catch(e){}
+}
+function renderMiniDets(){
+  const list=document.getElementById("mini-det-list");
+  const src=recentDets.length?recentDets:allDets.slice(0,10);
+  if(!src.length){
+    list.innerHTML=`<div style="color:var(--text3);font-size:11px;text-align:center;padding:20px 0">No detections yet</div>`;return;
+  }
+  list.innerHTML=src.map(d=>{
+    const img=d.image_url||`/static/detections/${d.thumb||""}`;
+    const cls=d.class_name||d.class||"?";
+    const time=d.time_hms||"";const date=d.date_dmy||"";
+    const info=`${cls} | ${time} ${date}`;
+    return `<div class="det-item" onclick="openModal('${img}','${info}')">
+      <img src="${img}" onerror="this.src=''">
+      <div class="det-item-info">
+        <div class="det-item-class">${cls}</div>
+        <div class="det-item-meta">${time} · ${date}</div>
+      </div></div>`;
+  }).join("");
+}
+
+// ── MODAL ─────────────────────────────────────────────────────────
+function openModal(src,info){
+  document.getElementById("modal-img").src=src;
+  document.getElementById("modal-info").innerText=info||"";
+  document.getElementById("modal").style.display="flex";
+}
+function closeModal(){document.getElementById("modal").style.display="none";}
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeModal();});
+
+// ── TOAST ─────────────────────────────────────────────────────────
+function showToast(msg){
+  const t=document.getElementById("toast");t.innerText=msg;t.style.display="block";
+  clearTimeout(t._t);t._t=setTimeout(()=>t.style.display="none",4000);
+}
+
+// ── CLOCK ─────────────────────────────────────────────────────────
+function updateClock(){
+  document.getElementById("hdr-time").innerText=new Date().toLocaleTimeString();
+}
 </script>
 </body>
 </html>

@@ -6,6 +6,7 @@ from database import SystemSettings, get_db
 from auth import verify_token
 from datetime import datetime
 from routes.stream import manager
+import asyncio
 
 router = APIRouter()
 
@@ -56,5 +57,16 @@ async def update_settings(body: SettingsUpdate, db: AsyncSession = Depends(get_d
 
     await manager.send_command_to_pc(cmd)
     await manager.broadcast_event(cmd)
+
+    # Push notification to all browsers + mobile
+    try:
+        from routes.notifications import notify_settings_changed
+        asyncio.create_task(notify_settings_changed(
+            confidence=s.confidence_threshold,
+            frames=s.confirm_frames,
+            camera=s.camera_index
+        ))
+    except Exception:
+        pass
 
     return {"settings": cmd}
