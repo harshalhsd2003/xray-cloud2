@@ -7,15 +7,16 @@ from auth import SECRET_KEY, ALGORITHM, ADMIN_USER, verify_token
 
 router = APIRouter()
 
-# How often to ping the PC to detect dead connections (seconds)
 PC_PING_INTERVAL = 5
 
 
 class ConnectionManager:
     def __init__(self):
-        self.clients = []
-        self.pc_socket = None
+        self.clients     = []
+        self.pc_socket   = None
         self.latest_frame = None
+        # Per-camera latest snapshot bytes {cam_idx: bytes}
+        self.camera_snapshots: dict[int, bytes] = {}
         self._pc_ping_task = None
 
     async def connect_client(self, ws: WebSocket):
@@ -28,26 +29,17 @@ class ConnectionManager:
 
     async def connect_pc(self, ws: WebSocket):
         await ws.accept()
-
-        # Close any existing stale PC connection first
         if self.pc_socket:
             try:
                 await self.pc_socket.close()
             except:
                 pass
-
         self.pc_socket = ws
         print("[WS] Scanner PC connected")
-
-        # Cancel old ping task if running, start fresh
         if self._pc_ping_task:
             self._pc_ping_task.cancel()
         self._pc_ping_task = asyncio.create_task(self._ping_pc_loop())
-
-        # Notify all watch clients that PC is now online
         await self.broadcast_event({"type": "pc_status", "online": True})
-
-        # Push notification to all browsers + mobile
         try:
             from routes.notifications import notify_pc_online
             asyncio.create_task(notify_pc_online())
@@ -58,16 +50,10 @@ class ConnectionManager:
         print("[WS] Scanner PC disconnected")
         self.pc_socket = None
         self.latest_frame = None
-
-        # Stop ping loop
         if self._pc_ping_task:
             self._pc_ping_task.cancel()
             self._pc_ping_task = None
-
-        # Immediately tell all watch clients PC went offline
         await self.broadcast_event({"type": "pc_status", "online": False})
-
-        # Push notification to all browsers + mobile
         try:
             from routes.notifications import notify_pc_offline
             asyncio.create_task(notify_pc_offline())
@@ -75,7 +61,6 @@ class ConnectionManager:
             pass
 
     async def _ping_pc_loop(self):
-        """Send periodic pings to the PC. If ping fails, mark PC offline immediately."""
         try:
             while True:
                 await asyncio.sleep(PC_PING_INTERVAL)
@@ -90,8 +75,10 @@ class ConnectionManager:
         except asyncio.CancelledError:
             pass
 
-    async def broadcast_frame(self, frame_bytes):
+    async def broadcast_frame(self, frame_bytes: bytes, cam_idx: int = 0):
         self.latest_frame = frame_bytes
+        # Store as camera snapshot for the camera preview grid
+        self.camera_snapshots[cam_idx] = frame_bytes
 
         dead = []
         for ws in self.clients:
@@ -102,9 +89,8 @@ class ConnectionManager:
         for ws in dead:
             self.disconnect_client(ws)
 
-    async def broadcast_event(self, event):
+    async def broadcast_event(self, event: dict):
         msg = json.dumps(event)
-
         dead = []
         for ws in self.clients:
             try:
@@ -114,19 +100,7 @@ class ConnectionManager:
         for ws in dead:
             self.disconnect_client(ws)
 
-    async def broadcast_settings(self, settings):
-        msg = json.dumps({
-        "type": "settings_update",
-        "data": settings
-        })
-
-        for ws in self.clients:
-            try:
-                await ws.send_text(msg)
-            except:
-                pass
-    
-    async def send_command_to_pc(self, cmd):
+    async def send_command_to_pc(self, cmd: dict) -> bool:
         if not self.pc_socket:
             return False
         try:
@@ -135,6 +109,10 @@ class ConnectionManager:
         except:
             await self.disconnect_pc()
             return False
+
+    def get_snapshot(self, cam_idx: int) -> bytes | None:
+        """Return latest stored JPEG snapshot for a given camera index."""
+        return self.camera_snapshots.get(cam_idx)
 
 
 manager = ConnectionManager()
@@ -152,7 +130,6 @@ def auth_ws_token(token: str):
 
 @router.websocket("/pc")
 async def pc_websocket(ws: WebSocket, token: str = Query(...)):
-
     user = auth_ws_token(token)
     if not user:
         await ws.close(code=4001)
@@ -164,8 +141,11 @@ async def pc_websocket(ws: WebSocket, token: str = Query(...)):
         while True:
             data = await ws.receive()
 
+            # Binary = video frame
             frame = data.get("bytes") or data.get("binary")
             if frame:
+                # Try to read camera index from the current settings
+                # (PC embeds cam_idx in a preceding text message)
                 await manager.broadcast_frame(frame)
                 continue
 
@@ -173,9 +153,11 @@ async def pc_websocket(ws: WebSocket, token: str = Query(...)):
             if text:
                 try:
                     msg = json.loads(text)
-                    # Ignore pong replies from PC
                     if msg.get("type") == "pong":
                         continue
+                    # If PC sends a frame with cam info, store snapshot
+                    if msg.get("type") == "frame_meta":
+                        pass  # future use
                     await manager.broadcast_event(msg)
                 except Exception as e:
                     print("JSON error:", e)
@@ -186,7 +168,6 @@ async def pc_websocket(ws: WebSocket, token: str = Query(...)):
 
 @router.websocket("/watch")
 async def watch_websocket(ws: WebSocket, token: str = Query(...)):
-
     user = auth_ws_token(token)
     if not user:
         await ws.close(code=4001)
@@ -194,13 +175,13 @@ async def watch_websocket(ws: WebSocket, token: str = Query(...)):
 
     await manager.connect_client(ws)
 
-    # Send current PC status immediately on connect so badge is accurate
+    # Send current PC status immediately
     await ws.send_text(json.dumps({
         "type": "pc_status",
         "online": manager.pc_socket is not None
     }))
 
-    # Send last frame if we have one
+    # Send last frame if available
     if manager.latest_frame:
         try:
             await ws.send_bytes(manager.latest_frame)
@@ -212,20 +193,42 @@ async def watch_websocket(ws: WebSocket, token: str = Query(...)):
             data = await ws.receive_text()
             cmd = json.loads(data)
             await manager.send_command_to_pc(cmd)
-
     except WebSocketDisconnect:
         manager.disconnect_client(ws)
 
 
-# ── MJPEG PROXY ───────────────────────────────────────────────────────────────
-# Browser calls GET /api/stream/mjpeg?token=...
-# Railway serves the latest frame buffer as a continuous MJPEG stream over HTTPS.
-# This bypasses the browser's mixed-content block (https page → http localhost).
+# ── SNAPSHOT ENDPOINT — used by camera preview grid ──────────────────────────
+@router.get("/snapshot")
+async def snapshot(
+    cam: int = Query(0, ge=0, le=7),
+    token: str = Query(...)
+):
+    """Return a JPEG still of the latest frame for the given camera index."""
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        if payload.get("sub") != ADMIN_USER:
+            return Response(status_code=401)
+    except JWTError:
+        return Response(status_code=401)
 
+    jpg_bytes = manager.get_snapshot(cam)
+    if not jpg_bytes:
+        # Return 204 so the browser img onerror fires cleanly
+        return Response(status_code=204)
+
+    return Response(
+        content=jpg_bytes,
+        media_type="image/jpeg",
+        headers={"Cache-Control": "no-cache, no-store"}
+    )
+
+
+# ── MJPEG PROXY ───────────────────────────────────────────────────────────────
 BOUNDARY = b"--mjpegframe"
 
+
 async def mjpeg_generator():
-    """Yield MJPEG frames from the latest_frame buffer as fast as they arrive."""
+    """Yield MJPEG frames from the latest_frame buffer at up to 30 fps."""
     last_sent = None
     while True:
         frame = manager.latest_frame
@@ -237,12 +240,11 @@ async def mjpeg_generator():
                 b"Content-Length: " + str(len(frame)).encode() + b"\r\n\r\n" +
                 frame + b"\r\n"
             )
-        await asyncio.sleep(0.033)   # ~30 fps max polling
+        await asyncio.sleep(0.033)   # ~30 fps cap
 
 
 @router.get("/mjpeg")
 async def mjpeg_stream(token: str = Query(...)):
-    # Validate token manually (can't use Depends with StreamingResponse easily)
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         if payload.get("sub") != ADMIN_USER:
@@ -252,7 +254,9 @@ async def mjpeg_stream(token: str = Query(...)):
 
     return StreamingResponse(
         mjpeg_generator(),
-        media_type=f"multipart/x-mixed-replace; boundary=mjpegframe",
-        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"}
+        media_type="multipart/x-mixed-replace; boundary=mjpegframe",
+        headers={
+            "Cache-Control":    "no-cache",
+            "X-Accel-Buffering": "no"
+        }
     )
-
