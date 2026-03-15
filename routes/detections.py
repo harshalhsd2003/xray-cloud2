@@ -1,14 +1,13 @@
-import os, io, base64, glob, shutil
+import os, io, base64
 from fastapi import APIRouter, Depends, UploadFile, File, Form, Query
 from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, desc, delete
+from sqlalchemy import select, desc
 from database import Detection, get_db
 from auth import verify_token
 from datetime import datetime
 import cloudinary
 import cloudinary.uploader
-import cloudinary.api
 
 router = APIRouter()
 
@@ -33,31 +32,13 @@ async def push_detection(
 ):
     now = datetime.utcnow()
     image_bytes = await image.read()
-
+    
     os.makedirs("static/detections", exist_ok=True)
-
-    # Always save locally as a fallback
-    local_path = f"static/detections/{image.filename}"
-    with open(local_path, "wb") as f:
+    
+    with open(f"static/detections/{image.filename}", "wb") as f:
         f.write(image_bytes)
-
-    # BUG FIX: Railway filesystem is ephemeral — files vanish on redeploy.
-    # Upload to Cloudinary when configured so images persist and are reachable
-    # from any browser without depending on Railwayx local disk.
-    if USE_CLOUDINARY:
-        try:
-            upload_result = cloudinary.uploader.upload(
-                image_bytes,
-                folder="xray_detections",
-                public_id=image.filename.rsplit(".", 1)[0],
-                overwrite=True,
-                resource_type="image"
-            )
-            image_url = upload_result.get("secure_url", f"/static/detections/{image.filename}")
-        except Exception:
-            image_url = f"/static/detections/{image.filename}"
-    else:
-        image_url = f"/static/detections/{image.filename}"
+        
+    image_url = f"/static/detections/{image.filename}"
 
     det = Detection(
         timestamp  = now,
@@ -128,39 +109,6 @@ async def list_detections(
         }
         for r in rows
     ]
-
-# ── Reset all detections ─────────────────────────────────────────────────────
-@router.delete("/reset")
-async def reset_detections(
-    db: AsyncSession = Depends(get_db),
-    _=Depends(verify_token)
-):
-    """Delete all detection records, images from local disk and Cloudinary, reset counter."""
-    # 1. Delete all DB rows
-    await db.execute(delete(Detection))
-    await db.commit()
-
-    # 2. Delete local image files
-    local_dir = "static/detections"
-    if os.path.isdir(local_dir):
-        for f in glob.glob(os.path.join(local_dir, "*")):
-            try:
-                os.remove(f)
-            except Exception:
-                pass
-
-    # 3. Delete Cloudinary folder if configured
-    if USE_CLOUDINARY:
-        try:
-            cloudinary.api.delete_resources_by_prefix("xray_detections/")
-        except Exception:
-            pass
-
-    # Notify all connected clients that counter was reset
-    from routes.stream import manager
-    await manager.broadcast_event({"type": "detections_reset"})
-
-    return {"ok": True, "message": "All detections cleared"}
 
 # ── CSV export ────────────────────────────────────────────────────────────────
 @router.get("/export")
