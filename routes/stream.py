@@ -91,20 +91,22 @@ class ConnectionManager:
     async def broadcast_frame(self, frame_bytes: bytes):
         """
         Broadcast a raw JPEG frame to all watch clients.
+        FIX: snapshot the client list under lock before iterating so a client
+        connecting or disconnecting mid-broadcast doesn't corrupt the loop.
         PERF FIX: skip clients that are slow/backlogged rather than letting
         one slow client hold up all others.
         """
         self.latest_frame = frame_bytes
         self.camera_snapshots[self.pc_current_cam] = frame_bytes
 
+        async with self._broadcast_lock:
+            clients_snapshot = list(self.clients)
+
         dead = []
-        for ws in self.clients:
+        for ws in clients_snapshot:
             try:
-                # BUG FIX: use wait_for with a short timeout so a stalled client
-                # doesn't block the entire broadcast loop
                 await asyncio.wait_for(ws.send_bytes(frame_bytes), timeout=0.5)
             except asyncio.TimeoutError:
-                # Client is too slow — skip this frame, don't drop the client
                 pass
             except Exception:
                 dead.append(ws)
@@ -115,7 +117,11 @@ class ConnectionManager:
     async def broadcast_event(self, event: dict):
         msg = json.dumps(event)
         dead = []
-        for ws in self.clients:
+        # FIX: acquire lock so concurrent calls (from detections.py push and
+        # pc_websocket message handler) can't race on self.clients list mutation.
+        async with self._broadcast_lock:
+            clients_snapshot = list(self.clients)
+        for ws in clients_snapshot:
             try:
                 await ws.send_text(msg)
             except Exception:
@@ -247,12 +253,11 @@ BOUNDARY = b"--mjpegframe"
 async def mjpeg_generator():
     """
     Yield MJPEG frames.
-    PERF FIX: track last-sent frame by object identity (id()) rather than
-    reference equality — avoids sending the same bytes object twice if the
-    reference hasn't changed since last poll, and correctly detects new frames
-    even when the size is identical.
-    PERF FIX: reduced poll sleep from 33 ms to 20 ms to reduce buffering delay
-    while still keeping CPU usage low.
+    FIX: only sleep when no new frame is available — when a fresh frame arrives
+    send it immediately without waiting the full 20ms poll interval.
+    This eliminates up to 20ms of unnecessary latency per frame.
+    Hard cap: if a frame WAS sent, still yield control to the event loop via
+    a short sleep(0) so other coroutines aren't starved.
     """
     last_id = None
     while True:
@@ -266,7 +271,11 @@ async def mjpeg_generator():
                 b"Content-Length: " + str(len(frame)).encode() + b"\r\n\r\n" +
                 frame + b"\r\n"
             )
-        await asyncio.sleep(0.020)   # 50 fps cap — smooth but not wasteful
+            # Yield control briefly — don't starve other coroutines
+            await asyncio.sleep(0)
+        else:
+            # No new frame yet — poll at 20ms to stay low-latency without spinning
+            await asyncio.sleep(0.020)
 
 
 @router.get("/mjpeg")

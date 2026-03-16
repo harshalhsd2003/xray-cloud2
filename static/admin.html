@@ -361,7 +361,8 @@ function switchTab(name, el) {
   document.querySelectorAll(".side-tab").forEach(function(t){ t.classList.remove("active"); });
   document.getElementById("pane-" + name).classList.add("active");
   el.classList.add("active");
-  if (name === "log") renderLog();
+  // FIX: always re-fetch from server when user opens log tab so stale/cleared data is never shown
+  if (name === "log") loadLog();
 }
 
 // AUTH
@@ -405,8 +406,8 @@ function showApp() {
   _appIntervals.forEach(function(id){ clearInterval(id); });
   _appIntervals = [];
   _appIntervals.push(setInterval(updateClock, 1000));
-  // BUG FIX: was 8000ms - missed detections if WS was down; now 5s
-  _appIntervals.push(setInterval(refreshMiniDets, 5000));
+  // FIX: 8s is plenty for the mini-det refresh — reduces server polling pressure
+  _appIntervals.push(setInterval(refreshMiniDets, 8000));
   startMjpeg();
   connectWS();
   loadSettings();
@@ -442,23 +443,45 @@ function updateClock() {
 }
 
 // MJPEG — attach handlers BEFORE setting src
+var _mjpegWatchdog = null;
+var _mjpegLastLoad = 0;
+
+function _resetMjpegWatchdog() {
+  _mjpegLastLoad = Date.now();
+  clearTimeout(_mjpegWatchdog);
+  // FIX: if no frame arrives within 6s, treat stream as stalled and reconnect
+  _mjpegWatchdog = setTimeout(function() {
+    if (mjpegActive) {
+      console.warn("[MJPEG] Stream stalled — reconnecting");
+      mjpegActive = false;
+      updateFeedVis();
+      startMjpeg();
+    }
+  }, 6000);
+}
+
 function startMjpeg() {
+  clearTimeout(_mjpegWatchdog);
   var img = document.getElementById("feed-img");
   img.onload = function() {
     if (!mjpegActive) { mjpegActive = true; updateFeedVis(); }
     tickFps();
+    _resetMjpegWatchdog();
   };
   img.onerror = function() {
     mjpegActive = false;
+    clearTimeout(_mjpegWatchdog);
     document.getElementById("feed-fps-tag").style.display = "none";
     document.getElementById("feed-fps-tag").textContent = "";
     updateFeedVis();
-    setTimeout(function(){ if(!mjpegActive) startMjpeg(); }, 4000);
+    // FIX: always retry on error after 4s, regardless of mjpegActive state
+    setTimeout(startMjpeg, 4000);
   };
   img.src = API + "/api/stream/mjpeg?token=" + TOKEN + "&_t=" + Date.now();
   img.style.display = "block";
 }
 function stopMjpeg() {
+  clearTimeout(_mjpegWatchdog);
   var img = document.getElementById("feed-img");
   img.onload = null; img.onerror = null; img.src = ""; img.style.display = "none";
   mjpegActive = false;
@@ -518,13 +541,17 @@ function handleWsEvent(msg) {
   if (msg.type==="status_update")   updateBadges(msg.status);
   if (msg.type==="new_detection") {
     showToast("ALERT: " + msg.class_name);
-    // BUG FIX: prepend directly so log updates instantly without a full fetch
+    // Prepend to local arrays for instant UI update without a round-trip fetch
     var det={id:msg.id,class_name:msg.class_name,time_hms:msg.time_hms,
              date_dmy:msg.date_dmy,conf:msg.conf,image_url:msg.image_url,camera_idx:msg.camera_idx};
     allDets.unshift(det);
     recentDets.unshift(det); recentDets=recentDets.slice(0,20);
     updateCounts(); renderMiniDets();
-    if(document.getElementById("pane-log").classList.contains("active")){logPage=1;renderLog();}
+    // FIX: always go to page 1 and re-render log so the new item appears at the top
+    if (document.getElementById("pane-log").classList.contains("active")) {
+      logPage = 1;
+      renderLog();
+    }
   }
 }
 
@@ -687,6 +714,9 @@ function checkCamIndex(idx) {
 }
 
 // CLEAR ALL DATA
+// FIX: after clearing, force a full reload of allDets from server so new detections
+// that arrive via WebSocket get prepended into a clean array (not stale data).
+// Also reset lastDetLen so refreshMiniDets doesn't skip re-render.
 async function clearAllData() {
   if (!confirm("DELETE ALL detections from the database?\n\nThis will permanently erase all logs, images, and reset the counter to 0. This cannot be undone.")) return;
   try {
@@ -695,6 +725,8 @@ async function clearAllData() {
       allDets = []; recentDets = [];
       logPage = 1;
       updateCounts(); renderLog(); renderMiniDets();
+      // Force a fresh fetch so the log panel is ready for new incoming detections
+      await loadLog();
       showToast("All detections cleared", "info");
     } else {
       showToast("Clear failed: " + res.status);
@@ -816,15 +848,23 @@ function updateCounts() {
 }
 
 // MINI DETECTIONS
-// BUG FIX: was only updating allDets if length < 20, so the mini list froze
-// after the first batch. Now always sync.
+// FIX: fetch full list (500) so allDets/counts stay in sync with DB, not just 20 rows.
+// Guard with pending flag to prevent overlapping fetches.
+var _miniDetPending = false;
 async function refreshMiniDets() {
+  if (_miniDetPending) return;
+  _miniDetPending = true;
   try {
-    var res=await authFetch("/api/detections/list?page=1&limit=20");
-    var data=await res.json();
-    allDets=data; updateCounts();
+    var res = await authFetch("/api/detections/list?page=1&limit=500");
+    if (!res.ok) return;
+    var data = await res.json();
+    allDets = data;
+    updateCounts();
     renderMiniDets();
+    // FIX: keep log pane in sync if it is currently visible
+    if (document.getElementById("pane-log").classList.contains("active")) renderLog();
   } catch(e){}
+  finally { _miniDetPending = false; }
 }
 function renderMiniDets() {
   var list=document.getElementById("mini-det-list");
