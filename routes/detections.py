@@ -18,7 +18,7 @@ cloudinary.config(
     api_secret = os.getenv("CLOUDINARY_API_SECRET", "")
 )
 
-USE_CLOUDINARY = bool(os.getenv("CLOUDINARY_CLOUD_NAME"))
+SE_CLOUDINARY = bool(os.getenv("CLOUDINARY_CLOUD_NAME"))
 
 # ── PC pushes detection here ──────────────────────────────────────────────────
 @router.post("/push")
