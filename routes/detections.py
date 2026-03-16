@@ -128,6 +128,32 @@ async def list_detections(
         for r in rows
     ]
 
+# ── Clear all detections ──────────────────────────────────────────────────────
+from sqlalchemy import delete as sa_delete
+
+@router.delete("/clear")
+async def clear_detections(
+    db: AsyncSession = Depends(get_db),
+    _=Depends(verify_token)
+):
+    """Delete every detection row and their Cloudinary images (best-effort)."""
+    if USE_CLOUDINARY:
+        try:
+            result = await db.execute(select(Detection.filename))
+            filenames = [row[0] for row in result.fetchall() if row[0]]
+            for fn in filenames:
+                public_id = "xray_detections/" + fn.rsplit(".", 1)[0]
+                try:
+                    cloudinary.uploader.destroy(public_id, resource_type="image")
+                except Exception:
+                    pass
+        except Exception:
+            pass
+
+    await db.execute(sa_delete(Detection))
+    await db.commit()
+    return {"cleared": True}
+
 # ── CSV export ────────────────────────────────────────────────────────────────
 @router.get("/export")
 async def export_csv(

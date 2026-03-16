@@ -103,16 +103,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 .btn-ctrl-icon{font-size:14px;display:block;margin-bottom:3px;}
 .btn-reset{width:100%;background:transparent;color:var(--text3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px;font-size:9px;cursor:pointer;font-family:'Orbitron';transition:all .15s;letter-spacing:.06em;}
 .btn-reset:hover{color:var(--warn);border-color:var(--warn);}
-/* CAMERA */
-.cam-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px;overflow-y:auto;}
-.cam-thumb{border-radius:var(--radius-sm);overflow:hidden;position:relative;cursor:pointer;border:2px solid var(--border);transition:all .2s;background:#000;aspect-ratio:16/9;}
-.cam-thumb:hover{border-color:var(--accent);box-shadow:0 0 10px rgba(0,212,255,.2);}
-.cam-thumb.cam-active{border-color:var(--accent);box-shadow:0 0 12px rgba(0,212,255,.3);}
-.cam-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
-.cam-label{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.78);font-family:'Orbitron';font-size:8px;padding:3px 6px;display:flex;justify-content:space-between;align-items:center;color:var(--text2);}
-.cam-thumb.cam-active .cam-label{color:var(--accent);}
-.cam-active-dot{width:5px;height:5px;border-radius:50%;background:var(--safe);box-shadow:var(--glow-safe);animation:blink .8s ease-in-out infinite;flex-shrink:0;}
-.cam-nosig{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:8px;color:var(--text3);font-family:'Orbitron';letter-spacing:.1em;background:rgba(0,0,0,.85);}
 /* LOG */
 .log-top{padding:10px 12px 8px;border-bottom:1px solid var(--border);flex-shrink:0;}
 .class-btns{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;}
@@ -224,7 +214,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
     <div class="side-panel">
       <div class="side-tabs">
         <div class="side-tab active" onclick="switchTab('controls',this)">CONTROLS</div>
-        <div class="side-tab" onclick="switchTab('camera',this)">CAMERA</div>
         <div class="side-tab" onclick="switchTab('log',this)">LOGS</div>
         <div class="side-tab" onclick="switchTab('status',this)">STATUS</div>
       </div>
@@ -266,17 +255,16 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
               <div class="ctrl-hint">Rotation: <span id="rot-val" style="color:var(--accent)">0</span> deg</div>
             </div>
             <div class="ctrl-section">
+              <div class="section-label">CAMERA</div>
+              <button class="btn-ctrl" id="btn-next-cam" onclick="nextCamera()" style="width:100%;padding:10px 4px;">
+                <span class="btn-ctrl-icon">&#127909;</span>CHANGE CAMERA
+              </button>
+              <div class="ctrl-hint" style="margin-top:6px">Active: <span id="cam-display" style="color:var(--accent)">CAM 1</span> &nbsp;|&nbsp; Auto-scans for working index</div>
+            </div>
+            <div class="ctrl-section">
               <button class="btn-reset" onclick="resetImageSettings()">RESET IMAGE SETTINGS</button>
             </div>
           </div>
-        </div>
-
-        <div id="pane-camera" class="side-pane">
-          <div style="padding:10px 12px 6px;border-bottom:1px solid var(--border);flex-shrink:0;">
-            <div class="section-label" style="margin-top:0;margin-bottom:2px">SELECT ACTIVE CAMERA</div>
-            <div class="ctrl-hint">Click preview to switch. Numbers start from 1.</div>
-          </div>
-          <div class="cam-grid" id="cam-grid"></div>
         </div>
 
         <div id="pane-log" class="side-pane">
@@ -298,6 +286,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
                   <div class="dl-item" onclick="exportHTMLReport()">HTML Report</div>
                 </div>
               </div>
+              <button class="btn-icon" onclick="clearAllData()" style="color:var(--danger);border-color:rgba(255,23,68,.4);" title="Delete all detections from database">&#128465; CLEAR</button>
             </div>
           </div>
           <div class="det-list" id="det-list"><div style="color:var(--text3);font-size:11px;padding:16px">Loading...</div></div>
@@ -373,7 +362,6 @@ function switchTab(name, el) {
   document.getElementById("pane-" + name).classList.add("active");
   el.classList.add("active");
   if (name === "log") renderLog();
-  if (name === "camera") buildCamGrid();
 }
 
 // AUTH
@@ -577,7 +565,8 @@ function applySettingsToUI(d) {
   if (d.camera_index!=null) {
     activeCamIdx = parseInt(d.camera_index);
     document.getElementById("feed-cam-tag").textContent = "CAM "+(activeCamIdx+1);
-    updateCamGridActive();
+    var cd = document.getElementById("cam-display");
+    if (cd) cd.textContent = "CAM "+(activeCamIdx+1);
   }
   if (d.image_settings) applyImgSettingsToUI(d.image_settings);
 }
@@ -638,76 +627,81 @@ function resetImageSettings() {
   showToast("Image settings reset","info");
 }
 
-// CAMERA GRID — use XHR to detect 204 No Content (no signal)
-function buildCamGrid() {
-  var grid = document.getElementById("cam-grid");
-  grid.innerHTML = "";
-  for (var i=0; i<NUM_CAMERAS; i++) {
-    (function(idx){
-      var isActive = (idx===activeCamIdx);
-      var d = document.createElement("div");
-      d.className = "cam-thumb" + (isActive?" cam-active":"");
-      d.id = "ct-"+idx;
-      d.onclick = function(){ switchCamera(idx); };
+// CAMERA — cycle through indices, auto-skip if no snapshot available
+var _camSwitching = false;
+async function nextCamera() {
+  if (_camSwitching) return;
+  _camSwitching = true;
+  var btn = document.getElementById("btn-next-cam");
+  if (btn) btn.disabled = true;
 
-      var img = document.createElement("img");
-      img.id = "cp-"+idx; img.alt = "CAM "+(idx+1);
+  var start = activeCamIdx;
+  var tried = 0;
+  var found = false;
 
-      var nosig = document.createElement("div");
-      nosig.className = "cam-nosig"; nosig.id = "cns-"+idx;
-      nosig.textContent = "NO SIGNAL";
-
-      var lbl = document.createElement("div");
-      lbl.className = "cam-label"; lbl.id = "cl-"+idx;
-      var ns = document.createElement("span");
-      ns.textContent = "CAM "+(idx+1);
-      lbl.appendChild(ns);
-      if (isActive) { var dot=document.createElement("span"); dot.className="cam-active-dot"; lbl.appendChild(dot); }
-
-      d.appendChild(img); d.appendChild(nosig); d.appendChild(lbl);
-      grid.appendChild(d);
-      fetchCamSnap(idx);
-    })(i);
+  while (tried < NUM_CAMERAS) {
+    var next = (activeCamIdx + 1 + tried) % NUM_CAMERAS;
+    // Try to see if this index has a valid snapshot
+    var ok = await checkCamIndex(next);
+    if (ok) {
+      activeCamIdx = next;
+      found = true;
+      break;
+    }
+    tried++;
   }
-}
-function fetchCamSnap(idx) {
-  var xhr = new XMLHttpRequest();
-  xhr.open("GET", API+"/api/stream/snapshot?cam="+idx+"&token="+TOKEN+"&_t="+Date.now(), true);
-  xhr.responseType = "blob";
-  xhr.onload = function() {
-    var img=document.getElementById("cp-"+idx);
-    var nosig=document.getElementById("cns-"+idx);
-    if (!img||!nosig) return;
-    if (xhr.status===200 && xhr.response && xhr.response.size>0) {
-      var url=URL.createObjectURL(xhr.response);
-      img.onload=function(){URL.revokeObjectURL(url);};
-      img.src=url; nosig.style.display="none";
-    } else { nosig.style.display="flex"; }
-  };
-  xhr.onerror=function(){var nosig=document.getElementById("cns-"+idx); if(nosig) nosig.style.display="flex";};
-  xhr.send();
-}
-function updateCamGridActive() {
-  for (var i=0; i<NUM_CAMERAS; i++) {
-    var ct=document.getElementById("ct-"+i); var lbl=document.getElementById("cl-"+i);
-    if (!ct||!lbl) continue;
-    var isActive=(i===activeCamIdx);
-    ct.classList.toggle("cam-active",isActive);
-    lbl.innerHTML=""; var ns=document.createElement("span"); ns.textContent="CAM "+(i+1); lbl.appendChild(ns);
-    if(isActive){var dot=document.createElement("span"); dot.className="cam-active-dot"; lbl.appendChild(dot);}
+
+  // If no camera has a snapshot (PC offline etc.) just advance by 1
+  if (!found) {
+    activeCamIdx = (start + 1) % NUM_CAMERAS;
   }
-}
-async function switchCamera(idx) {
-  activeCamIdx=idx;
-  document.getElementById("feed-cam-tag").textContent="CAM "+(idx+1);
-  updateCamGridActive();
+
+  document.getElementById("feed-cam-tag").textContent = "CAM "+(activeCamIdx+1);
+  var cd = document.getElementById("cam-display");
+  if (cd) cd.textContent = "CAM "+(activeCamIdx+1);
+
   try {
-    await authFetch("/api/settings/update",{method:"POST",headers:{"Content-Type":"application/json"},
+    await authFetch("/api/settings/update", {method:"POST", headers:{"Content-Type":"application/json"},
       body:JSON.stringify({confidence_threshold:parseFloat(document.getElementById("th").value),
-        confirm_frames:parseInt(document.getElementById("cf").value),camera_index:idx})});
-  } catch(e){}
-  setTimeout(function(){fetchCamSnap(idx);},1200);
+        confirm_frames:parseInt(document.getElementById("cf").value), camera_index:activeCamIdx})});
+    showToast("Switched to CAM "+(activeCamIdx+1), "info");
+  } catch(e) {}
+
+  _camSwitching = false;
+  if (btn) btn.disabled = false;
 }
+
+function checkCamIndex(idx) {
+  return new Promise(function(resolve) {
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", API+"/api/stream/snapshot?cam="+idx+"&token="+TOKEN+"&_t="+Date.now(), true);
+    xhr.responseType = "blob";
+    xhr.timeout = 2000;
+    xhr.onload = function() {
+      resolve(xhr.status===200 && xhr.response && xhr.response.size > 0);
+    };
+    xhr.onerror = function(){ resolve(false); };
+    xhr.ontimeout = function(){ resolve(false); };
+    xhr.send();
+  });
+}
+
+// CLEAR ALL DATA
+async function clearAllData() {
+  if (!confirm("DELETE ALL detections from the database?\n\nThis will permanently erase all logs, images, and reset the counter to 0. This cannot be undone.")) return;
+  try {
+    var res = await authFetch("/api/detections/clear", {method:"DELETE"});
+    if (res.ok) {
+      allDets = []; recentDets = [];
+      logPage = 1;
+      updateCounts(); renderLog(); renderMiniDets();
+      showToast("All detections cleared", "info");
+    } else {
+      showToast("Clear failed: " + res.status);
+    }
+  } catch(e) { showToast("Clear failed"); }
+}
+
 
 // CLASS FILTER
 function toggleCls(btn) {
