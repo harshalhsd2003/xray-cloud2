@@ -365,6 +365,36 @@ function switchTab(name, el) {
   if (name === "log") loadLog();
 }
 
+//FPS
+async function updateStatus() {
+  try {
+    const res = await fetch("/status");
+    const data = await res.json();
+
+    // FPS update
+    const fpsTag = document.getElementById("feed-fps-tag");
+    if (fpsTag) {
+      fpsTag.style.display = "block";
+      fpsTag.innerText = "FPS: " + data.fps;
+    }
+
+    // (Optional) status badges update
+    if (data.status) {
+      document.getElementById("badge-main").innerText = data.status.main;
+      document.getElementById("badge-gate").innerText = data.status.gate;
+      document.getElementById("badge-belt").innerText = data.status.belt;
+      document.getElementById("badge-buzzer").innerText = data.status.buzzer;
+    }
+
+  } catch (e) {
+    console.log("Status fetch error", e);
+  }
+}
+
+// 🔁 Call continuously
+setInterval(updateStatus, 500);  // every 0.5 sec
+
+
 // AUTH
 async function doLogin() {
   var u = document.getElementById("u").value.trim();

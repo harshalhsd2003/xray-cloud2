@@ -1,0 +1,4 @@
+cd "C:\Users\Harshal\people-xray-live\remote\xray-clean"
+git add .
+git commit -m "update files"
+git push
