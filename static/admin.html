@@ -155,11 +155,11 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 #toast{position:fixed;bottom:20px;right:20px;background:rgba(255,23,68,.95);color:#fff;padding:12px 18px;border-radius:var(--radius-sm);font-family:'Orbitron';font-weight:700;font-size:11px;letter-spacing:.06em;display:none;z-index:99999;box-shadow:0 0 30px rgba(255,23,68,.5);animation:toastIn .3s ease;}
 #toast.info-toast{background:rgba(0,212,255,.92);color:#000;}
 @keyframes toastIn{from{transform:translateY(20px);opacity:0;}to{transform:translateY(0);opacity:1;}}
-@media(max-width:768px){
-  :root{--side:100%;}
-  .main-layout{flex-direction:column;}
-  .feed-col{flex:none;height:44vw;min-height:180px;}
-  .side-panel{width:100%;border-left:none;border-top:1px solid var(--border);}
+@media (max-width: 768px){
+  .scanlines,
+  #feed-overlay {
+    display:none !important;
+  }
 }
 </style>
 </head>
