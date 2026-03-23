@@ -365,31 +365,6 @@ function switchTab(name, el) {
   if (name === "log") loadLog();
 }
 
-//FPS
-async function updateStatus() {
-  try {
-    const res = await fetch("/status");
-    const data = await res.json();
-
-    // FPS update
-    const fpsTag = document.getElementById("feed-fps-tag");
-    if (fpsTag) {
-      fpsTag.style.display = "block";
-      fpsTag.innerText = "FPS: " + data.fps;
-    }
-
-    // (Optional) status badges update
-    if (data.status) {
-      document.getElementById("badge-main").innerText = data.status.main;
-      document.getElementById("badge-gate").innerText = data.status.gate;
-      document.getElementById("badge-belt").innerText = data.status.belt;
-      document.getElementById("badge-buzzer").innerText = data.status.buzzer;
-    }
-
-  } catch (e) {
-    console.log("Status fetch error", e);
-  }
-}
 
 // 🔁 Call continuously
 setInterval(updateStatus, 500);  // every 0.5 sec
@@ -543,12 +518,26 @@ function connectWS() {
   ws.onopen  = function(){};
   ws.onclose = function(){ setConnected(false); wsTimer=setTimeout(connectWS,5000); };
   ws.onerror = function(){ try{ws.close();}catch(e){} };
-  ws.onmessage = function(ev) {
-    if (ev.data instanceof ArrayBuffer) { if(!mjpegActive) renderWsFrame(ev.data); return; }
-    var msg; try{ msg=JSON.parse(ev.data); }catch(e){ return; }
-    handleWsEvent(msg);
-  };
+  ws.onmessage = (event) => {
+  try {
+    const data = JSON.parse(event.data);
+
+    // ✅ FPS update
+    if (data.type === "status_update") {
+      const fpsTag = document.getElementById("feed-fps-tag");
+
+      if (fpsTag) {
+        fpsTag.style.display = "block";
+        fpsTag.innerText = "FPS: " + data.fps;
+      }
+    }
+
+  } catch (e) {
+    console.log("WS error:", e);
+  }
+};
 }
+
 function setConnected(c) {
   pcConnected = c;
   var b = document.getElementById("conn-badge");
