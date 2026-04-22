@@ -665,18 +665,6 @@ async function nextCamera() {
   var tried = 0;
   var found = false;
 
-  while (tried < NUM_CAMERAS) {
-    var next = (activeCamIdx + 1 + tried) % NUM_CAMERAS;
-    // Try to see if this index has a valid snapshot
-    var ok = await checkCamIndex(next);
-    if (ok) {
-      activeCamIdx = next;
-      found = true;
-      break;
-    }
-    tried++;
-  }
-
   // If no camera has a snapshot (PC offline etc.) just advance by 1
   if (!found) {
     activeCamIdx = (start + 1) % NUM_CAMERAS;
